@@ -24,13 +24,15 @@ Travail avec images communes:
 C'est la bonne méthode à priori. M. Autefage va nous envoyer une commande permettant de copier des images
 
 Réseau Virtuel:
-Au lieu de passer par la machine Debian en proxy pour avoir de l'internet, nous aurons un switch qui sera rélié à internet. Les machines seront connectées au switch, ce qui les permettra d'avoir internet. 
+Au lieu de passer par la machine Debian en proxy pour avoir de l'internet, nous aurons un switch qui sera rélié à internet. 
+Les machines seront connectées au switch, ce qui les permettra d'avoir internet. 
 
 Clés Wireguard:
 Si les clés OpenSSL ne sont pas acceptées par Wireguard, il faudra réutiliser l'algorithme de chiffrement de Wireguard pour faire des certificats x509
 
 Application Android Wireguard:
-Voir comment l'application pour Android de Wireguard fonctionne. Idéalement, faire une apk pouvant automatiser l'entrée des clés publiques au lieu de le faire manuellement. 
+Voir comment l'application pour Android de Wireguard fonctionne. Idéalement, faire une apk pouvant automatiser l'entrée
+des clés publiques au lieu de le faire manuellement. 
 Rappel sur le fonctionnement des applications Android: 2 couches
 	- Une couche 'haut niveau' : avec du code générique en Java
 	- Une couche 'bas niveau' : code natif en C/C++
