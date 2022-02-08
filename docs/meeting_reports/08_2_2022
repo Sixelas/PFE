@@ -1,21 +1,21 @@
 #Compte rendu Réunion 08/02/2022
 
 
-__Travail effectué à la date:__
+** Travail effectué à la date: **
 	-Mise en place Réseau Virtuel avec une machine Debian et une machine Android
 	-Mise en place et configuration d'un VPN entre la machine Debian (serveur) et la machine Android (client)
 
-__Travail à effectuer cette semaine:__
+** Travail à effectuer cette semaine: **
 - Lire la documentation de Aries Static Agent et Aries Cloud Agent
 - Lire la documentation sur les VC
 -Faire des demos des différents agents
 
-__Travail à effectuer (cette semaine s'il y a du temps ou plus tard):__ 
+** Travail à effectuer (cette semaine s'il y a du temps ou plus tard): **
 - S'informer sur le code Wireguard/algorithme utilisé pour générer les clés
 - Voir comment marche l'application Android de Wireguard (niveau APK et interface grahpique)
 
 
-__Informations importantes/réponses aux questions:__
+** Informations importantes/réponses aux questions: **
 
 Travail au CREMI :
 -Pour travailler au CREMI il y a 3 options, celle qui semble être le mieux est de créer un répertoire UNIX sur /net/stockage. 
