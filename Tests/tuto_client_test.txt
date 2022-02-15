@@ -1,0 +1,38 @@
+## Requirements
+    # python 3.6 et plus
+    # docker
+
+## installation de aries static agent
+    cloner le projet static agent
+    git clone https://github.com/hyperledger/aries-staticagent-python
+    Etape 1: Créez et activez l'environnement virtuel Python
+        $ python3 -m venv env
+        $ source env/bin/activate
+    Etape 2: Installez les dépendances et la bibliothèque dans l'environnement virtuel
+        $ pip install -e .
+    Etape 3: Executez keygen() pour générer les clés
+        $ python -c "import aries_staticagent; aries_staticagent.keygen()"
+
+        # For full agent:
+            # DID: <Base58 encoded DID>
+            # VK: <Base58 encoded verkey>
+        # For static agent:
+            # VK: <the same Base58 encoded verkey>  --------------> (clé public)
+            # SK: <Base58 encoded sigkey>           --------------> (clé privé)
+
+    Etape 3: Dans un autre terminal cloner le cloud agent pour récupéré le endpoint et sa clé publique
+        git clone https://github.com/hyperledger/aries-cloudagent-python
+        cd aries-cloudagent-python/demo
+        LEDGER_URL=http://dev.greenlight.bcovrin.vonx.io ./run_demo faber
+
+        Si vous avez sur le terminal
+            # Waiting for connection...
+        Tout est OK, remonter dans le terminal pour récupéré
+            # verkey --------------> (clé public)
+            # Endpoint URL
+    Etape 4: Revenir dans le terminal aries static agent et lancer cette commande
+        python3 examples/client_test.py --endpoint endpointDuCoundAgent
+            --their-verkey laClePublicCoudAgent
+            --my-verkey maClePublic
+            --my-sigkey maClePrivé
+            --port numeroDuPort
