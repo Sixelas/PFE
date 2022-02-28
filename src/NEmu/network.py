@@ -2,7 +2,7 @@
 
 ### Le flag hdcopy permet de forcer la copie des VFs (images disques) dans le workspace
 ###Ne pas placer le workspace dans son homedir car cela va prendre beaucoup d'espace
-InitNemu(session='TESTnemuFinal2', workspace='/tmp/cache-ahenquinet', hdcopy=False)
+InitNemu(session='NetworkPFE', workspace='/tmp/cache-ahenquinet', hdcopy=False)
 
 ### VHostConf permet de définir une configuration commune pour les VHosts
 ### Ce n'est pas une fonction obligatoire, cela permet uniquement de mutualiser les options pour ne pas avoir à les mettre systématiquement dans les VHosts
