@@ -10,7 +10,7 @@
 cd /espace/ \
 mkdir NEmu \
 cd NEmu/ \
-git clone https ://gitlab.com/v-a/nemu.git nemu.d \
+git clone https://gitlab.com/v-a/nemu.git nemu.d \
 cd nemu.d/ \
 ./init.sh
 
