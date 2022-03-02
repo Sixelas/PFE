@@ -7,29 +7,28 @@
 # Tuto installation NEmu au Cremi 
 
 1. Installation de NEmu :
-cd /espace/
-mkdir NEmu
-cd NEmu/
-git clone https ://gitlab.com/v-a/nemu.git nemu.d
-cd nemu.d/
+cd /espace/ \
+mkdir NEmu \
+cd NEmu/ \
+git clone https ://gitlab.com/v-a/nemu.git nemu.d \
+cd nemu.d/ \
 ./init.sh
 
-
-2. On ajoute le script NetworkPFE.py dans /espace/NEmu/
+2. On ajoute le script network.py dans /espace/NEmu/
 
 3. On modifie le "workspace" ligne 5 par celui de sa session.
 
-4. On lance le script avec "nemu -f NetworkPFE.py -i"
+4. On lance le script avec "nemu -f network.py -i"
 
 5. Pour enregister avant de quitter :
 StopNemu()
-SaveNemu("/tmp/NetworkPFE.tgz")  #Ce truc prend du temps
+SaveNemu("/tmp/network.tgz")  #Ce truc prend du temps
 DelNemu()
 exit()
 
 6. On peut relancer comme ça (plus besoin du script initial, on recharge à partir de l'archive) :
 nemu
-RestoreNemu("/tmp/NetworkPFE.tgz", workspace="/tmp")
+RestoreNemu("/tmp/network.tgz", workspace="/tmp")
 StartNemu()
 
 7. Pour configurer le réseau local 10.0.0.0/24 de l'interface eth1 sur l'Android :
