@@ -32,15 +32,13 @@ RestoreNemu("/tmp/network.tgz", workspace="/tmp") \
 StartNemu()
 
 7. Pour configurer le réseau local 10.0.0.0/24 de l'interface eth1 sur l'Android : \
-
 pkg install tsu \
-nano /etc/init.sh \
+nano /etc/init.sh
 
-- Juste avant le return 0 en bas mettre :
-
+- Juste avant le return 0 en bas mettre : \
 ifconfig eth1 10.0.0.2 netmask 255.255.255.0 \
 #route add default gw 10.0.0.254 dev eth1 #pas besoin de ça \
-route add -net 10.0.0.0 netmask 255.255.255.0 gw 10.0.0.2 \
+route add -net 10.0.0.0 netmask 255.255.255.0 gw 10.0.0.2
 
 - Il faut ensuite reboot la VM Android.
 
