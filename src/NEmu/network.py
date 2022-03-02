@@ -16,7 +16,7 @@ ANDROID_PATH="/net/stockage/PFE-VPN-2022/android.img";
 
 ### Le mode cow pour les VFs va dériver l'image disque à partir de l'image de base
 VHost('serveur', conf='common', hds=[VFs(DEBIAN_PATH, 'cow', tag='serveur.img')], nics=[VNic(hw='0a:0a:0a:00:01:01'), VNic(hw='0a:0a:0a:00:01:02'), VNic(hw='0c:0c:0c:00:01:01')])
-VHost('serveurB', conf='common', hds=[VFs(DEBIAN_PATH, 'cow', tag='serveur.img')], nics=[VNic(hw='0a:0a:0a:00:03:01'), VNic(hw='0a:0a:0a:00:03:02'), VNic(hw='0c:0c:0c:00:01:02')])
+VHost('serveurB', conf='common', hds=[VFs(DEBIAN_PATH, 'cow', tag='serveurB.img')], nics=[VNic(hw='0a:0a:0a:00:03:01'), VNic(hw='0a:0a:0a:00:03:02'), VNic(hw='0c:0c:0c:00:01:02')])
 VHost('client', conf='common', hds=[VFs(ANDROID_PATH, 'cow', tag='client.img')], nics=[VNic(model='pcnet', hw='0a:0a:0a:00:02:01'), VNic(model='pcnet', hw='0a:0a:0a:00:02:02')])
 
 ### L'appel à SetIface n'est nécessaire que dans le cas où on a besoin de construire un réseau avec des VMs externes ou bien sur différentes machines physiques
