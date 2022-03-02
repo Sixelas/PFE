@@ -6,7 +6,7 @@
 
 # Tuto installation NEmu au Cremi 
 
-1. Installation de NEmu :
+1. Installation de NEmu : \
 cd /espace/ \
 mkdir NEmu \
 cd NEmu/ \
@@ -20,32 +20,32 @@ cd nemu.d/ \
 
 4. On lance le script avec "nemu -f network.py -i"
 
-5. Pour enregister avant de quitter :
-StopNemu()
-SaveNemu("/tmp/network.tgz")  #Ce truc prend du temps
-DelNemu()
+5. Pour enregister avant de quitter : \
+StopNemu() \
+SaveNemu("/tmp/network.tgz")  #Ce truc prend du temps \
+DelNemu() \
 exit()
 
-6. On peut relancer comme ça (plus besoin du script initial, on recharge à partir de l'archive) :
-nemu
-RestoreNemu("/tmp/network.tgz", workspace="/tmp")
+6. On peut relancer comme ça (plus besoin du script initial, on recharge à partir de l'archive) : \
+nemu \
+RestoreNemu("/tmp/network.tgz", workspace="/tmp") \
 StartNemu()
 
-7. Pour configurer le réseau local 10.0.0.0/24 de l'interface eth1 sur l'Android :
+7. Pour configurer le réseau local 10.0.0.0/24 de l'interface eth1 sur l'Android : \
 
-pkg install tsu
-nano /etc/init.sh
+pkg install tsu \
+nano /etc/init.sh \
 
 - Juste avant le return 0 en bas mettre :
 
-ifconfig eth1 10.0.0.2 netmask 255.255.255.0
-#route add default gw 10.0.0.254 dev eth1 #pas besoin de ça
-route add -net 10.0.0.0 netmask 255.255.255.0 gw 10.0.0.2
+ifconfig eth1 10.0.0.2 netmask 255.255.255.0 \
+#route add default gw 10.0.0.254 dev eth1 #pas besoin de ça \
+route add -net 10.0.0.0 netmask 255.255.255.0 gw 10.0.0.2 \
 
 - Il faut ensuite reboot la VM Android.
 
-- On a maintenant wlan0 (wifi, relié à internet), et eth1 relié au réseau local. 
-Par contre impossible de ping 10.0.0.1 depuis android quand la wifi est activée, la règle de routage mise semble pas être prise en compte et tout sort sur wlan0. Il faut désactiver la wifi pour que le réseau local 10.0.0.0/24 fonctionne sur Android. (On peut switch comme ça entre les 2 réseaux en activant/désactivant le wifi).
+- On a maintenant wlan0 (wifi, relié à internet), et eth1 relié au réseau local. \
+Par contre impossible de ping 10.0.0.1 depuis android quand la wifi est activée, la règle de routage mise semble pas être prise en compte et tout sort sur wlan0. Il faut désactiver la wifi pour que le réseau local 10.0.0.0/24 fonctionne sur Android. (On peut switch comme ça entre les 2 réseaux en activant/désactivant le wifi). \
 Depuis Debian 10.0.0.1 on peut pourtant ping et obtenir une réponse de Android 10.0.0.2 quand la wifi est activée sur android (pas compris pk ça marche pour les echo request mais pas les echo send dans ce cas). 
 
 
