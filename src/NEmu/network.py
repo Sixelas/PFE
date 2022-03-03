@@ -2,14 +2,8 @@
 
 ##### Topologie de ce réseau dans docs/wk_reports/S7/topologieV3.jpg #####
 
-#  Pour fermer proprement sans sauvegarder : 
-#  1. On éteint les VMs
-#  2. StopNemu()
-#  3. DelNemu()
-#  4. exit()
-
 #  Pour sauvegarder la session dans une archive .tgz voir tuto sur le README.md
-
+# Attention Mode suppression Auto de la session activée, voir WaitNemu() et DelNemu()
 
 ### Le flag hdcopy permet de forcer la copie des VFs (images disques) dans le workspace
 ### Ne pas placer le workspace dans son homedir car cela va prendre beaucoup d'espace
@@ -63,3 +57,10 @@ Link("serveurW", "sw2:1")
 Link("clientW", "sw3:1")
 
 StartNemu()
+
+# Ces 3 lignes permettent de supprimer automatiquement la session et les images temporaires générées dans /tmp/ une fois qu'on éteint les 3 VMs
+# Il faut les commenter si on veut enregistrer sa session avant de quitter
+WaitNemu("serveurB") and WaitNemu("serveurW") and WaitNemu("clientW")
+StopNemu()
+DelNemu()
+
