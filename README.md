@@ -14,8 +14,18 @@ Il faudra donc coder en Python un petit logiciel permettant de récupérer les V
 Toutes les étapes d'installation et de configuration devront être documentées en détail et le code devra être commenté et spécifié en UML (diagramme de classe, d'états et de séquence).
 
 
+![alt text](https://github.com/Sixelas/PFE/blob/main/docs/wk_reports/S7/topologieV3.jpg)
+
 ## Explication des dossiers :
 
 - docs/ : Contient les rapports de RDV clients, le Mémoire et les rapports quotidiens.
 - src/ : Contient le code du projet.
 - Tests/ : Contient les scripts de test.
+
+## Dépendances & Licence :
+
+- [Apache License Version 2.0](https://github.com/Sixelas/PFE/blob/main/LICENSE.md)
+- Projet basé sur Aries Hyperledger : [dépot original](https://github.com/hyperledger/aries)
+- Dans src/Mobile-Agent nous avons repris et modifié le code du projet
+[Aries Mobile Agent React Native](https://github.com/hyperledger/aries-mobile-agent-react-native)
+- Dans src/Cloud-Agent nous avons repris et modifié le code du projet [Hyperledger Aries Cloud Agent - Python](https://github.com/hyperledger/aries-cloudagent-python)
