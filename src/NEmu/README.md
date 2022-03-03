@@ -22,16 +22,20 @@ cd nemu.d/ \
 
 5. Pour enregister avant de quitter : \
 StopNemu() \
-SaveNemu("/tmp/network.tgz")  #Ce truc prend du temps \
+SaveNemu("/tmp/NetworkPFE.tgz")  #Ce truc prend du temps \
 DelNemu() \
 exit()
 
 6. On peut relancer comme ça (plus besoin du script initial, on recharge à partir de l'archive) : \
 nemu \
-RestoreNemu("/tmp/network.tgz", workspace="/tmp") \
+RestoreNemu("/tmp/NetworkPFE.tgz", workspace="/tmp") \
 StartNemu()
 
-7. Pour configurer le réseau local 10.0.0.0/24 de l'interface eth1 sur l'Android : \
+7. Attention à bien supprimer l'archive NetworkPFE.tgz d'avant si on veut refaire un SaveNemu() par dessus la même ! (Ou alors la retirer de l'endroit ou on met la nouvelle de même nom, parce que l'écrasement de l'archive antérieure a bug de mon côté).
+
+## Optionnel si on a pas de VRouter :
+
+8. Pour configurer le réseau local 10.0.0.0/24 de l'interface eth1 sur l'Android : \
 pkg install tsu \
 nano /etc/init.sh
 
@@ -46,10 +50,8 @@ route add -net 10.0.0.0 netmask 255.255.255.0 gw 10.0.0.2
 Par contre impossible de ping 10.0.0.1 depuis android quand la wifi est activée, la règle de routage mise semble pas être prise en compte et tout sort sur wlan0. Il faut désactiver la wifi pour que le réseau local 10.0.0.0/24 fonctionne sur Android. (On peut switch comme ça entre les 2 réseaux en activant/désactivant le wifi). \
 Depuis Debian 10.0.0.1 on peut pourtant ping et obtenir une réponse de Android 10.0.0.2 quand la wifi est activée sur android (pas compris pk ça marche pour les echo request mais pas les echo send dans ce cas). 
 
-
-8. Pour configurer l'interface de ServerB (Serveur Debian de BlockChain relié au réseau du projet 2) :\
+9. Pour configurer l'interface de ServerB (Serveur Debian de BlockChain relié au réseau du projet 2) :\
 nano /etc/network/interfaces\
 Puis modifier l'@ip à 10.0.0.1 en 10.0.0.3\
 Ensuite faire "service networking restart"
-9. Attention à bien supprimer l'archive tgz d'avant si on veut refaire un SaveNemu() par dessus la même ! (Ou alors la retirer de l'endroit ou on met la nouvelle de même nom, parce que l'écrasement de l'archive antérieure a bug de mon côté).
  

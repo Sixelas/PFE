@@ -2,6 +2,12 @@
 
 #  Pour comprendre comment ajouter le VRouter au réseau final et le passer en Version3 !
 
+#  Pour fermer proprement sans sauvegarder : 
+#  - On éteint les VMs
+#  - StopNemu()
+#  - DelNemu()
+#  - exit()
+
 InitNemu(session='TestVRouter', workspace='/tmp/cache-ahenquinet', hdcopy=False)
 
 VHostConf('common', enable_kvm=None, k='fr', m='2G', smp=2)
@@ -10,6 +16,8 @@ VHostConf('common', enable_kvm=None, k='fr', m='2G', smp=2)
 DEBIAN_PATH="/net/stockage/PFE-VPN-2022/debian11.img";
 ANDROID_PATH="/net/stockage/PFE-VPN-2022/android.img";
 
+
+## Routeur Virtuel qui fait DHCP + NAT MASQUERADING pour les 3 VMs du Réseau. 
 VRouter("router", nics=[VNic(), VNic(), VNic(), VNic()],
         services=[Service("ipforward"),
           Service("ifup", '1:192.168.1.1', '2:192.168.2.1', '3:192.168.3.1'),
@@ -26,8 +34,10 @@ VHost("serveurB", conf='common', hds=[VFs(DEBIAN_PATH, "cow", tag='serveurB.img'
 VHost("serveurW", conf='common', hds=[VFs(DEBIAN_PATH, "cow", tag='serveurW.img')], nics=[VNic(hw='0a:0a:0a:00:02:01'), VNic(hw='0a:0a:0a:00:02:02'), VNic(hw='0c:0c:0c:00:02:01')])
 VHost("clientW", conf='common', hds=[VFs(ANDROID_PATH, "cow", tag='clientW.img')], nics=[VNic(model='pcnet', hw='0a:0a:0a:00:03:01')])
 
+## Le lien vers Internet relié au VRouter
 VSlirp("slirp", net='192.168.0.0/24')
 
+## les 3 switchs pour faire les liens VRouter--VM 
 VSwitch("sw1", niface=2)
 VSwitch("sw2", niface=2)
 VSwitch("sw3", niface=2)
