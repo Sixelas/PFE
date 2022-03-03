@@ -5,3 +5,7 @@ Rendu.out
 Rendu.aux
 Rendu.synctex.gz
 Rendu.toc
+src/Mobile-Agent/node_modules
+src/mobile-Agent/android/.gradle
+src/mobile-Agent/android/.idea
+src/mobile-Agent/android/local.properties
