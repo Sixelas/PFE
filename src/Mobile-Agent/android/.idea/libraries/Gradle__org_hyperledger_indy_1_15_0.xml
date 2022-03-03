@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: org.hyperledger:indy:1.15.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.hyperledger/indy/1.15.0/707cf5ba27d09230a192b5f28b97f7f42b754d54/indy-1.15.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.hyperledger/indy/1.15.0/fd413b48ffa5c80b6059f7c9f22df90187051ec0/indy-1.15.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.hyperledger/indy/1.15.0/40b6f12fc9b256f34d1e30ace68edf0033e0d6ae/indy-1.15.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

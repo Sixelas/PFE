@@ -1,0 +1,14 @@
+com/ariesbifold/BuildConfig.java
+ com.ariesbifold.BuildConfig
+com/ariesbifold/ReactNativeFlipper.java
+ com.ariesbifold.ReactNativeFlipper
+ com.ariesbifold.ReactNativeFlipper$1
+ com.ariesbifold.ReactNativeFlipper$2
+ com.ariesbifold.ReactNativeFlipper$2$1
+com/ariesbifold/MainActivity.java
+ com.ariesbifold.MainActivity
+com/ariesbifold/MainApplication.java
+ com.ariesbifold.MainApplication
+ com.ariesbifold.MainApplication$1
+com/facebook/react/PackageList.java
+ com.facebook.react.PackageList
