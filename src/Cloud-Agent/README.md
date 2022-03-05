@@ -4,7 +4,8 @@
 
 - agentw.py = Agent Serveur Wireguard
 
-## Installation et préparation : 
+## Installation :
+### Dans le cas où vous n'utilisez par notre réseau virtuel et VMs :
 - Après avoir récuperé nos fichiers, clonez les fichiers de Aries Cloud Agent et allez au dossier /demo
 ``` 
 git clone https://github.com/hyperledger/aries-cloudagent-python.git
@@ -25,6 +26,7 @@ Pour lancer l'Agent Serveur Wireguard :
 LEDGER_URL=http://dev.greenlight.bcovrin.vonx.io ./run_demo agentw
 ```
 
-Après avoir lancé les deux agent, choisir les différentes options pour :
+- Après avoir lancé les deux agents, copier l'invitation de l'Agent Indy (au dessus du QR) et la copier du côté du serveur Wireguard.
+- Une fois la connexion entre les deux établie, choisir les différentes options pour :
 - Créer et envoyer un VC
 - Demander une Proof Request 
