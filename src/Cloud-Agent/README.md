@@ -5,7 +5,7 @@
 - agentw.py = Agent Serveur Wireguard
 
 ## Installation :
-### Dans le cas où vous n'utilisez par notre réseau virtuel et VMs :
+### Dans le cas où vous n'utilisez pas notre réseau virtuel et VMs :
 - Après avoir récuperé nos fichiers, clonez les fichiers de Aries Cloud Agent et allez au dossier /demo
 ``` 
 git clone https://github.com/hyperledger/aries-cloudagent-python.git
