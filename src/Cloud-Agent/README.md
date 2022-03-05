@@ -12,7 +12,7 @@ cd aries-cloudagent-python/demo
 
 ```
 - Remplacer le fichier run_demo dans le dossier par celui proposé ici
-- Mettre les fichiers agentb.py et agentw.py dans le dossier /demo/runners
+- Mettre les fichiers agentb.py et agentw.py dans le dossier aries-coudagent-python/demo/runners
 
 ## Éxecution des agents
 Pour lancer l'Agent Indy : 
