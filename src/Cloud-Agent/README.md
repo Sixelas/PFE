@@ -12,6 +12,8 @@ git clone https://github.com/hyperledger/aries-cloudagent-python.git
 cd aries-cloudagent-python/demo
 
 ```
+
+## Préparation des fichiers :
 - Remplacer le fichier run_demo dans le dossier par celui proposé ici
 - Mettre les fichiers agentb.py et agentw.py dans le dossier aries-coudagent-python/demo/runners
 
