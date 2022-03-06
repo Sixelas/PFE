@@ -70,31 +70,49 @@
 \subsection{Contexte}
 \noindent 
 \begin{flushleft}
-L'apparition de l'Internet of Things permet de rendre nos vies quotidiennes plus accessibles. La quantité d'objets IoT augmente et continuera à le faire, avec des prédictions quantifiant le nombre de dispositifs IoT en 2025 à 25 millions, face à 4900 en 2015. Cependant, l'augmentation de l'utilisation d'objets IoT pose aussi des problèmes concernant la sécurité de ces dispositifs. En effet, beaucoup d'objets IoT sont vulnérables à des attaques, et de plus en plus, il y a des attaques visant spécialement les dispositifs IoT.\\ 
-\vspace{5mm}
-La plupart des dispositifs IoT ne sont pas protégés par manque d'espace dans la mémoire, ou alors nécessitent des mises à jour régulières pour pouvoir être protégés. Une façon de pouvoir sécuriser les échanges entre les composants d'un réseau IoT est d'utiliser un VPN afin d'encrypter les différents messages. Une autre mesure complémentaire concernant la sécurité des connexions est l'utilisation de certificats. Les certificats sont utilisés pour s'authentifier auprès de différentes entités. Les certificats permettent de sécuriser les connexions en vérifiant que le certificat soit signé par une autorité qui 'a notre confiance', et donc qui permet de démontrer que l'agent avec lequel nous communiquons est de 'confiance' et vice-versa. Cependant, ce système dépend des autorités de certification et peut présenter différents problèmes. D'une part la possible censure ou contrôle de la part de cette autorité, mais aussi le fait que si jamais cette autorité est attaquée, alors tout les certificats délivrés par celle-ci sont compromis. Pour pouvoir contrer ces difficultés, nous pouvons utiliser des systèmes décentralisés qui remplacent l'autorité de certification\\
+De nos jours l'emploi de réseaux privés virtuels (VPN, Virtual Private Network) est de plus en plus démocratisé. On s'en sert généralement pour masquer son adresse ip, ou pour créer un canal sécurisé chiffré avec un destinataire. De nombreuses applications, services et protocoles de VPN différents existent, que ce soit sur Ordinateur ou Smartphone.\\
+En tant qu'utilisateur, se connecter à un serveur VPN nécessite d'en connaitre son adresse ip ainsi qu'échanger des clés de chiffrement (symétrique ou asymétriques) avec celui-ci. Cependant pour garantir l'authenticité de la connexion, et identifier le serveur/client avec lequel le tunnel VPN s'établit, on peut recourir aux Certificats. Lorsqu'un client veut se connecter à un serveur, il lui demande son certificat afin de prouver son identité. Ce certificat étant délivré par un tier de confiance, à savoir l'Autorité de certification, le client peut donc avoir une preuve de l'identité du serveur. Cependant, ce système étant centralisé, il dépend des autorités de certification et peut présenter différents problèmes. D'une part la possible censure ou contrôle de la part de cette autorité, mais aussi le fait que si jamais cette autorité est attaquée, alors tous les certificats délivrés par celle-ci sont compromis. Pour pouvoir contrer ces difficultés, de nouvelles méthodes basée sur la décentralisation des autorités de certifications existent, comme par exemple basées sur la BlockChain.\\
 \end{flushleft}
 
 \subsection{Présentation du projet}
 \noindent 
 \begin{flushleft}
-Dans ce projet nous avons utilisé ces deux méthodes pour sécuriser les échanges IoT. Notre réseau IoT est composé d'une machine Android et une machine Debian. Nous avons aussi un serveur qui communique avec la Blockchain Indy qui authentifie les différentes parties, client et serveur. Dans les deux machines nous avons installé et configuré un VPN avec le software Wireguard. L'utilisation de certificats a été remplacée par l'utilisation de Verified Credentials et l'authentification auprès de noeuds Blockchain. \\
+\textit{Déploiement d'un VPN sur des équipement mobiles ou IoT} est un projet dont le but est de réussir à installer et configurer le VPN WireGuard sur un client Android. Cet Android sera une machine virtuelle qui s'appuie sur les logiciels QEMU et KVM, et membre d'un réseau virtuel NEmu.\\
+WireGuard est un VPN nécessitant des couples de clés publique/privée de chiffrement asymétrique. Afin de garantir l'authentification et l'identité du serveur VPN WireGuard auquel le client Android se connectera, cela nécessitera l'emploi de Verifiable Credentials (VC), un équivalent des Certificats mais dont l'autorité de certification repose sur la décentralisation, à savoir un noeud de blockchain déjà existant. Le projet Aries Hyperledger soutenu par la fondation Linux permet de développer des mécanismes basés sur les VCs. Nous utiliserons donc Aries Mobile Agent sur le client Android pour communiquer avec un Aries Cloud Agent relié à un réseau Hyperledger Indy dont le rôle est de délivrer les VC. Nous utiliserons également un Aries Cloud Agent sur le serveur WireGuard afin de communiquer avec le noeud Indy et récupérer un VC.
 \end{flushleft}
 
-
+\newpage
 \section{Étude de l'existant}
 
 \subsection{Wireguard}
 \noindent 
+\begin{center}
+\includegraphics[width=\textwidth]{wg.png}
+\end{center}
+
 \begin{flushleft}
-Wireguard est un VPN qui a été initialement déployé pour les systèmes Linux, mais qui maintenant peut être utilisé par des dispositifs Android, Windows, macOS et autres. Du côté utilisateur, Wireguard est simple à configurer. Il  suffit juste d'échanger des clés publiques et Wireguard configure le VPN. La clé publique est une clé de 32 bytes construite avec Curve25519. Wireguard utilise cette clé pour créer une interface réseau associé à la clé publique. Ces interfaces font partie de la 'cryptokey routing table', qui peut être configuré et à laquelle on peut ajouter des règles de routage supplémentaires. Quand des paquets sont envoyés vers une machine par un tunnel Wireguard (donc, par l'interface dans la cryptokey routing table), ils sont encryptés avec la clé publique de la machine qui reçoit le paquet.
-Quand un 
+WireGuard est un VPN fonctionnant sur la couche 3 du modèle OSI. Il est implémenté comme une interface réseau virtuelle du noyau pour Linux. Il est pensé pour remplacer les VPN IPsec et ceux basés sur TLS comme OpenVPN, tout en se voulant plus sûr, performant et facile d'utilisation de part son implémentation en moins de 4000 lignes de code facilement compréhensibles et vérifiables sur les systèmes Linux.\\
+Il a été initialement déployé pour les systèmes Linux, mais il dispose maintenant de portages sous Android, Windows ou macOS principalement. Pour un client, WireGuard ne nécessite qu'un échange de clés publiques et d'informations de connexions comme l'adresse ip du serveur hôte. De courtes clés statiques pré-partagées en Curve25519 (basé sur Diffie-Hellman) sont utilisées pour l'authentification mutuelle. Le protocole proposé assure une confidentialité forte ainsi qu'un haut degré de dissimulation d'identité. Au niveau du transport, il utilise le cryptage authentifié ChaCha20Poly1305 pour l'encapsulation des paquets en UDP.  La clé publique construite avec Curve25519 est utilisée pour créer une interface réseau qui lui est associée. Ces interfaces font partie de la 'cryptokey routing table', qui peut être configuré et à laquelle on peut ajouter des règles de routage supplémentaires. Quand des paquets sont envoyés vers une machine par un tunnel Wireguard (donc, par l'interface dans la cryptokey routing table), ils sont chiffrés avec la clé publique de la machine qui reçoit le paquet.\\
+Il est cependant à noter que les couples de clés asymétriques publiques/privées génrérées par WireGuard à l'aide de son algorithme ne sont pas adaptables aux Certificats X509 de part leur format (32 caractères 64 bits).\\
+Nous utiliserons pour notre projet la version mobile Android de WireGuard côté client, ainsi que la version Linux de WireGuard côté serveur.
+
 \end{flushleft}
 
-\subsection{Verified Credentials}
+\subsection{Verifiable Credentials}
 \noindent 
 \begin{flushleft}
-TODO
+Un "credential" correspond à une accréditation, un certificat ou une référence. Par exemple dans le monde physique cela peut être une pièce d'identité, un passeport, un permis ou encore un diplôme universitaire. Avec l'avènement de la BlockChain, il est maintenant possible de représenter numériquement et de manière sûre un credential. On parle alors de Verifiable Credential, car grâce à la BlockChain il est possible de les vérifier facilement et rapidement. En Novembre 2019 le W3C a entammé une procédure de normalisation en publiant une recommandation sur les Verifiable Credentials, dans le but de garantir un format générique reconnu mondialement. Il s'agit donc d'une technologie novatrice et en pleine construction.\\
+Il y est stipulé qu'un détenteur (ou "Holder") de VC peut générer une présentation à partager à quelqu'un voulant une preuve d'accréditation selon certaines caractéristiques, et ce sans forcément transmettre l'entièreté des caractéristiques de son VC. Par exemple pour obtenir un service nécessitant d'être majeur, une preuve de notre âge peut nous être demandée. Il n'est alors pas obligatoire de transmettre le champ de son VC d'identité contenant sa date de naissance, mais par exemple juste prouver dans la présentation que l'on a "plus de 18 ans".\\
+
+Pour mieux comprendre les différents rôles et informations concernant les VCs, voici ci-dessous le schéma proposé par la W3C :\\
+\begin{center}
+\includegraphics[scale=0.5]{vc.png}
+\end{center}
+
+Des mécanismes de preuves et de signatures numériques sont nécessaires afin d'assurer la protection d'un Verifiable Credential. L'obtention de la validation des preuves peut dépendre de la syntaxe de la preuve, cependant dans le cadre de ce projet les VCs correspondront à des JSON Web Tokens sécurisés par l'utilisation de JSON Web Signatures. Voici ci-dessous un exemple de de VC JWT présenté par le W3C :\\
+\begin{center}
+\includegraphics[scale=0.4]{vc2.png}
+\end{center}
 \end{flushleft}
 
 \subsection{Aries Hyperledger}
@@ -183,19 +201,23 @@ TODO
 
 \section{Bibliographie}
 \noindent 
-\begin{flushleft}
-TODO
-\end{flushleft}
+\begin{itemize}
+
+\item WireGuard : \url{https://www.wireguard.com/} (consulté le 06/03/2022) \\
+\item Verifiable Credentials : \url{https://www.w3.org/TR/vc-data-model/} (consulté le 06/03/2022) \\
+
+\end{itemize}
 
 \section{Annexe}
 \noindent 
 \begin{flushleft}
 TODO
 \end{flushleft}
+
 \end{document}
 
-\begin{thebibliography}{}
-\bibitem[1]{1}
-https://www.wireguard.com/
+%\begin{thebibliography}{}
+%\bibitem[1]{1}
+%https://www.wireguard.com/
 
-\end{thebibliography}
+%\end{thebibliography}
