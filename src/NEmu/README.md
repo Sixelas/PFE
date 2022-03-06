@@ -3,7 +3,6 @@
 - creator.py : Ce script permet de créer une image de debian réutilisable ensuite comme base pour les scripts des réseaux virtuels de notre choix.
 - network.py : Ce script correspond à notre réseau virtuel final.
 
-
 # Tuto installation NEmu au Cremi 
 
 1. Installation de NEmu : \
@@ -55,3 +54,14 @@ nano /etc/network/interfaces\
 Puis modifier l'@ip à 10.0.0.1 en 10.0.0.3\
 Ensuite faire "service networking restart"
  
+# Contenu des images Android et Debian11 :
+
+## Sur les VMs Debian11 serveurB et serveurW est installé :
+- Les deux dépôts git aries-cloudagent-python et PFE (celui-ci).
+- Docker et les autres dépendances nécessaires pour lancer le Cloud-Agent.
+- Wireshark pour de l'analyse réseau.
+- WireGuard.
+
+## Sur la VM Android clientW est installé :
+- WireGuard
+- Termux

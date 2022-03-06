@@ -5,7 +5,7 @@
 #Ici j'utilise comme base d'installation l'image de Debian11 "debian-11.2.0-amd64-netinst.iso" mais on peut utiliser la version de son choix sur le même principe.
 #iso téléchargeable ici : https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-11.2.0-amd64-netinst.iso
 
-#On peut aussi créer une image Android avec creator.py ! (voir lignes commentés, ATTENTION PAS ENCORE TESTE !!!!)
+#On peut aussi créer une image Android avec creator.py ! (voir lignes commentées)
 
 # Pour exécuter ce script : "nemu --file creator.py"
 
