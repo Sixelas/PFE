@@ -50,7 +50,7 @@ sudo make install
 ## Lancement Réseau noeuds Indy
 
 Pour cette partie j'ai suivi ce [tutoriel](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-getting-started/)
-Il y a deux autres tutoriels qui explorent plus le procès de connexion et de délivrance de VC, ils sont à la fin du premier tuto. 
+Il y a deux autres tutoriels qui explorent plus le procès de [connexion](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-part-3-connecting-using-didcomm-exchange/) et de [délivrance de VC](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-issue-credentials-v2/), ils sont à la fin du premier tuto. 
 
 ### Lancement du réseau de noeuds Indy (OPTIONNEL)
 Pour lancer le réseau il faut juste faire :
@@ -82,10 +82,10 @@ curl -X POST "http://localhost:9000/register" \
 Avant de lancer un agent, il nous faut la genesis URL, ceci est une URL qui décrit notre réseau de noeuds Indy. Si on a notre réseau en local c'est http://localhost:9000/genesis. Sinon on peut utiliser celle du prof : http://dev.greenlight.bcovrin.vonx.io/genesis
 
 ### Lancement Agents
--Il y a deux 'modes' de lancer aca-py, le mode **provision** et le mode **start**. 
--Le mode **provision**  crée un wallet avant de lancer un agent
--Le mode **start** lance notre agent
--Dans le tutoriel, la personne utilise l'argument **--auto-provision** qui permet de créer un wallet quand on en a pas un, et donc on peut 'éviter' de devoir éxecuter provision avant start. 
+- Il y a deux 'modes' de lancer aca-py, le mode **provision** et le mode **start**. 
+- Le mode **provision**  crée un wallet avant de lancer un agent
+- Le mode **start** lance notre agent
+- Dans le tutoriel, la personne utilise l'argument **--auto-provision** qui permet de créer un wallet quand on en a pas un, et donc on peut 'éviter' de devoir éxecuter provision avant start. 
 
 Pour créer un wallet :
 ```
@@ -170,7 +170,8 @@ Il y a deux types d'invitations, publiques et privées. Celle-ci est publique.
 Plus d'info dans le [tutoriel sur les connections](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-part-3-connecting-using-didcomm-exchange/)
 
 Quand nous produisons cette invitation, dans la même instance du terminal nous avons un résultat de ce type là :
-```{"state": "initial", "invitation": {"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/out-of-band/1.0/invitation", "@id": "f99ca578-7d1e-4d5d-a46f-4272c907ea61", "label": "Alice", "handshake_protocols": ["did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"], "services": [{"id": "#inline", "type": "did-communication", "recipientKeys": ["did:key:z6MkowCqyNXof1gLdbMifvAx1UjNPyfYceoq62ifY35RinMG"], "serviceEndpoint": "http://localhost:8000/"}]}, "invi_msg_id": "f99ca578-7d1e-4d5d-a46f-4272c907ea61", "trace": false, "invitation_url": "http://localhost:8000/?oob=eyJAdHlwZSI6ICJkaWQ6c292OkJ6Q2JzTlloTXJqSGlxWkRUVUFTSGc7c3BlYy9vdXQtb2YtYmFuZC8xLjAvaW52aXRhdGlvbiIsICJAaWQiOiAiZjk5Y2E1NzgtN2QxZS00ZDVkLWE0NmYtNDI3MmM5MDdlYTYxIiwgImxhYmVsIjogIkFsaWNlIiwgImhhbmRzaGFrZV9wcm90b2NvbHMiOiBbImRpZDpzb3Y6QnpDYnNOWWhNcmpIaXFaRFRVQVNIZztzcGVjL2RpZGV4Y2hhbmdlLzEuMCJdLCAic2VydmljZXMiOiBbeyJpZCI6ICIjaW5saW5lIiwgInR5cGUiOiAiZGlkLWNvbW11bmljYXRpb24iLCAicmVjaXBpZW50S2V5cyI6IFsiZGlkOmtleTp6Nk1rb3dDcXlOWG9mMWdMZGJNaWZ2QXgxVWpOUHlmWWNlb3E2MmlmWTM1UmluTUciXSwgInNlcnZpY2VFbmRwb2ludCI6ICJodHRwOi8vbG9jYWxob3N0OjgwMDAvIn1dfQ=="}
+```
+{"state": "initial", "invitation": {"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/out-of-band/1.0/invitation", "@id": "f99ca578-7d1e-4d5d-a46f-4272c907ea61", "label": "Alice", "handshake_protocols": ["did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"], "services": [{"id": "#inline", "type": "did-communication", "recipientKeys": ["did:key:z6MkowCqyNXof1gLdbMifvAx1UjNPyfYceoq62ifY35RinMG"], "serviceEndpoint": "http://localhost:8000/"}]}, "invi_msg_id": "f99ca578-7d1e-4d5d-a46f-4272c907ea61", "trace": false, "invitation_url": "http://localhost:8000/?oob=eyJAdHlwZSI6ICJkaWQ6c292OkJ6Q2JzTlloTXJqSGlxWkRUVUFTSGc7c3BlYy9vdXQtb2YtYmFuZC8xLjAvaW52aXRhdGlvbiIsICJAaWQiOiAiZjk5Y2E1NzgtN2QxZS00ZDVkLWE0NmYtNDI3MmM5MDdlYTYxIiwgImxhYmVsIjogIkFsaWNlIiwgImhhbmRzaGFrZV9wcm90b2NvbHMiOiBbImRpZDpzb3Y6QnpDYnNOWWhNcmpIaXFaRFRVQVNIZztzcGVjL2RpZGV4Y2hhbmdlLzEuMCJdLCAic2VydmljZXMiOiBbeyJpZCI6ICIjaW5saW5lIiwgInR5cGUiOiAiZGlkLWNvbW11bmljYXRpb24iLCAicmVjaXBpZW50S2V5cyI6IFsiZGlkOmtleTp6Nk1rb3dDcXlOWG9mMWdMZGJNaWZ2QXgxVWpOUHlmWWNlb3E2MmlmWTM1UmluTUciXSwgInNlcnZpY2VFbmRwb2ludCI6ICJodHRwOi8vbG9jYWxob3N0OjgwMDAvIn1dfQ=="}
 ```
 Notre invitation est donc ici. Nous devons utiliser cette invitation du côté de Bob.
 
