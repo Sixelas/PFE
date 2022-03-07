@@ -171,7 +171,26 @@ Plus d'info dans le [tutoriel sur les connections](https://ldej.nl/post/becoming
 
 Quand nous produisons cette invitation, dans la même instance du terminal nous avons un résultat de ce type là :
 ```
-{"state": "initial", "invitation": {"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/out-of-band/1.0/invitation", "@id": "f99ca578-7d1e-4d5d-a46f-4272c907ea61", "label": "Alice", "handshake_protocols": ["did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"], "services": [{"id": "#inline", "type": "did-communication", "recipientKeys": ["did:key:z6MkowCqyNXof1gLdbMifvAx1UjNPyfYceoq62ifY35RinMG"], "serviceEndpoint": "http://localhost:8000/"}]}, "invi_msg_id": "f99ca578-7d1e-4d5d-a46f-4272c907ea61", "trace": false, "invitation_url": "http://localhost:8000/?oob=eyJAdHlwZSI6ICJkaWQ6c292OkJ6Q2JzTlloTXJqSGlxWkRUVUFTSGc7c3BlYy9vdXQtb2YtYmFuZC8xLjAvaW52aXRhdGlvbiIsICJAaWQiOiAiZjk5Y2E1NzgtN2QxZS00ZDVkLWE0NmYtNDI3MmM5MDdlYTYxIiwgImxhYmVsIjogIkFsaWNlIiwgImhhbmRzaGFrZV9wcm90b2NvbHMiOiBbImRpZDpzb3Y6QnpDYnNOWWhNcmpIaXFaRFRVQVNIZztzcGVjL2RpZGV4Y2hhbmdlLzEuMCJdLCAic2VydmljZXMiOiBbeyJpZCI6ICIjaW5saW5lIiwgInR5cGUiOiAiZGlkLWNvbW11bmljYXRpb24iLCAicmVjaXBpZW50S2V5cyI6IFsiZGlkOmtleTp6Nk1rb3dDcXlOWG9mMWdMZGJNaWZ2QXgxVWpOUHlmWWNlb3E2MmlmWTM1UmluTUciXSwgInNlcnZpY2VFbmRwb2ludCI6ICJodHRwOi8vbG9jYWxob3N0OjgwMDAvIn1dfQ=="}
+{"state": "initial", 
+"invitation": 
+{
+  "@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/out-of-band/1.0/invitation", 
+  "@id": "f99ca578-7d1e-4d5d-a46f-4272c907ea61", 
+  "label": "Alice", 
+  "handshake_protocols": ["did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"], 
+  "services": [
+    {
+      "id": "#inline", 
+      "type": "did-communication", 
+      "recipientKeys": ["did:key:z6MkowCqyNXof1gLdbMifvAx1UjNPyfYceoq62ifY35RinMG"], 
+      "serviceEndpoint": "http://localhost:8000/"
+     }
+    ]
+  }, 
+ "invi_msg_id": "f99ca578-7d1e-4d5d-a46f-4272c907ea61", 
+ "trace": false, 
+ "invitation_url": "http://localhost:8000/?oob=eyJAdHlwZSI6ICJkaWQ6c292OkJ6Q2JzTlloTXJqSGlxWkRUVUFTSGc7c3BlYy9vdXQtb2YtYmFuZC8xLjAvaW52aXRhdGlvbiIsICJAaWQiOiAiZjk5Y2E1NzgtN2QxZS00ZDVkLWE0NmYtNDI3MmM5MDdlYTYxIiwgImxhYmVsIjogIkFsaWNlIiwgImhhbmRzaGFrZV9wcm90b2NvbHMiOiBbImRpZDpzb3Y6QnpDYnNOWWhNcmpIaXFaRFRVQVNIZztzcGVjL2RpZGV4Y2hhbmdlLzEuMCJdLCAic2VydmljZXMiOiBbeyJpZCI6ICIjaW5saW5lIiwgInR5cGUiOiAiZGlkLWNvbW11bmljYXRpb24iLCAicmVjaXBpZW50S2V5cyI6IFsiZGlkOmtleTp6Nk1rb3dDcXlOWG9mMWdMZGJNaWZ2QXgxVWpOUHlmWWNlb3E2MmlmWTM1UmluTUciXSwgInNlcnZpY2VFbmRwb2ludCI6ICJodHRwOi8vbG9jYWxob3N0OjgwMDAvIn1dfQ=="
+ }
 ```
 Notre invitation est donc ici. Nous devons utiliser cette invitation du côté de Bob.
 
@@ -180,7 +199,21 @@ Pour ceci nous faisons :
 ```
 curl -X POST "http://localhost:11001/out-of-band/receive-invitation" \
    -H 'Content-Type: application/json' \
-   -d '{"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/out-of-band/1.0/invitation", "@id": "f99ca578-7d1e-4d5d-a46f-4272c907ea61", "label": "Alice", "handshake_protocols": ["did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"], "services": [{"id": "#inline", "type": "did-communication", "recipientKeys": ["did:key:z6MkowCqyNXof1gLdbMifvAx1UjNPyfYceoq62ifY35RinMG"], "serviceEndpoint": "http://localhost:8000/"}]}'
+   -d '
+   {
+    "@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/out-of-band/1.0/invitation", 
+    "@id": "f99ca578-7d1e-4d5d-a46f-4272c907ea61", 
+    "label": "Alice", 
+    "handshake_protocols": ["did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"], 
+    "services": [
+      {
+        "id": "#inline", 
+        "type": "did-communication", 
+        "recipientKeys": ["did:key:z6MkowCqyNXof1gLdbMifvAx1UjNPyfYceoq62ifY35RinMG"], 
+        "serviceEndpoint": "http://localhost:8000/"
+     }
+    ]
+   }'
 ```
 Quand nous l'avons bien reçue, il faut l'accepter. Dans l'invitation, il y a un champ **@id**, en le copiant nous faison : 
 
