@@ -65,16 +65,17 @@ Nous pouvons faire ceci de deux manières en passant par le webserver ou en util
 
 1. Nous allons au lien où notre réseau Von Network est hosté : https://localhost:9000
 En gauche-bas, il y a un formulaire à remplir. On choisit **“Authenticate a New DID”**. Comme indiqué sur le tutoriel, un DID est dérivé d'une clé publique. La paire clé pub/priv est générée avec une valeur appellée **seed value**. On enregistre un DID, et nous obtenons un seed value. Exemple:  résultat de formulaire avec DID=Alice000000000000000000000000000 est:
-
-
+```
 Seed: Alice000000000000000000000000000
 DID: UpFt248WuA5djSFThNjBhq
 Verkey: GAHDkEKJDZpcpVVcnn5wFpgbtfkrvaceS4oMdki4cU2P 
-
+```
 2. Nous pouvons aussi faire une requête POST : 
 Exemple :
+```
 curl -X POST "http://localhost:9000/register" \
 -d '{"seed": "Alice000000000000000000000000001", "role": "TRUST_ANCHOR", "alias": "Alice"}
+```
 
 ## Agents
 
@@ -173,7 +174,7 @@ Quand nous produisons cette invitation, dans la même instance du terminal nous 
 ```
 Notre invitation est donc ici. Nous devons utiliser cette invitation du côté de Bob.
 
-Du côté de Bob, il faut en premier recevoir cette invitation. En prennant l'invitation générée par Alice :
+Du côté de Bob, il faut en premier recevoir cette invitation, en prennant l'invitation générée par Alice.
 Pour ceci nous faisons : 
 ```
 curl -X POST "http://localhost:11001/out-of-band/receive-invitation" \
