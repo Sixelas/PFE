@@ -215,7 +215,7 @@ curl -X POST "http://localhost:11001/out-of-band/receive-invitation" \
     ]
    }'
 ```
-Quand nous l'avons bien reçue, il faut l'accepter. Dans l'invitation, il y a un champ **@id**, en le copiant nous faison : 
+Quand nous l'avons bien reçue, il faut l'accepter. Dans l'invitation, il y a un champ **@id**, en le copiant nous faisons : 
 
 ```
 curl -X POST "http://localhost:11001/didexchange/f99ca578-7d1e-4d5d-a46f-4272c907ea61/accept-invitation" -H 'Content-Type: application/json'
