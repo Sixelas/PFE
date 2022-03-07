@@ -4,7 +4,7 @@
 Pour pouvoir lancer des Agents Clouds, il faut se relier à un réseau de noeuds Indy, normalement mis en place avec Von Network. 
 Nous pouvons avoir notre propre réseau de noeuds ou utiliser un déjà mis en place (c'est le prof qui nous a donné celui-ci).
 
-### Avoir son propre réseau de noeuds
+### Avoir son propre réseau de noeuds (OPTIONNEL)
 Pour avoir son propre réseau de noeuds il faut installer/build Von Network :
 
 ```
