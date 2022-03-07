@@ -70,7 +70,7 @@ Seed: Alice000000000000000000000000000
 DID: UpFt248WuA5djSFThNjBhq
 Verkey: GAHDkEKJDZpcpVVcnn5wFpgbtfkrvaceS4oMdki4cU2P 
 ```
-2. Nous pouvons aussi faire une requête POST : (changer http://localost:9000/ register par la URL du réseau si on a pas notre propre réseau)
+2. Nous pouvons aussi faire une requête POST : (changer http://localost:9000/register par la URL du réseau si on a pas notre propre réseau)
 Exemple :
 ```
 curl -X POST "http://localhost:9000/register" \
