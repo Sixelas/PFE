@@ -50,7 +50,7 @@ sudo make install
 ## Lancement Réseau noeuds Indy
 
 Pour cette partie j'ai suivi ce [tutoriel](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-getting-started/)
-Il y a deux autres tutoriels qui explorent plus le procès de connexion et de délivrance de VC, ils sont à la fin de ce tuto. 
+Il y a deux autres tutoriels qui explorent plus le procès de [connexion](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-getting-started/) et de [délivrance de VC](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-issue-credentials-v2/), ils sont à la fin de ce tuto. 
 
 ### Lancement du réseau de noeuds Indy (OPTIONNEL)
 Pour lancer le réseau il faut juste faire :
@@ -64,7 +64,7 @@ Avant de lancer un agent, il faut enregistrer notre DID auprès du réseau Indy.
 Nous pouvons faire ceci de deux manières en passant par le webserver ou en utilisant POST : 
 
 1. Nous allons au lien où notre réseau Von Network est hosté : https://localhost:9000
-En gauche-bas, il y a un formulaire à remplir. On choisit ** “Authenticate a New DID” **. Comme indiqué sur le tutoriel, un DID est dérivé d'une clé publique. La paire clé pub/priv est générée avec une valeur appellée ** seed value **. On enregistre un DID, et nous obtenons un seed value. Exemple:  résultat de formulaire avec DID=Alice000000000000000000000000000 est:
+En gauche-bas, il y a un formulaire à remplir. On choisit __ “Authenticate a New DID” __. Comme indiqué sur le tutoriel, un DID est dérivé d'une clé publique. La paire clé pub/priv est générée avec une valeur appellée __ seed value __. On enregistre un DID, et nous obtenons un seed value. Exemple:  résultat de formulaire avec DID=Alice000000000000000000000000000 est:
 
 
 Seed: Alice000000000000000000000000000
@@ -81,10 +81,10 @@ curl -X POST "http://localhost:9000/register" \
 Avant de lancer un agent, il nous faut la genesis URL, ceci est une URL qui décrit notre réseau de noeuds Indy. Si on a notre réseau en local c'est http://localhost:9000/genesis. Sinon on peut utiliser celle du prof : http://dev.greenlight.bcovrin.vonx.io/genesis
 
 ### Lancement Agents
--Il y a deux 'modes' de lancer aca-py, le mode **provision** et le mode **start**. 
--Le mode **provision**  crée un wallet avant de lancer un agent
--Le mode **start** lance notre agent
--Dans le tutoriel, la personne utilise l'argument **--auto-provision ** qui permet de créer un wallet quand on en a pas un, et donc on peut 'éviter' de devoir éxecuter provision avant start. 
+-Il y a deux 'modes' de lancer aca-py, le mode __provision__ et le mode __start__. 
+-Le mode __provision__  crée un wallet avant de lancer un agent
+-Le mode __start__ lance notre agent
+-Dans le tutoriel, la personne utilise l'argument __--auto-provision __ qui permet de créer un wallet quand on en a pas un, et donc on peut 'éviter' de devoir éxecuter provision avant start. 
 
 Pour créer un wallet :
 ```
@@ -164,7 +164,7 @@ curl -X POST "http://localhost:11000/out-of-band/create-invitation" \
  }'
 
 ```
-Le mode **attachments** ne fonctionnait pas pour la personne du tutoriel, donc vaut mieux utiliser le mode **handshake_protocol**.
+Le mode __attachments__ ne fonctionnait pas pour la personne du tutoriel, donc vaut mieux utiliser le mode __handshake_protocol__.
 Il y a deux types d'invitations, publiques et privées. Celle-ci est publique. 
 Plus d'info dans le [tutoriel sur les connections](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-part-3-connecting-using-didcomm-exchange/)
 
@@ -180,13 +180,15 @@ curl -X POST "http://localhost:11001/out-of-band/receive-invitation" \
    -H 'Content-Type: application/json' \
    -d '{"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/out-of-band/1.0/invitation", "@id": "f99ca578-7d1e-4d5d-a46f-4272c907ea61", "label": "Alice", "handshake_protocols": ["did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"], "services": [{"id": "#inline", "type": "did-communication", "recipientKeys": ["did:key:z6MkowCqyNXof1gLdbMifvAx1UjNPyfYceoq62ifY35RinMG"], "serviceEndpoint": "http://localhost:8000/"}]}'
 ```
-Quand nous l'avons bien reçue, il faut l'accepter. Dans l'invitation, il y a un champ **@id**, en le copiant nous faison : 
+Quand nous l'avons bien reçue, il faut l'accepter. Dans l'invitation, il y a un champ __@id__, en le copiant nous faison : 
 
 ```
 curl -X POST "http://localhost:11001/didexchange/f99ca578-7d1e-4d5d-a46f-4272c907ea61/accept-invitation" -H 'Content-Type: application/json'
 ```
 
 Et voilà normalement, la connexion devrait être établie !
+
+
 
 
 
