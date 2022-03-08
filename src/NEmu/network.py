@@ -60,7 +60,7 @@ StartNemu()
 
 # Ces 3 lignes permettent de supprimer automatiquement la session et les images temporaires générées dans /tmp/ une fois qu'on éteint les 3 VMs
 # Il faut les commenter si on veut enregistrer sa session avant de quitter
-WaitNemu("serveurB") and WaitNemu("serveurW") and WaitNemu("clientW")
+WaitNemu("serveurB", "serveurW", "clientW")
 StopNemu()
 DelNemu()
 
