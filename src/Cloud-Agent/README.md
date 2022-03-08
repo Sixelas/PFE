@@ -122,7 +122,9 @@ aca-py start \
   --auto-provision \
   --wallet-type indy \
   --wallet-name Alice \
-  --wallet-key secret
+  --wallet-key secret \
+  --auto-accept-requests \
+  --auto-accept-invites
 ```
 
 Il y a des précisions sur les différents arguments ici, mais pour moi les plus 'importantes' sont :
@@ -147,7 +149,9 @@ aca-py start \
   --auto-provision \
   --wallet-type indy \
   --wallet-name Bob \
-  --wallet-key secret
+  --wallet-key secret \
+  --auto-accept-requests \
+  --auto-accept-invites
 ```
 
 ### Connection des Agents - Invitations
