@@ -63,7 +63,7 @@ Pour lancer le réseau il faut juste faire :
 Avant de lancer un agent, il faut enregistrer notre DID auprès du réseau Indy. C'est à nous de faire ceci. 
 Nous pouvons faire ceci de deux manières en passant par le webserver ou en utilisant POST : 
 
-1. Nous allons au lien où notre réseau Von Network est hosté : https://localhost:9000 Ou alors si on ne lance pas un réseau, mais on utilise celui que le prof nous a donné :  http://dev.greenlight.bcovrin.vonx.io
+1. Nous allons au lien où notre réseau Von Network est hosté : http://localhost:9000 Ou alors si on ne lance pas un réseau, mais on utilise celui que le prof nous a donné :  http://dev.greenlight.bcovrin.vonx.io
 En gauche-bas, il y a un formulaire à remplir. On choisit **“Authenticate a New DID”**. Comme indiqué sur le tutoriel, un DID est dérivé d'une clé publique. La paire clé pub/priv est générée avec une valeur appellée **seed value**. On enregistre un DID, et nous obtenons un seed value. Exemple:  résultat de formulaire avec DID=Alice000000000000000000000000000 est:
 ```
 Seed: Alice000000000000000000000000000
