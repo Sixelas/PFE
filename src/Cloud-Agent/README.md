@@ -36,15 +36,55 @@ pip install python3_indy
 ```
 
 ### libindy, rust et libsodium
-Il faut installer libindy et rust, j'ai installé libsodium différemment car le dépôt de la partie 3. est vieux : [Tuto installation libindy+rust](https://hyperledger-indy.readthedocs.io/projects/sdk/en/latest/docs/build-guides/ubuntu-build.html)
+Installation basée sur ce tuto mais il est pas totalement à jour donc voir en dessous nos étapes : [Tuto installation libindy+rust](https://hyperledger-indy.readthedocs.io/projects/sdk/en/latest/docs/build-guides/ubuntu-build.html)
+
+Prérequis :
+```
+apt-get update && \
+apt-get install -y \
+   build-essential \
+   pkg-config \
+   cmake \
+   libssl-dev \
+   libsqlite3-dev \
+   libzmq3-dev \
+   libncursesw5-dev \
+   curl \
+   docker.io \
+   python3-pip \
+   cargo
+
+```
+Docker compose : [install](https://docs.docker.com/compose/install/)
+
 
 Pour installer libsodium : 
 
 ```
 git clone https://github.com/jedisct1/libsodium --branch stable
+cd libsodium/
 ./configure
 make && make check
 sudo make install
+```
+
+Pour installer libindy : 
+
+```
+git clone https://github.com/hyperledger/indy-sdk.git
+cd ./indy-sdk/libindy
+cargo build
+cd
+```
+
+Pour libindy modif de path à faire sur Debian11 donc on ajoute au .bashrc : 
+```
+export LD_LIBRARY_PATH=:/root/indy-sdk/libindy/target/debug/ 
+``` 
+Puis ensuite on fait :
+```
+sudo ldconfig
+source .bashrc 
 ```
 
 ## Lancement Réseau noeuds Indy
@@ -105,8 +145,9 @@ Pour avoir accès aux différents arguments :
 aca-py start -h
 ```
 
+#### Si on met les 2 Agents sur la même machine : 
 
-Exemple lancement Agent Alice (ISSUER): 
+Lancement Agent Alice (ISSUER): 
 ```
 aca-py start \
   --label Alice \
@@ -134,7 +175,7 @@ Il y a des précisions sur les différents arguments ici, mais pour moi les plus
 - --wallet-name Alice : chaque nom de wallet est unique, c'est à dire, que si on met un autre nom de wallet on aura un autre wallet
 --wallet-key secret : secret = mdp pour accèder à son wallet, donc si au lieu de secret vous mettez 123 vous devrez mettre 123 au lieu de secret
 
-Exemple lancement Agent Bob (HOLDER) :
+Lancement Agent Bob (HOLDER) :
 ```
 aca-py start \
   --label Bob \
@@ -154,11 +195,57 @@ aca-py start \
   --auto-accept-invites
 ```
 
+#### Si on met les 2 Agents sur 2 machines différentes :
+Pensé pour être fait dans le réseau NEmu du projet sur serveurB et serveurW : [voir ici](https://github.com/Sixelas/PFE/tree/main/src/NEmu) 
+
+1. Sur serveurB après avoir lancé le réseau de noeuds Indy : (préinstallé dans le dossier ~/von-network/ ) \
+Lancement Agent Alice (ISSUER): 
+```
+aca-py start \
+  --label Alice \
+  -it http 0.0.0.0 8000 \
+  -ot http \
+  --admin 0.0.0.0 11000 \
+  --admin-insecure-mode \
+  --genesis-url http://localhost:9000/genesis \
+  --seed Alice000000000000000000000000000 \
+  --endpoint http://192.168.1.15:8000/ \
+  --debug-connections \
+  --public-invites \
+  --auto-provision \
+  --wallet-type indy \
+  --wallet-name Alice \
+  --wallet-key secret \
+  --auto-accept-requests \
+  --auto-accept-invites
+```
+2. Sur serveurW pas de réseau indy von-network à lancer vu qu'il est sur serveurB : \
+Lancement Agent Bob (HOLDER) :
+```
+aca-py start \
+  --label Bob \
+  -it http 0.0.0.0 8001 \
+  -ot http \
+  --admin 0.0.0.0 11001 \
+  --admin-insecure-mode \
+  --genesis-url http://192.168.1.15:9000/genesis \
+  --seed Bob00000000000000000000000000000 \
+  --endpoint http://192.168.2.13:8001/ \
+  --debug-connections \
+  --auto-provision \
+  --wallet-type indy \
+  --wallet-name Bob \
+  --wallet-key secret \
+  --auto-accept-requests \
+  --auto-accept-invites
+```
+
+
 ### Connection des Agents - Invitations
 Comme dans la demo, il faut que Alice génère des invitations et que Bob les accepte pour que les deux Agents puissent connecter entre eux. 
 Si nous regardons la doc dans l'endpoint de Alice, nous pouvons voir les différents champs des invitations. Nous devons éxecuter ces commandes dans une autre instance du terminal évidemment. 
 
-Un exemple d'invitation  : 
+Un exemple d'invitation générée (enregistrée dans un fichier invit.txt): 
 ``` 
 curl -X POST "http://localhost:11000/out-of-band/create-invitation" \
     -H 'Content-Type: application/json' \
@@ -167,14 +254,14 @@ curl -X POST "http://localhost:11000/out-of-band/create-invitation" \
      "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"
    ],
    "use_public_did": false
- }'
+ }' > invit.txt
 
 ```
 Le mode **attachments** ne fonctionnait pas pour la personne du tutoriel, donc vaut mieux utiliser le mode **handshake_protocol**.
 Il y a deux types d'invitations, publiques et privées. Celle-ci est publique. 
 Plus d'info dans le [tutoriel sur les connections](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-part-3-connecting-using-didcomm-exchange/)
 
-Quand nous produisons cette invitation, dans la même instance du terminal nous avons un résultat de ce type là :
+Quand nous produisons cette invitation, dans la même instance du terminal (et dans invit.txt) nous avons un résultat de ce type là :
 ```
 {"state": "initial", 
 "invitation": 
@@ -197,7 +284,19 @@ Quand nous produisons cette invitation, dans la même instance du terminal nous 
  "invitation_url": "http://localhost:8000/?oob=eyJAdHlwZSI6ICJkaWQ6c292OkJ6Q2JzTlloTXJqSGlxWkRUVUFTSGc7c3BlYy9vdXQtb2YtYmFuZC8xLjAvaW52aXRhdGlvbiIsICJAaWQiOiAiZjk5Y2E1NzgtN2QxZS00ZDVkLWE0NmYtNDI3MmM5MDdlYTYxIiwgImxhYmVsIjogIkFsaWNlIiwgImhhbmRzaGFrZV9wcm90b2NvbHMiOiBbImRpZDpzb3Y6QnpDYnNOWWhNcmpIaXFaRFRVQVNIZztzcGVjL2RpZGV4Y2hhbmdlLzEuMCJdLCAic2VydmljZXMiOiBbeyJpZCI6ICIjaW5saW5lIiwgInR5cGUiOiAiZGlkLWNvbW11bmljYXRpb24iLCAicmVjaXBpZW50S2V5cyI6IFsiZGlkOmtleTp6Nk1rb3dDcXlOWG9mMWdMZGJNaWZ2QXgxVWpOUHlmWWNlb3E2MmlmWTM1UmluTUciXSwgInNlcnZpY2VFbmRwb2ludCI6ICJodHRwOi8vbG9jYWxob3N0OjgwMDAvIn1dfQ=="
  }
 ```
-Notre invitation est donc ici. Nous devons utiliser cette invitation du côté de Bob.
+Notre invitation est donc ici. Nous devons utiliser cette invitation du côté de Bob. \
+Petite astuce pour envoyer l'invitation à Bob si Bob et Alice son sur serveurB et serveurW du réseau NEmu (pas sécurisé, juste pour tests) :
+
+1. Sur serverW :
+```
+nc -lp 1234
+```
+
+2. Sur serveurB :
+```
+cat invit.txt | nc 192.168.2.13 1234
+```
+On récupère ainsi le contenu de l'invitation avec les champs à utiliser par la suite (commence à {"@type":  .... }).
 
 Du côté de Bob, il faut en premier recevoir cette invitation, en prennant l'invitation générée par Alice.
 Pour ceci nous faisons : 
@@ -220,7 +319,10 @@ curl -X POST "http://localhost:11001/out-of-band/receive-invitation" \
     ]
    }'
 ```
-Quand nous l'avons bien reçue, il faut l'accepter. Dans la réponse, il y a un champ **connection id**, en le copiant nous faisons : 
+
+A ce moment là, si on a lancé les agents avec les options --auto-accept-requests et --auto-accept-invites, le reste des étapes s'effectue automatiquement et on peut voir au terme des échanges un message "Received connection complete" sur l'Agent Alice. \
+Sinon on continue avec la suite des étapes : \
+Quand nous l'avons bien reçue, il faut l'accepter. Dans la réponse, il y a un champ **connection id**, en le copiant nous faisons (sur Bob): 
 
 ```
 curl -X POST "http://localhost:11001/didexchange/{connection_id}/accept-invitation" -H 'Content-Type: application/json'
@@ -228,7 +330,7 @@ curl -X POST "http://localhost:11001/didexchange/{connection_id}/accept-invitati
 
 Du côté d'Alice, il faut que nous acceptions la réponse à notre requête. En prennant le **connection id** qui était dans les réponses affichées dans notre Agent Alice on fait : (ce connection id est différent de celui de Bob)
 ```
-curl -X POST "http://localhost:11000/didexchange/c162ef70-372c-4306-ad9f-14c4c8dbda72/accept-request" -H 'Content-Type: application/json'
+curl -X POST "http://localhost:11000/didexchange/{connection_id}/accept-request" -H 'Content-Type: application/json'
 ```
 
 Et voilà normalement, la connexion devrait être établie !
@@ -251,9 +353,9 @@ Et voilà normalement, la connexion devrait être établie !
 
 # Tutoriel Agent Serveur Wireguard et Agent Indy
 
-- agentb.py = Agent Indy
+- agentb.py = Agent Indy (sur la VM serveurB du réseau virtuel du projet).
 
-- agentw.py = Agent Serveur Wireguard
+- agentw.py = Agent Serveur Wireguard (sur la VM serveurW du réseau virtuel du projet).
 
 ## Installation :
 ### Dans le cas où vous n'utilisez pas notre réseau virtuel et VMs  (qui se trouve [ici](https://github.com/Sixelas/PFE/tree/main/src/NEmu)):

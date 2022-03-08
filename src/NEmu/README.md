@@ -61,6 +61,7 @@ Ensuite faire "service networking restart"
 - Docker et les autres dépendances nécessaires pour lancer le Cloud-Agent.
 - Wireshark pour de l'analyse réseau.
 - WireGuard.
+- Toutes les autres dépendances nécessaires aux démos de nos Cloud Agents qui se trouvent [ici](https://github.com/Sixelas/PFE/tree/main/src/Cloud-Agent)
 
 ## Sur la VM Android clientW est installé :
 - WireGuard
