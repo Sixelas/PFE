@@ -216,10 +216,15 @@ curl -X POST "http://localhost:11001/out-of-band/receive-invitation" \
     ]
    }'
 ```
-Quand nous l'avons bien reçue, il faut l'accepter. Dans l'invitation, il y a un champ **@id**, en le copiant nous faisons : 
+Quand nous l'avons bien reçue, il faut l'accepter. Dans la réponse, il y a un champ **connection id**, en le copiant nous faisons : 
 
 ```
-curl -X POST "http://localhost:11001/didexchange/f99ca578-7d1e-4d5d-a46f-4272c907ea61/accept-invitation" -H 'Content-Type: application/json'
+curl -X POST "http://localhost:11001/didexchange/{connection_id}/accept-invitation" -H 'Content-Type: application/json'
+```
+
+Du côté d'Alice, il faut que nous acceptions la réponse à notre requête. En prennant le **connection id** qui était dans les réponses affichées dans notre Agent Alice on fait : (ce connection id est différent de celui de Bob)
+```
+curl -X POST "http://localhost:11000/didexchange/c162ef70-372c-4306-ad9f-14c4c8dbda72/accept-request" -H 'Content-Type: application/json'
 ```
 
 Et voilà normalement, la connexion devrait être établie !
