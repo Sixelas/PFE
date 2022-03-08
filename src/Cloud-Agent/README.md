@@ -133,7 +133,8 @@ Il y a des précisions sur les différents arguments ici, mais pour moi les plus
 --wallet-key secret : secret = mdp pour accèder à son wallet, donc si au lieu de secret vous mettez 123 vous devrez mettre 123 au lieu de secret
 
 Exemple lancement Agent Bob (HOLDER) :
-```aca-py start \
+```
+aca-py start \
   --label Bob \
   -it http 0.0.0.0 8001 \
   -ot http \
