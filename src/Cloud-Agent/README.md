@@ -74,7 +74,7 @@ Verkey: GAHDkEKJDZpcpVVcnn5wFpgbtfkrvaceS4oMdki4cU2P
 Exemple :
 ```
 curl -X POST "http://localhost:9000/register" \
--d '{"seed": "Alice000000000000000000000000001", "role": "TRUST_ANCHOR", "alias": "Alice"}
+-d '{"seed": "Alice000000000000000000000000001", "role": "TRUST_ANCHOR", "alias": "Alice"}'
 ```
 
 ## Agents
