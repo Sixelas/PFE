@@ -504,12 +504,56 @@ curl -X GET "http://localhost:11001/credentials"
 ## Issuer des VCs - Façon 'automatique'
 Avec la façon automatique, au lieu d'utiliser l'endpoint /issue-credential-2.0/send-offer nous utilisons l'endpoint /issue-credential-2.0/send ce qui met les champs auto\_offer et auto\_issue à true.
 Il faut juste que du côté holder ça soit aussi automatisé. Pour ceci nous pouvons ajouter des options quand nous lançons nos Agents: 
-```
-    --auto-respond-credential-proposal \
-    --auto-respond-credential-offer \
-    --auto-respond-credential-request \
-    --auto-store-credential
+Exemple Alice :
 
+```
+   aca-py start \
+  --label Alice \
+  -it http 0.0.0.0 8000 \
+  -ot http \
+  --admin 0.0.0.0 11000 \
+  --admin-insecure-mode \
+  --genesis-url http://localhost:9000/genesis \
+  --seed Alice000000000000000000000000000 \
+  --endpoint http://192.168.1.15:8000/ \
+  --debug-connections \
+  --public-invites \
+  --auto-provision \
+  --wallet-type indy \
+  --wallet-name Alice \
+  --wallet-key secret \
+  --auto-accept-requests \
+  --auto-accept-invites \
+  --auto-respond-credential-proposal \
+  --auto-respond-credential-offer \
+  --auto-respond-credential-request \
+  --auto-store-credential
+
+```
+
+Exemple Bob: 
+
+```
+aca-py start \
+  --label Bob \
+  -it http 0.0.0.0 8001 \
+  -ot http \
+  --admin 0.0.0.0 11001 \
+  --admin-insecure-mode \
+  --genesis-url http://192.168.1.15:9000/genesis \
+  --seed Bob00000000000000000000000000000 \
+  --endpoint http://192.168.2.13:8001/ \
+  --debug-connections \
+  --auto-provision \
+  --wallet-type indy \
+  --wallet-name Bob \
+  --wallet-key secret \
+  --auto-accept-requests \
+  --auto-accept-invites \
+  --auto-respond-credential-proposal \
+  --auto-respond-credential-offer \
+  --auto-respond-credential-request \
+  --auto-store-credential
 ```
 
 
