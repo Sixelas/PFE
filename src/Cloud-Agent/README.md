@@ -1,8 +1,38 @@
-# Tutoriel pour lancer des Agent Cloud en local :
 
-## Installation 
+
+# Cloud Agent
+1. [Explication des différents versions](#explications) 
+2. [Tutoriel 1 : Lancer des Agents Cloud en local](#Tuto1)
+    1. [Installation](#T1install)
+    2. [Réseau noeuds Indy Local (OPTIONNEL)](#T1indy)
+    3. [Enregistrement DID](#T1DID)
+    4. [Agents](#T1Agents)
+3. [Tutoriel 2 : Tutoriel 2 : Issue VC](#Tuto2)
+    1. [Création du schema et de la credential definition](#T2CreaSCD)
+    2. [Issuer des VC - Méthode étape par étape](#T2IssueE)
+    3. [Issuer des VCs - Mode 'automatique'](#T2IssueA)
+    4. [Agents](#T1Agents)
+4. [Tutoriel 3 : Agent Serveur Wireguard et Agent Indy sur Docker](#Tuto3)
+    1. [Installation (facultative si on utilise le réseau virtuel)](#T3Install)
+    2. [Préparation des fichiers](#T3Fichiers)
+    3. [Éxecution des agents](#T3Agents)
+ 
+
+
+# Explication des différents versions <a name="explications"></a>
+Dans les tutoriels ci-dessous, on retrouve 2 types d'Agents Clouds :
+- Les Agents Clouds basés sur l'image docker des démos officielles du projet [Hyperledger Aries Cloud Agent - Python - Demo](https://github.com/hyperledger/aries-cloudagent-python/tree/main/demo#the-alicefaber-python-demo).
+- Les Agents Clouds Locaux (avec ou sans noeud Indy von-network).
+
+De plus, si on se réfère à notre réseau virtuel [NEmu](https://github.com/Sixelas/PFE/tree/main/src/NEmu) on a deux Clouds Agents sur serveurB et serveurW, qui ont pour scripts agentb.py et agentw.py.
+
+
+# Tutoriel 1 : lancer des Agent Cloud en local :<a name="Tuto1"></a>
+
+## 1. Installation <a name="T1install"></a>
 Pour pouvoir lancer des Agents Clouds, il faut se relier à un réseau de noeuds Indy, normalement mis en place avec Von Network. 
-Nous pouvons avoir notre propre réseau de noeuds ou utiliser un déjà mis en place (c'est le prof qui nous a donné celui-ci).
+Nous pouvons avoir notre propre réseau de noeuds ou utiliser un déjà existant en ligne. \
+Sur l'image debian11.img du réseau NEmu du projet, toutes les dépendances sont déjà installées à l'avance. 
 
 ### Avoir son propre réseau de noeuds (OPTIONNEL)
 Pour avoir son propre réseau de noeuds il faut installer/build Von Network :
@@ -77,7 +107,7 @@ cargo build
 cd
 ```
 
-Pour libindy modif de path à faire sur Debian11 donc on ajoute au .bashrc : 
+Pour libindy modif de path à faire dans certains cas donc on ajoute au .bashrc : 
 ```
 export LD_LIBRARY_PATH=:/root/indy-sdk/libindy/target/debug/ 
 ``` 
@@ -87,41 +117,43 @@ sudo ldconfig
 source .bashrc 
 ```
 
-## Lancement Réseau noeuds Indy
+## 2. Réseau noeuds Indy Local (OPTIONNEL) <a name="T1indy"></a>
 
-Pour cette partie j'ai suivi ce [tutoriel](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-getting-started/)
-Il y a deux autres tutoriels qui explorent plus le procès de [connexion](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-part-3-connecting-using-didcomm-exchange/) et de [délivrance de VC](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-issue-credentials-v2/), ils sont à la fin du premier tuto. 
+Pour cette partie j'ai suivi ce [tutoriel](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-getting-started/).
+Il y a deux autres tutoriels qui explorent plus le processus de [connexion](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-part-3-connecting-using-didcomm-exchange/) et de [délivrance de VC](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-issue-credentials-v2/), ils sont à la fin du premier tuto. 
 
-### Lancement du réseau de noeuds Indy (OPTIONNEL)
+### Lancement du réseau de noeuds Indy local (OPTIONNEL)
 Pour lancer le réseau il faut juste faire :
 ```
+cd von-network/
 ./manage start logs
 ```
 
-## Enregistrement DID
+## 3. Enregistrement DID <a name="T1DID"></a>
 
 Avant de lancer un agent, il faut enregistrer notre DID auprès du réseau Indy. C'est à nous de faire ceci. 
 Nous pouvons faire ceci de deux manières en passant par le webserver ou en utilisant POST : 
 
-1. Nous allons au lien où notre réseau Von Network est hosté : http://localhost:9000 Ou alors si on ne lance pas un réseau, mais on utilise celui que le prof nous a donné :  http://dev.greenlight.bcovrin.vonx.io
-En gauche-bas, il y a un formulaire à remplir. On choisit **“Authenticate a New DID”**. Comme indiqué sur le tutoriel, un DID est dérivé d'une clé publique. La paire clé pub/priv est générée avec une valeur appellée **seed value**. On enregistre un DID, et nous obtenons un seed value. Exemple:  résultat de formulaire avec DID=Alice000000000000000000000000000 est:
+1. Nous allons au lien où notre réseau Von Network est hosté : http://localhost:9000 Ou alors si on ne lance pas un réseau, mais on utilise celui en ligne :  http://dev.greenlight.bcovrin.vonx.io
+En gauche-bas, il y a un formulaire à remplir. On choisit **“Authenticate a New DID”**. Comme indiqué sur le tutoriel, un DID est dérivé d'une clé publique. La paire clé pub/priv est générée avec une valeur appelée **seed value**. On enregistre un DID, et nous obtenons un seed value.\
+ **Exemple :**  Le résultat de la saisie sur le formulaire avec DID=Alice000000000000000000000000000 est :
 ```
 Seed: Alice000000000000000000000000000
 DID: UpFt248WuA5djSFThNjBhq
 Verkey: GAHDkEKJDZpcpVVcnn5wFpgbtfkrvaceS4oMdki4cU2P 
 ```
-2. Nous pouvons aussi faire une requête POST : (changer http://localost:9000/register par la URL du réseau si on a pas notre propre réseau)
-Exemple :
+2. Nous pouvons aussi faire une requête POST : (changer http://localost:9000/register par la URL du réseau si on a pas notre propre réseau) \
+Exemple avec Alice :
 ```
 curl -X POST "http://localhost:9000/register" \
--d '{"seed": "Alice000000000000000000000000001", "role": "TRUST_ANCHOR", "alias": "Alice"}'
+-d '{"seed": "Alice000000000000000000000000000", "role": "TRUST_ANCHOR", "alias": "Alice"}'
 ```
 
-## Agents
+## 4. Agents <a name="T1agents"></a>
 
-Avant de lancer un agent, il nous faut la genesis URL, ceci est une URL qui décrit notre réseau de noeuds Indy. Si on a notre réseau en local c'est http://localhost:9000/genesis. Sinon on peut utiliser celle du prof : http://dev.greenlight.bcovrin.vonx.io/genesis
+Avant de lancer un agent, il nous faut la genesis URL, qui est une URL qui décrit notre réseau de noeuds Indy. Si on a notre réseau en local c'est http://localhost:9000/genesis. Sinon on peut utiliser celle en ligne : http://dev.greenlight.bcovrin.vonx.io/genesis
 
-### Lancement Agents
+### Lancement des Agents
 - Il y a deux 'modes' de lancer aca-py, le mode **provision** et le mode **start**. 
 - Le mode **provision**  crée un wallet avant de lancer un agent
 - Le mode **start** lance notre agent
@@ -336,14 +368,14 @@ curl -X POST "http://localhost:11000/didexchange/{connection_id}/accept-request"
 Et voilà normalement, la connexion devrait être établie !
 
 
-# Tutoriel pour Issuer des VC
+# Tutoriel 2 : Issue VC <a name="Tuto2"></a>
 Pour ce tutoriel je me suis aidée de ce [tutoriel](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-issue-credentials-v2/)
 
 Nous avons Alice **(ISSUER)** et Bob **(HOLDER)**
 
 Avant de se lancer sur les VC, il faut que le **issuer** crée un schéma et une définition de credential qui décrivent notre VC et ses champs. 
 
-## Création du schema et de la credential definition
+## 1. Création du schema et de la credential definition <a name="T2CreaSCD"></a>
 C'est Alice qui va créer les deux
 
 ### Création du schema
@@ -401,9 +433,9 @@ curl http://localhost:11000/credential-definitions/{credential\_definition\_id}
 
 Si nous voulons chercher des objets comme schemas ou definitions de credentials dans notre ledger, on peut le faire en allant dans le webserver de notre ledger, dans le cas où c'est en local : [http://localhost:9000/browse/](http://localhost:9000/browse/) 
 
-## Issuer des VC - Façon pas 'automatique'
+## 2. Issuer des VC - Méthode étape par étape : <a name="T2IssueE"></a>
 
-Une fois le schema et la definition crées, c'est le moment de créer des VC. Dans le tutoriel, l'agent qui lance le procès est Bob, le holder. Il y a plusieurs façons de faire : 
+Une fois le schéma et la définition créés, c'est le moment de créer des VC. Dans le tutoriel, l'agent qui lance le procès est Bob, le holder. Il y a plusieurs façons de faire : 
 1. Le holder envoie une proposal (proposal = décrit un credential definition, donc le holder indique le type de VC qu'il veut recevoir)
 2. Le issuer envoie une offre de VC au holder
 3. Le holder saute la proposal et juste demande un VC. Le issuer lui donne un VC. 
@@ -455,7 +487,7 @@ Nous obtenons cette réponse :
 {"cred_ex_id": "d54463f5-5fe1-45b6-bfcc-28505f13c794", "created_at": "2022-03-09T01:15:14.343365Z", "state": "proposal-sent", "auto_offer": false, "connection_id": "baf82399-dbaa-4edc-b921-1e4e6f5b4b88", "cred_preview": {"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/issue-credential/2.0/credential-preview", "attributes": [{"name": "name", "mime-type": "plain/text", "value": "Bob"}, {"name": "age", "mime-type": "plain/text", "value": "120"}]}, "cred_proposal": {"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/issue-credential/2.0/propose-credential", "@id": "9a156eb4-dc07-4c89-93f3-a965a93428d0", "filters~attach": [{"@id": "indy", "mime-type": "application/json", "data": {"base64": "e30="}}], "comment": "I want this", "credential_preview": {"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/issue-credential/2.0/credential-preview", "attributes": [{"name": "name", "mime-type": "plain/text", "value": "Bob"}, {"name": "age", "mime-type": "plain/text", "value": "120"}]}, "formats": [{"attach_id": "indy", "format": "hlindy/cred-filter@v2.0"}]}, "thread_id": "9a156eb4-dc07-4c89-93f3-a965a93428d0", "by_format": {"cred_proposal": {"indy": {}}}, "auto_issue": false, "updated_at": "2022-03-09T01:15:14.343365Z", "initiator": "self", "role": "holder", "auto_remove": true}
 ```
 
-Mais la seule valeur que nous alons vraiment uttiliser est la valeur du champ **cred_ex_id** : d54463f5-5fe1-45b6-bfcc-28505f13c794
+Mais la seule valeur que nous allons vraiment utiliser est la valeur du champ **cred_ex_id** : d54463f5-5fe1-45b6-bfcc-28505f13c794
 
 ### 2. Le issuer envoie une offre au holder basée sur son proposal
 Il faut savoir que les **cred\_ex\_id** sont différentes pour Alice et Bob. Pour consulter celui de Alice, nous consultons les records :
@@ -482,7 +514,7 @@ curl -X POST http://localhost:11001/issue-credential-2.0/records/d54463f5-5fe1-4
 
 ### 4. Le issuer envoie le credential au holder
 
-Le issuer maintenant envoie le credential : 
+Le issuer envoie maintenant le credential : 
 ```
 curl -X POST http://localhost:11000/issue-credential-2.0/records/606e7b4b-e1e9-40a3-b2d2-7b992a14913a/issue \
   -H "Content-Type: application/json" -d '{"comment": "Receive your credential"}'
@@ -495,15 +527,14 @@ curl -X POST http://localhost:11001/issue-credential-2.0/records/d54463f5-5fe1-4
 -H "Content-Type: application/json" -d '{}'
 ```
 
-Pour consulter ses credentials il suffit de : 
+Pour consulter ses credentials il suffit à Bob de : 
 ```
 curl -X GET "http://localhost:11001/credentials"
 ```
 
-## Issuer des VCs - Façon 'automatique'
-Avec la façon automatique, au lieu d'utiliser l'endpoint /issue-credential-2.0/send-offer nous utilisons l'endpoint /issue-credential-2.0/send ce qui met les champs auto\_offer et auto\_issue à true.
-Il faut juste que du côté holder ça soit aussi automatisé. Pour ceci nous pouvons ajouter des options quand nous lançons nos Agents: 
-Exemple Alice :
+## 3. Issuer des VCs - Mode 'automatique' : <a name="T2IssueA"></a>
+Avec le mode automatique, au lieu d'utiliser l'endpoint /issue-credential-2.0/send-offer nous utilisons l'endpoint /issue-credential-2.0/send ce qui met les champs auto\_offer et auto\_issue à true.
+Il faut juste que du côté holder ça soit aussi automatisé. Pour ceci nous pouvons ajouter des options quand nous lançons nos Agents, par exemple sur Alice :
 
 ```
    aca-py start \
@@ -530,7 +561,7 @@ Exemple Alice :
 
 ```
 
-Exemple Bob: 
+Et sur Bob: 
 
 ```
 aca-py start \
@@ -556,10 +587,10 @@ aca-py start \
 ```
 
 Pour faire ceci il suffit d'utiliser le endpoint indiqué en haut : /issue-credential-2.0/send 
-Pas besoin de faire send-proposal du côté de Bob
+Pas besoin de faire send-proposal du côté de Bob.
 
 
-Nous le faison du côté d'Alice : 
+Nous le faisons du côté d'Alice : 
 
 ```
 curl -X POST http://localhost:11000/issue-credential-2.0/send \
@@ -590,37 +621,17 @@ curl -X POST http://localhost:11000/issue-credential-2.0/send \
 
 ```
 
-Si tout s'est bien passé, le VC doit être affiché sur notre terminal, et si du côté de Bob nous consultons les credentials dans son wallet, il sera là.
+Si tout s'est bien passé, le VC doit être affiché sur notre terminal, et si du côté de Bob nous consultons ses credentials dans son wallet, il devrait s'y trouver.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Tutoriel Agent Serveur Wireguard et Agent Indy
+# Tutoriel 3 : Agent Serveur Wireguard et Agent Indy sur Docker : <a name="Tuto3"></a>
 
 - agentb.py = Agent Indy (sur la VM serveurB du réseau virtuel du projet).
 
 - agentw.py = Agent Serveur Wireguard (sur la VM serveurW du réseau virtuel du projet).
 
-## Installation :
-### Dans le cas où vous n'utilisez pas notre réseau virtuel et VMs  (qui se trouve [ici](https://github.com/Sixelas/PFE/tree/main/src/NEmu)):
+## 1. Installation (facultative si on utilise le réseau virtuel) : <a name="T3Install"></a>
+Dans le cas où vous n'utilisez pas notre réseau virtuel et VMs  (qui se trouve [ici](https://github.com/Sixelas/PFE/tree/main/src/NEmu)) :
 - Après avoir récupéré nos fichiers, clonez les fichiers de Aries Cloud Agent et allez au dossier /demo
 ``` 
 git clone https://github.com/hyperledger/aries-cloudagent-python.git
@@ -628,11 +639,11 @@ cd aries-cloudagent-python/demo
 
 ```
 
-## Préparation des fichiers :
-- Remplacer le fichier run_demo dans le dossier par celui proposé ici
-- Mettre les fichiers agentb.py et agentw.py dans le dossier aries-coudagent-python/demo/runners
+## 2. Préparation des fichiers : <a name="T3Fichiers"></a>
+- Remplacer le fichier run_demo dans /demo par celui proposé ici.
+- Mettre les fichiers agentb.py et agentw.py dans le dossier aries-coudagent-python/demo/runners.
 
-## Éxecution des agents
+## Éxecution des agents : <a name="T3Agents"></a>
 Pour lancer l'Agent Indy : 
 ```
 LEDGER_URL=http://dev.greenlight.bcovrin.vonx.io ./run_demo agentb
@@ -643,7 +654,7 @@ Pour lancer l'Agent Serveur Wireguard :
 LEDGER_URL=http://dev.greenlight.bcovrin.vonx.io ./run_demo agentw
 ```
 
-- Après avoir lancé les deux agents, copier l'invitation de l'Agent Indy (au dessus du QR) et la copier du côté du serveur Wireguard.
+- Après avoir lancé les deux agents, copier l'invitation de l'Agent Indy agentb (au dessus du QR généré) et la coller du côté du serveur Wireguard agentw.
 - Une fois la connexion entre les deux établie, choisir les différentes options pour :
 - Créer et envoyer un VC
 - Demander une Proof Request 

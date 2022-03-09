@@ -63,4 +63,5 @@ StartNemu()
 WaitNemu("serveurB", "serveurW", "clientW")
 StopNemu()
 DelNemu()
+exit()
 
