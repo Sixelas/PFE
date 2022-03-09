@@ -555,6 +555,45 @@ aca-py start \
   --auto-store-credential
 ```
 
+Pour faire ceci il suffit d'utiliser le endpoint indiqué en haut : /issue-credential-2.0/send 
+Pas besoin de faire send-proposal du côté de Bob
+
+
+Nous le faison du côté d'Alice : 
+
+```
+curl -X POST http://localhost:11000/issue-credential-2.0/send \
+ -H "Content-Type: application/json" -d '{
+  "comment": "I want this",
+  "connection_id": {connection_id_issuer},
+  "credential_preview": {
+    "@type": "issue-credential/2.0/credential-preview",
+    "attributes": [
+      {
+        "mime-type": "plain/text",
+        "name": "name", 
+        "value": "Bob"
+      },
+      {
+        "mime-type": "plain/text",
+        "name": "age", 
+        "value": "120"
+      }
+    ]
+  },
+  "filter": {
+    "indy": {
+      
+    }
+  }
+}'
+
+```
+
+Si tout s'est bien passé, le VC doit être affiché sur notre terminal, et si du côté de Bob nous consultons les credentials dans son wallet, il sera là.
+
+
+
 
 
 
