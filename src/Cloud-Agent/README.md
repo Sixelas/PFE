@@ -444,7 +444,6 @@ curl -X POST http://localhost:11001/issue-credential-2.0/send-proposal \
     ]
   },
   "filter": {
-    "dif": {},
     "indy": {
       
     }
