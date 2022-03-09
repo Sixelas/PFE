@@ -421,8 +421,6 @@ Le tutoriel met en pratique le flow 1. C'est ce flow que je vais décrire ici.
 
 Tous les endpoints utilisés ici peuvent être trouvés dans les docs perspectives des Agents. 
 
-9b3eb15b-e1ab-4dd0-838c-a18f1373aa76
-id bob : baf82399-dbaa-4edc-b921-1e4e6f5b4b88
 ### 1. Le holder envoie une proposal au issuer
 Ce credential est très simple, il y a beaucoup plus de champs que nous pouvons ajouter, par exemple un champ avec des proofs. 
 ```
