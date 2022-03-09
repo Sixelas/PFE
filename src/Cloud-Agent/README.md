@@ -320,7 +320,7 @@ curl -X POST "http://localhost:11001/out-of-band/receive-invitation" \
    }'
 ```
 
-A ce moment là, si on a lancé les agents avec les options --auto-accept-requests et --auto-accept-invites, le reste des étapes s'effectue automatiquement et on peut voir au terme des échanges un message "Received connection complete" sur l'Agent Alice. \
+À ce moment là, si on a lancé les agents avec les options --auto-accept-requests et --auto-accept-invites, le reste des étapes s'effectue automatiquement et on peut voir au terme des échanges un message "Received connection complete" sur l'Agent Alice. \
 Sinon on continue avec la suite des étapes : \
 Quand nous l'avons bien reçue, il faut l'accepter. Dans la réponse, il y a un champ **connection id**, en le copiant nous faisons (sur Bob): 
 
@@ -424,6 +424,7 @@ Tous les endpoints utilisés ici peuvent être trouvés dans les docs perspectiv
 9b3eb15b-e1ab-4dd0-838c-a18f1373aa76
 id bob : baf82399-dbaa-4edc-b921-1e4e6f5b4b88
 ### 1. Le holder envoie une proposal au issuer
+Ce credential est très simple, il y a beaucoup plus de champs que nous pouvons ajouter, par exemple un champ avec des proofs. 
 ```
 curl -X POST http://localhost:11001/issue-credential-2.0/send-proposal \
  -H "Content-Type: application/json" -d '{
@@ -457,7 +458,7 @@ Nous obtenons cette réponse :
 {"cred_ex_id": "d54463f5-5fe1-45b6-bfcc-28505f13c794", "created_at": "2022-03-09T01:15:14.343365Z", "state": "proposal-sent", "auto_offer": false, "connection_id": "baf82399-dbaa-4edc-b921-1e4e6f5b4b88", "cred_preview": {"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/issue-credential/2.0/credential-preview", "attributes": [{"name": "name", "mime-type": "plain/text", "value": "Bob"}, {"name": "age", "mime-type": "plain/text", "value": "120"}]}, "cred_proposal": {"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/issue-credential/2.0/propose-credential", "@id": "9a156eb4-dc07-4c89-93f3-a965a93428d0", "filters~attach": [{"@id": "indy", "mime-type": "application/json", "data": {"base64": "e30="}}], "comment": "I want this", "credential_preview": {"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/issue-credential/2.0/credential-preview", "attributes": [{"name": "name", "mime-type": "plain/text", "value": "Bob"}, {"name": "age", "mime-type": "plain/text", "value": "120"}]}, "formats": [{"attach_id": "indy", "format": "hlindy/cred-filter@v2.0"}]}, "thread_id": "9a156eb4-dc07-4c89-93f3-a965a93428d0", "by_format": {"cred_proposal": {"indy": {}}}, "auto_issue": false, "updated_at": "2022-03-09T01:15:14.343365Z", "initiator": "self", "role": "holder", "auto_remove": true}
 ```
 
-Mais le seul valeur que nous alons vraiment uttiliser est la valeur du champ **cred_ex_id** : d54463f5-5fe1-45b6-bfcc-28505f13c794
+Mais la seule valeur que nous alons vraiment uttiliser est la valeur du champ **cred_ex_id** : d54463f5-5fe1-45b6-bfcc-28505f13c794
 
 ### 2. Le issuer envoie une offre au holder basée sur son proposal
 Il faut savoir que les **cred\_ex\_id** sont différentes pour Alice et Bob. Pour consulter celui de Alice, nous consultons les records :
@@ -465,7 +466,7 @@ Il faut savoir que les **cred\_ex\_id** sont différentes pour Alice et Bob. Pou
 ```
 curl http://localhost:11000/issue-credential-2.0/records
 ```
-Et nous obtenons un record qui a un champ **cred_ex_id** = 606e7b4b-e1e9-40a3-b2d2-7b992a14913a
+Et nous obtenons un record qui a un champ **cred_ex_id** : 606e7b4b-e1e9-40a3-b2d2-7b992a14913a
 ```
 {"results": [{"cred_ex_record": {"auto_remove": true, "state": "proposal-received", "initiator": "external", "thread_id": "9a156eb4-dc07-4c89-93f3-a965a93428d0", "by_format": {"cred_proposal": {"indy": {}}}, "connection_id": "9b3eb15b-e1ab-4dd0-838c-a18f1373aa76", "cred_preview": {"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/issue-credential/2.0/credential-preview", "attributes": [{"name": "name", "mime-type": "plain/text", "value": "Bob"}, {"name": "age", "mime-type": "plain/text", "value": "120"}]}, "cred_ex_id": "606e7b4b-e1e9-40a3-b2d2-7b992a14913a", "cred_proposal": {"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/issue-credential/2.0/propose-credential", "@id": "9a156eb4-dc07-4c89-93f3-a965a93428d0", "credential_preview": {"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/issue-credential/2.0/credential-preview", "attributes": [{"name": "name", "mime-type": "plain/text", "value": "Bob"}, {"name": "age", "mime-type": "plain/text", "value": "120"}]}, "comment": "I want this", "filters~attach": [{"@id": "indy", "mime-type": "application/json", "data": {"base64": "e30="}}], "formats": [{"attach_id": "indy", "format": "hlindy/cred-filter@v2.0"}]}, "trace": false, "updated_at": "2022-03-09T01:15:14.444459Z", "role": "issuer", "created_at": "2022-03-09T01:15:14.444459Z"}, "indy": null, "ld_proof": null}]}
 ```
