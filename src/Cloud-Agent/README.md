@@ -336,6 +336,187 @@ curl -X POST "http://localhost:11000/didexchange/{connection_id}/accept-request"
 Et voilà normalement, la connexion devrait être établie !
 
 
+# Tutoriel pour Issuer des VC
+Pour ce tutoriel je me suis aidée de ce [tutorie](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-issue-credentials-v2/)
+
+Nous avons Alice **(ISSUER)** et Bob **(HOLDER)**
+
+Avant de se lancer sur les VC, il faut que le **issuer** crée un schéma et une définition de credential qui décrivent notre VC et ses champs. 
+
+## Création du schema et de la credential definition
+C'est Alice qui va créer les deux
+
+###Création du schema
+Dans cet exemple on aura un attribut public key et un attribut name. 
+```
+curl -X POST http://localhost:11000/schemas \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "attributes": [
+      "public key",
+      "name"
+    ],
+    "schema_name": "my-schema",
+    "schema_version": "1.0"
+}'
+
+```
+Ce qui donne cette réponse : 
+```
+{
+"schema_id": "5BLDQMdotBUS3hXjNTbZqm:2:my-schema:1.0", 
+"schema": 
+	{
+	"ver": "1.0", 
+	"id": "5BLDQMdotBUS3hXjNTbZqm:2:my-schema:1.0", 
+	"name": "", 
+	"version": "1.0", 
+	"attrNames": ["public key", "name"], 
+	"seqNo": 16}
+}
+```
+
+###Création de la credential definition
+Nous utilisons le champ schema_id résultat de la création du schema :
+```
+curl http://localhost:11000/credential-definitions \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "revocation_registry_size": 4,
+    "schema_id": "5BLDQMdotBUS3hXjNTbZqm:2:my-schema:1.0",
+    "tag": "default"
+  }'
+```
+Ce qui résulte en : 
+
+```
+{"credential_definition_id": "5BLDQMdotBUS3hXjNTbZqm:3:CL:16:default"}
+```
+ 
+
+Si jamais nous voulons récupérer ou checker la credential definition nous pouvons faire :
+```
+curl http://localhost:11000/credential-definitions/{credential\_definition\_id}
+```
+
+Si nous voulons chercher des objets comme schemas ou definitions de credentials dans notre ledger, on peut le faire en allant dans le webserver de notre ledger, dans le cas où c'est en local : [http://localhost:9000/browse/](http://localhost:9000/browse/) 
+
+## Issuer des VC - Façon pas 'automatique'
+
+Une fois le schema et la definition crées, c'est le moment de créer des VC. Dans le tutoriel, l'agent qui lance le procès est Bob, le holder. Il y a plusieurs façons de faire : 
+1. Le holder envoie une proposal (proposal = décrit un credential definition, donc le holder indique le type de VC qu'il veut recevoir)
+2. Le issuer envoie une offre de VC au holder
+3. Le holder saute la proposal et juste demande un VC. Le issuer lui donne un VC. 
+
+Un schema de tout ceci peut aussi être consulté [ici](https://github.com/hyperledger/aries-rfcs/tree/main/features/0453-issue-credential-v2#states) - ainsi que des informations plus détaillées sur les états. 
+
+
+Le tutoriel met en pratique le flow 1. C'est ce flow que je vais décrire ici. 
+1. Le holder envoie une proposal au issuer
+2. Le issuer envoie une offre au holder basée sur son proposal
+3. Le holder envoie une requête pour avoir un credential
+4. Le issuer envoie le credential au holder
+5. Le holder store le credential
+6. Le issuer a un ack
+
+Tous les endpoints utilisés ici peuvent être trouvés dans les docs perspectives des Agents. 
+
+9b3eb15b-e1ab-4dd0-838c-a18f1373aa76
+id bob : baf82399-dbaa-4edc-b921-1e4e6f5b4b88
+### 1. Le holder envoie une proposal au issuer
+```
+curl -X POST http://localhost:11001/issue-credential-2.0/send-proposal \
+ -H "Content-Type: application/json" -d '{
+  "comment": "I want this",
+  "connection_id": "baf82399-dbaa-4edc-b921-1e4e6f5b4b88",
+  "credential_preview": {
+    "@type": "issue-credential/2.0/credential-preview",
+    "attributes": [
+      {
+        "mime-type": "plain/text",
+        "name": "name", 
+        "value": "Bob"
+      },
+      {
+        "mime-type": "plain/text",
+        "name": "age", 
+        "value": "120"
+      }
+    ]
+  },
+  "filter": {
+    "dif": {},
+    "indy": {
+      
+    }
+  }
+}'
+```
+Nous obtenons cette réponse :
+```
+{"cred_ex_id": "d54463f5-5fe1-45b6-bfcc-28505f13c794", "created_at": "2022-03-09T01:15:14.343365Z", "state": "proposal-sent", "auto_offer": false, "connection_id": "baf82399-dbaa-4edc-b921-1e4e6f5b4b88", "cred_preview": {"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/issue-credential/2.0/credential-preview", "attributes": [{"name": "name", "mime-type": "plain/text", "value": "Bob"}, {"name": "age", "mime-type": "plain/text", "value": "120"}]}, "cred_proposal": {"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/issue-credential/2.0/propose-credential", "@id": "9a156eb4-dc07-4c89-93f3-a965a93428d0", "filters~attach": [{"@id": "indy", "mime-type": "application/json", "data": {"base64": "e30="}}], "comment": "I want this", "credential_preview": {"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/issue-credential/2.0/credential-preview", "attributes": [{"name": "name", "mime-type": "plain/text", "value": "Bob"}, {"name": "age", "mime-type": "plain/text", "value": "120"}]}, "formats": [{"attach_id": "indy", "format": "hlindy/cred-filter@v2.0"}]}, "thread_id": "9a156eb4-dc07-4c89-93f3-a965a93428d0", "by_format": {"cred_proposal": {"indy": {}}}, "auto_issue": false, "updated_at": "2022-03-09T01:15:14.343365Z", "initiator": "self", "role": "holder", "auto_remove": true}
+```
+
+Mais le seul valeur que nous alons vraiment uttiliser est la valeur du champ **cred_ex_id** : d54463f5-5fe1-45b6-bfcc-28505f13c794
+
+### 2. Le issuer envoie une offre au holder basée sur son proposal
+Il faut savoir que les **cred\_ex\_id** sont différentes pour Alice et Bob. Pour consulter celui de Alice, nous consultons les records :
+(rien ne s'affiche sur les agents donc obligé de consulter à chaque fois.)
+```
+curl http://localhost:11000/issue-credential-2.0/records
+```
+Et nous obtenons un record qui a un champ **cred_ex_id** = 606e7b4b-e1e9-40a3-b2d2-7b992a14913a
+```
+{"results": [{"cred_ex_record": {"auto_remove": true, "state": "proposal-received", "initiator": "external", "thread_id": "9a156eb4-dc07-4c89-93f3-a965a93428d0", "by_format": {"cred_proposal": {"indy": {}}}, "connection_id": "9b3eb15b-e1ab-4dd0-838c-a18f1373aa76", "cred_preview": {"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/issue-credential/2.0/credential-preview", "attributes": [{"name": "name", "mime-type": "plain/text", "value": "Bob"}, {"name": "age", "mime-type": "plain/text", "value": "120"}]}, "cred_ex_id": "606e7b4b-e1e9-40a3-b2d2-7b992a14913a", "cred_proposal": {"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/issue-credential/2.0/propose-credential", "@id": "9a156eb4-dc07-4c89-93f3-a965a93428d0", "credential_preview": {"@type": "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/issue-credential/2.0/credential-preview", "attributes": [{"name": "name", "mime-type": "plain/text", "value": "Bob"}, {"name": "age", "mime-type": "plain/text", "value": "120"}]}, "comment": "I want this", "filters~attach": [{"@id": "indy", "mime-type": "application/json", "data": {"base64": "e30="}}], "formats": [{"attach_id": "indy", "format": "hlindy/cred-filter@v2.0"}]}, "trace": false, "updated_at": "2022-03-09T01:15:14.444459Z", "role": "issuer", "created_at": "2022-03-09T01:15:14.444459Z"}, "indy": null, "ld_proof": null}]}
+```
+Pour envoyer une offre de VC à Bob on prend ce cred\_ex\_id et on fait : 
+```
+curl -X POST http://localhost:11000/issue-credential-2.0/records/606e7b4b-e1e9-40a3-b2d2-7b992a14913a/send-offer
+```
+
+
+### 3. Le holder envoie une requête pour avoir un credential
+Maintenant, le holder qui a reçu l'offre envoie une requête au issuer pour avoir son credential. Toujours en utilisant le cred\_ex\_id de Bob. 
+
+```
+curl -X POST http://localhost:11001/issue-credential-2.0/records/d54463f5-5fe1-45b6-bfcc-28505f13c794/send-request
+```
+
+### 4. Le issuer envoie le credential au holder
+
+Le issuer maintenant envoie le credential : 
+```
+curl -X POST http://localhost:11000/issue-credential-2.0/records/606e7b4b-e1e9-40a3-b2d2-7b992a14913a/issue \
+  -H "Content-Type: application/json" -d '{"comment": "Receive your credential"}'
+```
+  
+### 5. Le holder store le credential
+Finalement, le holder Bob peut storer le credential : 
+```
+curl -X POST http://localhost:11001/issue-credential-2.0/records/d54463f5-5fe1-45b6-bfcc-28505f13c794/store \
+-H "Content-Type: application/json" -d '{}'
+```
+
+Pour consulter ses credentials il suffit de : 
+```
+curl -X GET "http://localhost:11001/credentials"
+```
+
+## Issuer des VCs - Façon 'automatique'
+Avec la façon automatique, au lieu d'utiliser l'endpoint /issue-credential-2.0/send-offer nous utilisons l'endpoint /issue-credential-2.0/send ce qui met les champs auto\_offer et auto\_issue à true.
+Il faut juste que du côté holder ça soit aussi automatisé. Pour ceci nous pouvons ajouter des options quand nous lançons nos Agents: 
+```
+    --auto-respond-credential-proposal \
+    --auto-respond-credential-offer \
+    --auto-respond-credential-request \
+    --auto-store-credential
+
+```
+
+
+
+
+
 
 
 
