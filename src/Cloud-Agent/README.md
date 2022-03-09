@@ -337,7 +337,7 @@ Et voilà normalement, la connexion devrait être établie !
 
 
 # Tutoriel pour Issuer des VC
-Pour ce tutoriel je me suis aidée de ce [tutorie](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-issue-credentials-v2/)
+Pour ce tutoriel je me suis aidée de ce [tutoriel](https://ldej.nl/post/becoming-a-hyperledger-aries-developer-issue-credentials-v2/)
 
 Nous avons Alice **(ISSUER)** et Bob **(HOLDER)**
 
@@ -346,7 +346,7 @@ Avant de se lancer sur les VC, il faut que le **issuer** crée un schéma et une
 ## Création du schema et de la credential definition
 C'est Alice qui va créer les deux
 
-###Création du schema
+### Création du schema
 Dans cet exemple on aura un attribut public key et un attribut name. 
 ```
 curl -X POST http://localhost:11000/schemas \
@@ -376,7 +376,7 @@ Ce qui donne cette réponse :
 }
 ```
 
-###Création de la credential definition
+### Création de la credential definition
 Nous utilisons le champ schema_id résultat de la création du schema :
 ```
 curl http://localhost:11000/credential-definitions \
