@@ -4,14 +4,19 @@ from PIL import Image, ImageTk
 import os
 import sys
 import subprocess
+import signal
+import json
+from QrCode_Generation import QRCode
 
 # /////// CONFIG ///////
 
 # Chemin du dossier qui contient ce fichier .py
 selfFolderPath = os.getcwd() 
 
-# "&" pour lancer en tâche de fond ? A tester (sinon peut-être que aca-py propose une option toute faite pour ça)
-AgentStartCommand = "aca-py start   --label ServeurW   -it http 0.0.0.0 8000   -ot http   --admin 0.0.0.0 11000   --admin-insecure-mode   --genesis-url http://localhost:9000/genesis   --seed ServeurW000000000000000000000000   --endpoint http://172.20.10.11:8000/   --debug-connections   --public-invites   --auto-provision   --wallet-type indy   --wallet-name ServeurW   --wallet-key secret   --auto-accept-requests --auto-accept-invites &"
+# "&" pour lancer en tâche de fond.
+AgentStartCommand = "aca-py start   --label ServeurW   -it http 0.0.0.0 8000   -ot http   --admin 0.0.0.0 11000   --admin-insecure-mode   --genesis-url http://localhost:9000/genesis   --seed ServeurW000000000000000000000000   --endpoint http://192.168.1.17:8000/   --debug-connections   --public-invites   --auto-provision   --wallet-type indy   --wallet-name ServeurW   --wallet-key secret   --auto-accept-requests --auto-accept-invites &"
+
+InvitCommand = ''' curl -X POST "http://localhost:11000/out-of-band/create-invitation" -H 'Content-Type: application/json' -d '{ "handshake_protocols": ["did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"],"use_public_did": false}' > invitClientW.json '''
 
 backgroundColor = 'white'
 windowTitle = "Agent ServeurW"
@@ -23,7 +28,7 @@ height=606
 # ///// END CONFIG /////
 
 #TODO Commande pour lancer l'agent Cloud du ServeurW (en tâche de fond si possible, faut pas qu'il bloque le terminal). 
-subprocess.call("echo TODO : Commande pour lancer aca-py ServeurW", shell=True)
+Agentproc = subprocess.Popen(AgentStartCommand, shell=True, preexec_fn=os.setsid)
 
 #Cette fonction lit un fichier de nom "file" et retourne la première ligne sans le retour à la ligne \n
 def loadFile(file) :
@@ -35,6 +40,10 @@ def loadFile(file) :
     print( "Erreur : " + selfFolderPath + "/" + file +" non trouvé")
     return "Erreur lors de la génération des clés" #Message d'erreur à retourner au choix, ici pensé pour retourner la clé publique wireguard
 
+# Open a json file
+def loadJSON(filePath):
+    with open(filePath, 'r') as file:
+        return json.load(file)
 
 class App:
 
@@ -53,7 +62,6 @@ class App:
 
         ft = tkFont.Font(family='Times',size=12)
 
-        #print("SALUT   " + os.getcwd() +"/wg.png")
         WGimg = Image.open(selfFolderPath+"/wg.png")
         WGimg = WGimg.resize((40, 40), Image.ANTIALIAS)
         WGimg = ImageTk.PhotoImage(WGimg)
@@ -185,23 +193,26 @@ class App:
     def GButton_1_command(self):
         subprocess.call("echo Génération des clés WireGuard", shell=True)
         #Ici on génère le couple publickey / privatekey
-        #subprocess.call("cd src/Cloud-Agent/", shell=True)
-        #subprocess.call("ls", shell=True)
         subprocess.call("umask 077", shell=True)
         subprocess.call("wg genkey | tee privatekey | wg pubkey > publickey", shell=True)
-        #subprocess.call("cd ../..", shell=True)
         #Ici on met à jour la zone de texte à droite du bouton
         self.GLineEdit_1.delete(0, len(self.GLineEdit_1.get()))
         self.GLineEdit_1.insert(1,loadFile("publickey"))
 
 #TODO Fonction appelée quand on clique sur le bouton "OK"
     def GButton_2_command(self):
-        subprocess.call("echo TODO : Connection à ServeurB", shell=True)
+        subprocess.call("echo TODO : Etablir connexion avec ServeurB", shell=True)
+        
 
 
-#TODO Fonction appelée quand on clique sur le bouton "Générer invitation pour ClientW"
+# Fonction appelée quand on clique sur le bouton "Générer invitation pour ClientW"
     def GButton_3_command(self):
-        subprocess.call("echo TODO : Générer invitation pour CLientW", shell=True)
+        subprocess.call(InvitCommand, shell=True)
+        invitJson = loadJSON(selfFolderPath + "/invitClientW.json") #Enregistre l'invitation dans un fichier json.
+        invitURL = invitJson['invitation_url']
+        self.GLineEdit_3.delete(0, len(self.GLineEdit_3.get()))
+        self.GLineEdit_3.insert(1,invitURL)
+        QRCode(invitURL).toPNG(selfFolderPath + "/invitClientW.png") #Génère un QRcode d'invitation à partir de l'URL d'invitation.
 
 
 #TODO Fonction appelée quand on clique sur le bouton "Echanges de Proofs avec ClientW"
@@ -222,3 +233,4 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = App(root)
     root.mainloop()
+    os.killpg(Agentproc.pid, signal.SIGTERM) #Pour tuer le processus aca-py Agent lancé au départ
