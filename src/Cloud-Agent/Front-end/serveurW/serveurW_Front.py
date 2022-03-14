@@ -11,6 +11,20 @@ from socket import *
 from netifaces import interfaces, ifaddresses, AF_INET
 
 
+# Dépendances manquantes sur les VM à installer :
+#
+# apt-get install python3-tk python3-pil python3-pil.imagetk
+# pip install pyqrcode netifaces pypng
+
+# ATTENTION Important :
+#
+# Script pensé pour être lancé sur ServeurW car il est root !
+# Pour l'instant ça lance le aca-py en arrière plan donc faut bien les kill avant de relancer quoi que ce soit avec :
+#
+# ps aux | grep aca-py
+# kill -9 <pid aca-py> 
+# 
+
 # /////// CONFIG ///////
 
 # Chemin du dossier qui contient ce fichier .py
@@ -22,6 +36,7 @@ for ifaceName in interfaces():
     addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
     listeAdresses.append(addresses)
 
+# A modif pour pointer sur l'adresse ip de ServeurB
 genesisIP = 'localhost'
 
 # "&" pour lancer en tâche de fond.
