@@ -10,3 +10,7 @@ src/mobile-Agent/android/.gradle
 src/mobile-Agent/android/.idea
 src/mobile-Agent/android/local.properties
 src/Cloud-Agent/Front-end/__pycache__
+src/Cloud-Agent/Front-end/invitClientW.json
+src/Cloud-Agent/Front-end/invitClientW.png
+src/Cloud-Agent/Front-end/privatekey
+src/Cloud-Agent/Front-end/publickey
