@@ -40,7 +40,7 @@ InvitCommand = ''' curl -X POST "http://localhost:11000/out-of-band/create-invit
 #Commande pour lancer l'agent Von du ServeurB (en tâche de fond si possible, faut pas qu'il bloque le terminal). 
 print("Démarrage du von-network ...")
 Vonproc = subprocess.Popen(VonStartCommand, shell=True, preexec_fn=os.setsid)
-time.sleep(5)
+time.sleep(20)
 print("OK")
 
 #Commandes pour enregistrer les utilisateurs dans le von-network
@@ -48,18 +48,18 @@ print("Enregistrement des utilisateurs ...")
 subprocess.Popen(RegisterCommand_1, shell=True, preexec_fn=os.setsid)
 subprocess.Popen(RegisterCommand_2, shell=True, preexec_fn=os.setsid)
 subprocess.Popen(RegisterCommand_3, shell=True, preexec_fn=os.setsid)
+time.sleep(10)
 print("OK")
 
 print("Démarrage du CloudAgent ...")
 #Commande pour lancer l'agent Cloud du ServeurB (en tâche de fond si possible, faut pas qu'il bloque le terminal). 
 Agentproc = subprocess.Popen(AgentStartCommand, shell=True, preexec_fn=os.setsid)
-time.sleep(5)
+time.sleep(20)
 print("OK")
 
 print("Création de l'invitation pour ServeurW ...")
 #Commande pour lancer l'agent Cloud du ServeurB (en tâche de fond si possible, faut pas qu'il bloque le terminal). 
 subprocess.Popen(InvitCommand, shell=True, preexec_fn=os.setsid)
-time.sleep(5)
 print("OK")
 
 print("Invitation : ")
