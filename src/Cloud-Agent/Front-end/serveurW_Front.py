@@ -7,14 +7,25 @@ import subprocess
 import signal
 import json
 from QrCode_Generation import QRCode
+from socket import *
+from netifaces import interfaces, ifaddresses, AF_INET
+
 
 # /////// CONFIG ///////
 
 # Chemin du dossier qui contient ce fichier .py
 selfFolderPath = os.getcwd() 
 
+# Permet de récupérer automatiquement l'@ip de l'interface de la machine reliée au LAN. 
+listeAdresses = []*len(interfaces())
+for ifaceName in interfaces():
+    addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
+    listeAdresses.append(addresses)
+
+genesisIP = 'localhost'
+
 # "&" pour lancer en tâche de fond.
-AgentStartCommand = "aca-py start   --label ServeurW   -it http 0.0.0.0 8000   -ot http   --admin 0.0.0.0 11000   --admin-insecure-mode   --genesis-url http://localhost:9000/genesis   --seed ServeurW000000000000000000000000   --endpoint http://192.168.1.17:8000/   --debug-connections   --public-invites   --auto-provision   --wallet-type indy   --wallet-name ServeurW   --wallet-key secret   --auto-accept-requests --auto-accept-invites &"
+AgentStartCommand = "aca-py start   --label ServeurW   -it http 0.0.0.0 8000   -ot http   --admin 0.0.0.0 11000   --admin-insecure-mode   --genesis-url http://"+genesisIP+":9000/genesis   --seed ServeurW000000000000000000000000   --endpoint http://"+listeAdresses[1][0]+":8000/   --debug-connections   --public-invites   --auto-provision   --wallet-type indy   --wallet-name ServeurW   --wallet-key secret   --auto-accept-requests --auto-accept-invites &"
 
 InvitCommand = ''' curl -X POST "http://localhost:11000/out-of-band/create-invitation" -H 'Content-Type: application/json' -d '{ "handshake_protocols": ["did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"],"use_public_did": false}' > invitClientW.json '''
 
@@ -98,13 +109,12 @@ class App:
         self.GLineEdit_1["text"] = ""
         self.GLineEdit_1.place(x=290,y=50,width=463,height=40)
 
-        self.GMessage_1=tk.Message(root)
-        self.GMessage_1["bg"] = "#a9e5a1"
-        self.GMessage_1["font"] = ft
-        self.GMessage_1["fg"] = "#333333"
-        self.GMessage_1["justify"] = "center"
-        self.GMessage_1["text"] = "Entrer l'invitation de ServeurB ci-dessous"
-        self.GMessage_1.place(x=290,y=150,width=464,height=40)
+        self.GText_1 = tk.Label(text = "Entrer l'invitation de ServeurB ci-dessous")
+        self.GText_1["bg"] = "#a9e5a1"
+        self.GText_1["font"] = ft
+        self.GText_1["fg"] = "#333333"
+        self.GText_1["justify"] = "center"
+        self.GText_1.place(x=290,y=150,width=464,height=40)
 
         self.GLineEdit_2=tk.Entry(root)
         self.GLineEdit_2["bg"] = "#a9e5a1"
