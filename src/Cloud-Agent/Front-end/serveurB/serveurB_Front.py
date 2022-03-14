@@ -60,6 +60,7 @@ print("OK")
 print("Création de l'invitation pour ServeurW ...")
 #Commande pour lancer l'agent Cloud du ServeurB (en tâche de fond si possible, faut pas qu'il bloque le terminal). 
 subprocess.Popen(InvitCommand, shell=True, preexec_fn=os.setsid)
+time.sleep(5)
 print("OK")
 
 print("Invitation : ")
