@@ -63,11 +63,11 @@ backgroundColor = 'white'
 windowTitle = "Agent ServeurW"
 #font = 'times 12'
 #setting window size
-width=810
-height=606
+width=400
+height=400
 # ///// END CONFIG /////
 
-
+'''
 # Commande pour lancer l'agent Von du ServeurB. 
 print("Démarrage du von-network ...")
 Vonproc = subprocess.Popen(VonStartCommand, shell=True, preexec_fn=os.setsid)
@@ -91,7 +91,7 @@ Agentproc = subprocess.Popen(AgentStartCommand, shell=True, preexec_fn=os.setsid
 Agentproc.wait()
 time.sleep(5)
 print("CloudAgent ServeurB OK")
-
+'''
 
 # Open a json file
 def loadJSON(filePath):
@@ -166,20 +166,24 @@ class App:
 # Fonction appelée quand on clique sur le bouton "STOP"
     def GButton_1_command(self):
         global stop
-        os.killpg(Agentproc.pid, signal.SIGTERM)                    #Pour tuer le processus aca-py Agent lancé au départ
-        subprocess.call("~/von-network/manage stop", shell=True)    #Pour tuer le von-network
+        print("byyye")
+        #os.killpg(Agentproc.pid, signal.SIGTERM)                    #Pour tuer le processus aca-py Agent lancé au départ
+        #subprocess.call("~/von-network/manage stop", shell=True)    #Pour tuer le von-network
         stop = True
 
 
 # Fonction appelée quand on clique sur le bouton "Générer invitation pour ClientW"
     def GButton_3_command(self):
-        #Commande pour lancer l'agent Cloud du ServeurB (en tâche de fond si possible, faut pas qu'il bloque le terminal). 
+        #Commande pour lancer l'agent Cloud du ServeurB (en tâche de fond si possible, faut pas qu'il bloque le terminal).
+        ''' 
         Invitproc = subprocess.Popen(InvitCommand, shell=True, preexec_fn=os.setsid)
         Invitproc.wait()
         invitJson = loadJSON(selfFolderPath + "/invitServeurtW.json") #Récupère l'invitation dans le fichier json.
         invitURL = invitJson['invitation_url']
         self.GLineEdit_3.delete(0, len(self.GLineEdit_3.get()))
         self.GLineEdit_3.insert(1,invitURL)
+        '''
+        print("invit")
 
 
 if __name__ == "__main__":
@@ -187,8 +191,9 @@ if __name__ == "__main__":
     app = App(root)
     root.mainloop()
     if not stop :
-        os.killpg(Agentproc.pid, signal.SIGTERM)                    #Pour tuer le processus aca-py Agent lancé au départ
-        subprocess.call("~/von-network/manage stop", shell=True)    #Pour tuer le von-network
+        print("byyyyyyyye")
+        #os.killpg(Agentproc.pid, signal.SIGTERM)                    #Pour tuer le processus aca-py Agent lancé au départ
+        #subprocess.call("~/von-network/manage stop", shell=True)    #Pour tuer le von-network
 
     
 
