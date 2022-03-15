@@ -9,7 +9,7 @@ import json
 from QrCode_Generation import QRCode
 from socket import *
 from netifaces import interfaces, ifaddresses, AF_INET
-
+import time
 
 # Dépendances manquantes sur les VM à installer :
 #
@@ -42,9 +42,9 @@ for ifaceName in interfaces():
 pubKey = ""
 
 # Si on a le von-network en local :
-genesisIP = 'localhost'
+#genesisIP = 'localhost'
 # Si le von-network est sur serveurB :
-# genesisIP = '192.168.1.15'
+genesisIP = '192.168.1.15'
 
 # "&" pour lancer en tâche de fond.
 AgentStartCommand = "aca-py start   --label ServeurW   -it http 0.0.0.0 8000   -ot http   --admin 0.0.0.0 11000   --admin-insecure-mode   --genesis-url http://"+genesisIP+":9000/genesis   --seed ServeurW000000000000000000000000   --endpoint http://"+listeAdresses[1][0]+":8000/   --debug-connections   --public-invites   --auto-provision   --wallet-type indy   --wallet-name ServeurW   --wallet-key secret   --auto-accept-requests --auto-accept-invites  --auto-respond-credential-proposal  --auto-respond-credential-offer  --auto-respond-credential-request  --auto-store-credential &"
@@ -239,15 +239,23 @@ class App:
     def GButton_2_command(self):
         global InvitRequest
         reqMSG = InvitRequest + self.GLineEdit_2.get() +''' ' '''
-        invitProc = subprocess.call(reqMSG, shell=True)
+        invitProc = subprocess.Popen(reqMSG, shell=True, preexec_fn=os.setsid)
         invitProc.wait()
+        time.sleep(5)
         self.GLineEdit_2.delete(0, len(self.GLineEdit_2.get()))
-        invitProc = subprocess.call(''' curl http://localhost:11000/connections > Connection_logs.json ''', shell=True)
+        invitProc = subprocess.Popen(''' curl http://localhost:11000/connections > Connection_logs.json ''', shell=True, preexec_fn=os.setsid)
         invitProc.wait()
+        time.sleep(5)
         connectJson = loadJSON(selfFolderPath + "/Connection_logs.json") #Enregistre l'invitation dans un fichier json.
-        connectID = json.dumps(connectJson['connection_id'])
-        proposeCommand = ''' curl -X POST http://localhost:11000/issue-credential-2.0/send-proposal -H "Content-Type: application/json" -d '{"comment": "VC WG Please","connection_id": ''' +connectID+''',"credential_preview": {"@type": "issue-credential/2.0/credential-preview","attributes": [{"mime-type": "plain/text","name": "public key", "value": '''+ pubKey +'''},{"mime-type": "plain/text","name": "name", "value": "ServeurW"}]},"filter": {"indy": {  }}}' '''
-        invitProc = subprocess.call(proposeCommand, shell=True)
+        #print("COUCOU")
+        #print(connectJson)
+        connectID = json.dumps(connectJson['results'][0]['connection_id'])
+        print("COUCOU")
+        print(connectID)
+        proposeCommand = ''' curl -X POST http://localhost:11000/issue-credential-2.0/send-proposal -H "Content-Type: application/json" -d '{"comment": "VC WG Please","connection_id": ''' +connectID+ ''',"credential_preview": {"@type": "issue-credential/2.0/credential-preview","attributes": [{"mime-type": "plain/text","name": "public key", "value": "'''+ pubKey +'''"},{"mime-type": "plain/text","name": "name", "value": "ServeurW"}]},"filter": {"indy": {  }}}' '''
+        print("COUCOU 2")
+        print(proposeCommand)
+        invitProc = subprocess.Popen(proposeCommand, shell=True, preexec_fn=os.setsid)
         invitProc.wait()
 
 # Fonction appelée quand on clique sur le bouton "Générer invitation pour ClientW"
