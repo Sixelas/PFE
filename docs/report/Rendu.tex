@@ -154,12 +154,16 @@ L'Agent Aries Cloud met aussi en oeuvre une interface  OpenAPI REST pouvant serv
 \end{flushleft}
 
 \vspace{5mm}
+Dans notre architecture, nous pouvons voir que notre Agent communique avec un Distributed Ledger, donc un Blockchain. Pour précision, dans notre projet nous utilisons Von Network comme Blockchain.
+
+\vspace{2mm}
 Pour controler et faire des actions dans l'API il suffit juste de retrouver le endpoint qui fera l'action qu'on veut, le sélectionner et rentrer les champs nécessaires s'il en faut. C'est un outil très outil pour comprendre et développer son agent. \\
 Voici l'API d'un agent Aries Cloud : 
 
 \begin{center}
 \includegraphics[scale=0.2]{adminApi.png}
 \end{center}
+
 
 \subsubsection{Aries Mobile Agent React-Native}
 \noindent 
@@ -204,13 +208,19 @@ TODO
 \subsection{Cloud Agent du Serveur WireGuard}
 \noindent 
 \begin{flushleft}
-TODO
+Le Serveur Wireguard est une machine qui hoste un service VPN Wireguard. Cette machine est une machine Debian. Dans cette machine il y a aussi un Agent Cloud. Cet Agent Cloud est capable de communiquae avec d'autres agents, notamment dans ce cas l'Agent du Serveur Blockchain et l'Agent du Client Wireguard. Il aura de différentes intéractions avec chacun des deux agents. \\
+Avec l'Agent Server Blockchain il aura des interactions qui auront comme objectif la réception de Verifiable Credentials, ainsi que la vérification de ceux-ci. \\
+Les échanges avec le Client Wireguard seront différents. En premier, il y aura un échange concernant les Verifiable Credentials - il faut que le Serveur Wireguard et le Client Wireguard s'échangent leur Verifiable Credentials/Presentations. Une fois les VC/P sont validés de chaque côté, les deux machines vont échanger leur clés publiques Wireguard pour pouvoir mettre en place un VPN. \\
+Nous avons mis en place une interface graphique en python pour pouvoir gérer les différentes intéractions et événements.\\
+TODO : AJOUTER IMAGE INTERFACE 
 \end{flushleft}
 
 \subsection{Cloud Agent du Serveur BlockChain}
 \noindent 
 \begin{flushleft}
-TODO
+Le Serveur Blockchain a différentes responsabilités. Dans le cas où on veut avoir notre propre réseau de noeuds Blockchain, le serveur Blockchain sera celui qui déploie ce réseau. Nous utilisons Von Network pour déployer les noeuds Blockchain. Nous avons aussi la possibilité de prendre comme référence un réseau de noeuds déjà éxistant. \\
+Le Serveur Blockchain est donc celui qui est directemment rélié au réseau de noeuds Blockchain. Ce serveur enregistre les utilisateurs auprès de la Blockchain. Il se charge aussi de la délivrance de Verifiable Credentials et de la vérification de VC/VP. \\
+
 \end{flushleft}
 
 \section{Analyse du fonctionnement \& Tests}
