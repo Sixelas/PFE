@@ -176,7 +176,7 @@ class App:
         Invitproc = subprocess.Popen(InvitCommand, shell=True, preexec_fn=os.setsid)
         Invitproc.wait()
         invitJson = loadJSON(selfFolderPath + "/invitServeurtW.json") #Récupère l'invitation dans le fichier json.
-        invitURL = invitJson['invitation_url']
+        invitURL = invitJson['invitation']
         self.GLineEdit_3.delete(0, len(self.GLineEdit_3.get()))
         self.GLineEdit_3.insert(1,invitURL)
 
