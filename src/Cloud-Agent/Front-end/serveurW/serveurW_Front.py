@@ -36,8 +36,10 @@ for ifaceName in interfaces():
     addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
     listeAdresses.append(addresses)
 
-# A modif pour pointer sur l'adresse ip de ServeurB
+# Si on a le von-network en local :
 genesisIP = 'localhost'
+# Si le von-network est sur serveurB :
+# genesisIP = '192.168.1.15'
 
 # "&" pour lancer en tâche de fond.
 AgentStartCommand = "aca-py start   --label ServeurW   -it http 0.0.0.0 8000   -ot http   --admin 0.0.0.0 11000   --admin-insecure-mode   --genesis-url http://"+genesisIP+":9000/genesis   --seed ServeurW000000000000000000000000   --endpoint http://"+listeAdresses[1][0]+":8000/   --debug-connections   --public-invites   --auto-provision   --wallet-type indy   --wallet-name ServeurW   --wallet-key secret   --auto-accept-requests --auto-accept-invites &"
@@ -226,7 +228,7 @@ class App:
         self.GLineEdit_1.delete(0, len(self.GLineEdit_1.get()))
         self.GLineEdit_1.insert(1,loadFile("publickey"))
 
-#TODO Fonction appelée quand on clique sur le bouton "OK"
+# Fonction appelée quand on clique sur le bouton "OK"
     def GButton_2_command(self):
         global InvitRequest
         reqMSG = InvitRequest + self.GLineEdit_2.get() +''' ' '''
@@ -239,10 +241,10 @@ class App:
     def GButton_3_command(self):
         subprocess.call(InvitCommand, shell=True)
         invitJson = loadJSON(selfFolderPath + "/invitClientW.json") #Enregistre l'invitation dans un fichier json.
-        invitURL = invitJson['invitation_url']
+        invitURL = json.dumps(invitJson['invitation'])
         self.GLineEdit_3.delete(0, len(self.GLineEdit_3.get()))
         self.GLineEdit_3.insert(1,invitURL)
-        QRCode(invitURL).toPNG(selfFolderPath + "/invitClientW.png") #Génère un QRcode d'invitation à partir de l'URL d'invitation.
+        QRCode(json.dumps(invitJson['invitation_url'])).toPNG(selfFolderPath + "/invitClientW.png") #Génère un QRcode d'invitation à partir de l'URL d'invitation.
 
 
 #TODO Fonction appelée quand on clique sur le bouton "Echanges de Proofs avec ClientW"
