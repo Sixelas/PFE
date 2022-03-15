@@ -168,8 +168,29 @@ Voici l'API d'un agent Aries Cloud :
 \subsubsection{Aries Mobile Agent React-Native}
 \noindent 
 \begin{flushleft}
-TODO
+L'Aries Mobile Agent (ou Aries Bifold) est une application Open Source développée sur React Native 0.64.1 qui a pour but de regrouper les efforts de la communauté Aries Hyperledger orientée application mobile vers un projet centralisé, afin d'éviter la duplication du code et les similitudes entre les projets. Ce projet est aussi destiné à aider d'autres projets spécifiques voulant utiliser sur mobile les technologies de la fondation Aries Hyperledger sans avoir à redéfinir la complexité interne des agents Aries. Il est conçu pour permettre de démarrer rapidement un projet en ayant un agent Aries de base.\
+
+Aries Mobile Agent est basé sur deux dépendances principales qui sont les suivantes :\\
+\begin{itemize}
+
+\item Aries Framework Javascript, un framework écrit en TypeScript pour la création d'agents Self Sovereign Identity. SSI est une approche visant l'idée que chacun contrôle ses propres données informatiques, ainsi qu'un contrôle de quand et comment elles sont fournies aux autres. De plus, lorsqu'une donnée est partagée, cela doit être fait avec fiabilité. Avec SSI, il n'y a pas d'autorité centrale détenant les données les transmettant à d'autres entités sur demande. Vous seul en êtes le possesseur. Ce framework a également pour but d'utiliser les services DIDComm qui visent à être en conformité avec les normes définies dans les RFC d'Aries.
+
+\item Indy-sdk-react-Native : Il s’agit d’un Wrapper de Indy destiné à React Native. Son rôle est d’implémenter les fonctionnalités de Indy SDK afin qu’elles soient utilisables avec React Native. 
+
+React Native est un framework d'applications mobiles Open Source conçu par Facebook. Il est utilisé pour développer des applications natives pour Android et iOS. Aries Bifold étant développé en React native 0.64.1, il cible l’API 29.0.3 d’Android, tandis que sur IOS il vise la version 10.0+ et il ne peut être utilisé que sur des appareils physiques pour le moment. La virtualisation est possible que sur Androidx86.
+
+Aries Bifold nécessite un médiateur pour fonctionner. Le mobile Agent est configuré pour utiliser la médiation implicite. Il utilise par défaut Indicio Public Mediator, médiateur public de tests en ligne basé sur un Agent ACA-Py.
+Un médiateur est un agent dont le but est de faire l'intermédiaire entre un Mobile Agent et un autre Agent (par exemple un Cloud Agent ACA-py), en relayant les messages transmis entre eux. Une connexion DIDComm est établie avec le médiateur.\
+Ci-dessous nous pouvons voir le principe et fonctionnement d'un médiateur entre deux Agents Alice et Bob comme cela est présenté dans la norme "Aries RFC 0211: Coordinate Mediation Protocol"\footnote{\url{https://github.com/hyperledger/aries-rfcs/blob/main/features/0211-route-coordination/README.md
+}} :\\
+
+\begin{center}
+\includegraphics[scale=0.25]{mediator.png}
+\end{center}
+
+\end{itemize} 
 \end{flushleft}
+
 
 \subsection{QEMU}
 \noindent 
@@ -251,9 +272,12 @@ TODO
 
 \item WireGuard : \url{https://www.wireguard.com/} (consulté le 06/03/2022) 
 \item Verifiable Credentials : \url{https://www.w3.org/TR/vc-data-model/} (consulté le 06/03/2022) 
-\item Aries Cloud Agent : \url{https://github.com/hyperledger/aries-cloudagent-python (consulté le 15/03/2022} 
-\item QEMU : \url{https://www.qemu.org/} , \url{https://wiki.qemu.org/Main_Page}
-\item NEmu : \url{https://gitlab.com/v-a/nemu}
+\item Aries Cloud Agent : \url{https://github.com/hyperledger/aries-cloudagent-python} (consulté le 15/03/2022)
+\item Aries Mobile Agent : \url{https://github.com/hyperledger/aries-mobile-agent-react-native/} (consulté le 15/03/2022)
+\item Aries Framework Javascript : \url{https://github.com/hyperledger/aries-framework-javascript} (consulté le 15/03/2022)
+\item React Native Indy SDK : \url{https://github.com/hyperledger/indy-sdk-react-native} (consulté le 15/03/2022)
+\item QEMU : \url{https://www.qemu.org/} , \url{https://wiki.qemu.org/Main_Page} (consultés le 15/03/2022)
+\item NEmu : \url{https://gitlab.com/v-a/nemu} (consulté le 15/03/2022)
 
 \end{itemize}
 
