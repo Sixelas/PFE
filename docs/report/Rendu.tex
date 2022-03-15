@@ -115,11 +115,13 @@ Des mécanismes de preuves et de signatures numériques sont nécessaires afin d
 \end{center}
 \end{flushleft}
 
+\newpage
 \subsection{Aries Hyperledger}
 \noindent 
 \begin{flushleft}
 Aries Hyperledger est un projet developpé par l'Hyperledger Foundation. Hyperledger Foundation est une communauté centrée sur le développement d'outils, librairies et frameworks permettant de déployer des blockchains qui seront majoritairement mises au service d'entreprises. \\
 Il y a différents projets lancées par la Fondation Hyperledger. Aries Hyerledger est le 13ème projet lancé par cette communauté. Aries Hyperedger est une infrastructure permettant l'échange de données en relation à la blockchain ainsi que l'échange de messages peer-to-peer. \\
+\vspace{2mm}
 Aries Hyperledger inclut plusieurs services dans son infrastructure :
 \begin{itemize}
 \item Une couche interface appelée resolver qui permet de créer et signer des transactions blockchain
@@ -128,19 +130,36 @@ Aries Hyperledger inclut plusieurs services dans son infrastructure :
 \item Une implementation des W3C Verifiable Credentials 
 \item Une implementation du Decentralized Key Management System (DKMS)
 \item Un mechanisme qui permet de construire protocoles et des API
+
 \end{itemize}
-
+\begin{center}
 \includegraphics[scale=0.4]{aries-hyper.png}
+\end{center}
 
+\vspace{5mm}
 Le plus grand objectif du projet Aries Hyperledger est de pouvoir offrir une infrastructure qui peut travailler et s'adapter à d'autres technologies développées par Indy ou qui se servent d'autres technologies blockchain. 
-
 \end{flushleft}
 
+\newpage
 \subsubsection{Aries Cloud Agent}
 \noindent 
 \begin{flushleft}
+Hyperledger Aries Cloud Agent Python (ACA-Py) est une projet visé à servir de base pour contruire des agent pouvant utiliser des Verifiable Credentials. Ses protocols et fonctionnalités de base permettent de délivrer, vérifier et stocker des Verifiable Credentials. Les agent ACA-Py peuvent contrôler des Verifiable Credentials de format Hyperledger Indy AnonCreds et de format W3C, dans ce projet nous nous intéréssons eu dernier format. \\
+Aries Cloud Agent fonctionne avec des requêtes HTTP et des notifications webhook. Ceci ouvre la possibilité d'écrire un controlleur qui 'discute' avec notre agent en n'importe quel langage pouvant gérer des requêtes HTTP. \\
+L'Agent Aries Cloud met aussi en oeuvre une interface  OpenAPI REST pouvant servir à comprendre comment les protocols dans notre agent fonctionnent. Le controller peut donc utiliser ceci pour gérer le comportement de l'agent. Voici un résume de l'architecture de l'agent Aries Cloud : \\
 
+\begin{center}
+\includegraphics[scale=0.6]{ACA-py.png}
+\end{center}
 \end{flushleft}
+
+\vspace{5mm}
+Pour controler et faire des actions dans l'API il suffit juste de retrouver le endpoint qui fera l'action qu'on veut, le sélectionner et rentrer les champs nécessaires s'il en faut. C'est un outil très outil pour comprendre et développer son agent. \\
+Voici l'API d'un agent Aries Cloud : 
+
+\begin{center}
+\includegraphics[scale=0.2]{adminApi.png}
+\end{center}
 
 \subsubsection{Aries Mobile Agent React-Native}
 \noindent 
