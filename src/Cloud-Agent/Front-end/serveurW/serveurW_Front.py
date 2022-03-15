@@ -32,9 +32,11 @@ selfFolderPath = os.getcwd()
 
 # Permet de récupérer automatiquement l'@ip de l'interface de la machine reliée au LAN. 
 listeAdresses = []*len(interfaces())
+listeInterfaces = []*len(interfaces())
 for ifaceName in interfaces():
     addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
     listeAdresses.append(addresses)
+    listeInterfaces.append(ifaceName)
 
 # Id de la connexion établie avec serveurB 
 #connectID = ""
@@ -279,7 +281,13 @@ class App:
 
 #TODO Fonction appelée quand on clique sur le bouton "Configuration du Tunnel VPN"
     def GButton_6_command(self):
-        subprocess.call("echo TODO : Configuration du Tunnel VPN", shell=True)
+        #clientPubKey = self.GLineEdit_4.get()
+        clientPubKey = "0123456789"
+        confWG = ''' echo "[Interface]\nPrivateKey = '''+loadFile("privatekey") +''' \nAddress = 120.0.0.1 \nSaveConfig = false \nListenPort = 51820 \nPostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o '''+listeInterfaces[1]+''' -j MASQUERADE \nPostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o '''+listeInterfaces[1]+''' -j MASQUERADE \nDNS = 8.8.8.8 \n\n[Peer] \n# ClientW \nPublicKey = ''' +clientPubKey+ '''\nAllowedIPs = 120.0.0.2/32" > /etc/wireguard/wg0.conf'''
+        subprocess.Popen(confWG, shell=True)
+        startVPN = subprocess.Popen("wg-quick up wg0", shell=True, preexec_fn=os.setsid)
+        startVPN.wait()
+        subprocess.call("echo Tunnel VPN établi !", shell=True)
 
 if __name__ == "__main__":
     root = tk.Tk()
