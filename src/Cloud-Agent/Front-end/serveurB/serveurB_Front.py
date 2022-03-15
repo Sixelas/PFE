@@ -49,7 +49,7 @@ genesisIP = 'localhost'
 VonStartCommand = "~/von-network/manage start logs"
 
 # "&" pour lancer en tâche de fond.
-AgentStartCommand = "aca-py start   --label ServeurB   -it http 0.0.0.0 8000   -ot http   --admin 0.0.0.0 11000   --admin-insecure-mode   --genesis-url http://"+genesisIP+":9000/genesis   --seed ServeurB000000000000000000000000   --endpoint http://"+listeAdresses[1][0]+":8000/   --debug-connections   --public-invites   --auto-provision   --wallet-type indy   --wallet-name ServeurB   --wallet-key secret   --auto-accept-requests --auto-accept-invites &"
+AgentStartCommand = "aca-py start   --label ServeurB   -it http 0.0.0.0 8000   -ot http   --admin 0.0.0.0 11000   --admin-insecure-mode   --genesis-url http://"+genesisIP+":9000/genesis   --seed ServeurB000000000000000000000000   --endpoint http://"+listeAdresses[1][0]+":8000/   --debug-connections   --public-invites   --auto-provision   --wallet-type indy   --wallet-name ServeurB   --wallet-key secret   --auto-accept-requests --auto-accept-invites --auto-respond-credential-proposal  --auto-respond-credential-offer  --auto-respond-credential-request  --auto-store-credential &"
 
 RegisterCommand_1 = ''' curl -X POST "http://localhost:9000/register" -d '{"seed": "ServeurW000000000000000000000000", "role": "TRUST_ANCHOR", "alias": "ServeurW"}' '''
 RegisterCommand_2 = ''' curl -X POST "http://localhost:9000/register" -d '{"seed": "ServeurB000000000000000000000000", "role": "TRUST_ANCHOR", "alias": "ServeurB"}' '''
@@ -57,6 +57,7 @@ RegisterCommand_3 = ''' curl -X POST "http://localhost:9000/register" -d '{"seed
 
 InvitCommand = ''' curl -X POST "http://localhost:11000/out-of-band/create-invitation" -H 'Content-Type: application/json' -d '{ "handshake_protocols": ["did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"],"use_public_did": false}' > invitServeurtW.json '''
 
+CredentialSchemaCommand = ''' curl -X POST http://localhost:11000/schemas -H 'Content-Type: application/json' -d '{"attributes": ["public key","name"],"schema_name": "wg-schema","schema_version": "1.0"}' > CredSchema.json '''
 
 backgroundColor = 'white'
 windowTitle = "Agent ServeurW"
@@ -65,6 +66,21 @@ windowTitle = "Agent ServeurW"
 width=400
 height=300
 # ///// END CONFIG /////
+
+# Open a json file
+def loadJSON(filePath):
+    with open(filePath, 'r') as file:
+        return json.load(file)
+
+#Cette fonction lit un fichier de nom "file" et retourne la première ligne sans le retour à la ligne \n
+def loadFile(file) :
+    if os.path.exists(selfFolderPath + "/"+ file):
+        fichier = open(selfFolderPath + "/"+ file, "r")
+        for line in fichier :
+            return  line.strip('\n') 
+        fichier.close()
+    print( "Erreur : " + selfFolderPath + "/" + file +" non trouvé")
+    return "Erreur lors de la génération des clés" #Message d'erreur à retourner au choix, ici pensé pour retourner la clé publique wireguard
 
 
 # Commande pour lancer l'agent Von du ServeurB. 
@@ -91,12 +107,16 @@ Agentproc.wait()
 time.sleep(5)
 print("CloudAgent ServeurB OK")
 
+# Commande pour enregistrer le Credential Schema :
+print("Enregistrement du schéma de VC ...")
+Credproc = subprocess.Popen(CredentialSchemaCommand, shell=True, preexec_fn=os.setsid)
+Credproc.wait()
+CredSchema = loadJSON(selfFolderPath + "/CredSchema.json")
+ID_Schema = json.dumps(CredSchema['schema_id'])
+CredentialDefCommand = ''' curl http://localhost:11000/credential-definitions -H 'Content-Type: application/json' -d '{"revocation_registry_size": 4,"schema_id": ''' + ID_Schema + ''',"tag": "default"}' '''
+Credproc = subprocess.Popen(CredentialDefCommand, shell=True, preexec_fn=os.setsid)
+Credproc.wait()
 
-# Open a json file
-def loadJSON(filePath):
-    with open(filePath, 'r') as file:
-        return json.load(file)
-        
 class App:
 
     def __init__(self, root):
@@ -187,9 +207,8 @@ if __name__ == "__main__":
     root.mainloop()
     if not stop :
         os.killpg(Agentproc.pid, signal.SIGTERM)                    #Pour tuer le processus aca-py Agent lancé au départ
-        subprocess.call("~/von-network/manage stop", shell=True)    #Pour tuer le von-network
+        #subprocess.call("~/von-network/manage stop", shell=True)    #Pour tuer le von-network
 
     
-
 
 

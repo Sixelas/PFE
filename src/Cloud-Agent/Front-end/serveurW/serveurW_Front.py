@@ -36,13 +36,18 @@ for ifaceName in interfaces():
     addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
     listeAdresses.append(addresses)
 
+# Id de la connexion établie avec serveurB 
+#connectID = ""
+
+pubKey = ""
+
 # Si on a le von-network en local :
 genesisIP = 'localhost'
 # Si le von-network est sur serveurB :
 # genesisIP = '192.168.1.15'
 
 # "&" pour lancer en tâche de fond.
-AgentStartCommand = "aca-py start   --label ServeurW   -it http 0.0.0.0 8000   -ot http   --admin 0.0.0.0 11000   --admin-insecure-mode   --genesis-url http://"+genesisIP+":9000/genesis   --seed ServeurW000000000000000000000000   --endpoint http://"+listeAdresses[1][0]+":8000/   --debug-connections   --public-invites   --auto-provision   --wallet-type indy   --wallet-name ServeurW   --wallet-key secret   --auto-accept-requests --auto-accept-invites &"
+AgentStartCommand = "aca-py start   --label ServeurW   -it http 0.0.0.0 8000   -ot http   --admin 0.0.0.0 11000   --admin-insecure-mode   --genesis-url http://"+genesisIP+":9000/genesis   --seed ServeurW000000000000000000000000   --endpoint http://"+listeAdresses[1][0]+":8000/   --debug-connections   --public-invites   --auto-provision   --wallet-type indy   --wallet-name ServeurW   --wallet-key secret   --auto-accept-requests --auto-accept-invites  --auto-respond-credential-proposal  --auto-respond-credential-offer  --auto-respond-credential-request  --auto-store-credential &"
 
 InvitCommand = ''' curl -X POST "http://localhost:11000/out-of-band/create-invitation" -H 'Content-Type: application/json' -d '{ "handshake_protocols": ["did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"],"use_public_did": false}' > invitClientW.json '''
 
@@ -220,22 +225,30 @@ class App:
 
 # Fonction appelée quand on clique sur le bouton "Générer clés WireGuard"
     def GButton_1_command(self):
+        global pubKey
         subprocess.call("echo Génération des clés WireGuard", shell=True)
         #Ici on génère le couple publickey / privatekey
         subprocess.call("umask 077", shell=True)
         subprocess.call("wg genkey | tee privatekey | wg pubkey > publickey", shell=True)
         #Ici on met à jour la zone de texte à droite du bouton
         self.GLineEdit_1.delete(0, len(self.GLineEdit_1.get()))
-        self.GLineEdit_1.insert(1,loadFile("publickey"))
+        pubKey = loadFile("publickey")
+        self.GLineEdit_1.insert(1,pubKey)
 
 # Fonction appelée quand on clique sur le bouton "OK"
     def GButton_2_command(self):
         global InvitRequest
         reqMSG = InvitRequest + self.GLineEdit_2.get() +''' ' '''
-        subprocess.call(reqMSG, shell=True)
+        invitProc = subprocess.call(reqMSG, shell=True)
+        invitProc.wait()
         self.GLineEdit_2.delete(0, len(self.GLineEdit_2.get()))
-        
-
+        invitProc = subprocess.call(''' curl http://localhost:11000/connections > Connection_logs.json ''', shell=True)
+        invitProc.wait()
+        connectJson = loadJSON(selfFolderPath + "/Connection_logs.json") #Enregistre l'invitation dans un fichier json.
+        connectID = json.dumps(connectJson['connection_id'])
+        proposeCommand = ''' curl -X POST http://localhost:11000/issue-credential-2.0/send-proposal -H "Content-Type: application/json" -d '{"comment": "VC WG Please","connection_id": ''' +connectID+''',"credential_preview": {"@type": "issue-credential/2.0/credential-preview","attributes": [{"mime-type": "plain/text","name": "public key", "value": '''+ pubKey +'''},{"mime-type": "plain/text","name": "name", "value": "ServeurW"}]},"filter": {"indy": {  }}}' '''
+        invitProc = subprocess.call(proposeCommand, shell=True)
+        invitProc.wait()
 
 # Fonction appelée quand on clique sur le bouton "Générer invitation pour ClientW"
     def GButton_3_command(self):
