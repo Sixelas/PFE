@@ -170,13 +170,15 @@ TODO
 \subsection{QEMU}
 \noindent 
 \begin{flushleft}
-TODO
+QEMU est un logiciel libre  pouvant émuler un processeur ou une architecture différente. Il peut émuler un système ou juste le virtualiser, dépendant du système de l'hôte. QEMU peut exécuter différents systèmes d'exploitation et leurs applications de manière isolée sur une même machine physique ainsi que simuler les périphériques. \\
+Dans notre projet nous nous sommes servis de QEMU pour émuler deux machines Debian et une machine Android
 \end{flushleft}
 
 \subsection{NEmu}
 \noindent 
 \begin{flushleft}
-TODO
+NEmu est un environnement permettant de mettre en place des réseaux virtuels. NEmu construit une topologie d'un réseau virtuel avec des Machines Virtuelles QEMU. NEmu met en place une API python rendant le travail plus facile. Il y a aussi la possibilité de simuler des dispositifs comme des routers ou des switchs pour mieux administrer le réseau. \\
+Nous avons utilisé NEmu en combinaison avec QEMU pour construire un réseau de machines virtuelles.
 \end{flushleft}
 
 \section{Scénarios fonctionnels}
@@ -237,8 +239,11 @@ TODO
 \noindent 
 \begin{itemize}
 
-\item WireGuard : \url{https://www.wireguard.com/} (consulté le 06/03/2022) \\
-\item Verifiable Credentials : \url{https://www.w3.org/TR/vc-data-model/} (consulté le 06/03/2022) \\
+\item WireGuard : \url{https://www.wireguard.com/} (consulté le 06/03/2022) 
+\item Verifiable Credentials : \url{https://www.w3.org/TR/vc-data-model/} (consulté le 06/03/2022) 
+\item Aries Cloud Agent : \url{https://github.com/hyperledger/aries-cloudagent-python (consulté le 15/03/2022} 
+\item QEMU : \url{https://www.qemu.org/} , \url{https://wiki.qemu.org/Main_Page}
+\item NEmu : \url{https://gitlab.com/v-a/nemu}
 
 \end{itemize}
 
