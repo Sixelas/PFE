@@ -44,6 +44,8 @@ AgentStartCommand = "aca-py start   --label ServeurW   -it http 0.0.0.0 8000   -
 
 InvitCommand = ''' curl -X POST "http://localhost:11000/out-of-band/create-invitation" -H 'Content-Type: application/json' -d '{ "handshake_protocols": ["did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"],"use_public_did": false}' > invitClientW.json '''
 
+InvitRequest = ''' curl -X POST "http://localhost:11001/out-of-band/receive-invitation" -H 'Content-Type: application/json' -d ' '''
+
 backgroundColor = 'white'
 windowTitle = "Agent ServeurW"
 #font = 'times 12'
@@ -226,7 +228,10 @@ class App:
 
 #TODO Fonction appelée quand on clique sur le bouton "OK"
     def GButton_2_command(self):
-        subprocess.call("echo TODO : Etablir connexion avec ServeurB", shell=True)
+        InvitRequest = InvitRequest + self.GLineEdit_2.get() +''' ' '''
+        print("INVITAION REQUEST : ")
+        print(InvitRequest)
+        subprocess.call(InvitRequest, shell=True)
         
 
 

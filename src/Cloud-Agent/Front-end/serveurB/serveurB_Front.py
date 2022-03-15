@@ -58,13 +58,12 @@ RegisterCommand_3 = ''' curl -X POST "http://localhost:9000/register" -d '{"seed
 InvitCommand = ''' curl -X POST "http://localhost:11000/out-of-band/create-invitation" -H 'Content-Type: application/json' -d '{ "handshake_protocols": ["did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"],"use_public_did": false}' > invitServeurtW.json '''
 
 
-
 backgroundColor = 'white'
 windowTitle = "Agent ServeurW"
 #font = 'times 12'
 #setting window size
-width=810
-height=606
+width=400
+height=300
 # ///// END CONFIG /////
 
 
