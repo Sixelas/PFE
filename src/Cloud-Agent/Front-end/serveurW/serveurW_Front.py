@@ -250,13 +250,12 @@ class App:
         #print("COUCOU")
         #print(connectJson)
         connectID = json.dumps(connectJson['results'][0]['connection_id'])
-        print("COUCOU")
-        print(connectID)
         proposeCommand = ''' curl -X POST http://localhost:11000/issue-credential-2.0/send-proposal -H "Content-Type: application/json" -d '{"comment": "VC WG Please","connection_id": ''' +connectID+ ''',"credential_preview": {"@type": "issue-credential/2.0/credential-preview","attributes": [{"mime-type": "plain/text","name": "public key", "value": "'''+ pubKey +'''"},{"mime-type": "plain/text","name": "name", "value": "ServeurW"}]},"filter": {"indy": {  }}}' '''
-        print("COUCOU 2")
-        print(proposeCommand)
         invitProc = subprocess.Popen(proposeCommand, shell=True, preexec_fn=os.setsid)
         invitProc.wait()
+        print("VC obtenu : ")
+        subprocess.Popen(''' curl -X GET "http://localhost:11000/credentials" ''', shell=True, preexec_fn=os.setsid)
+
 
 # Fonction appelée quand on clique sur le bouton "Générer invitation pour ClientW"
     def GButton_3_command(self):
