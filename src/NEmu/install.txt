@@ -1,0 +1,51 @@
+Refaire l'image debian11.img avec :
+- WireGuard https://www.tutos.snatch-crash.fr/wireguard-vpn-rapide-moderne-et-securise/
+
+- apt-get update && \
+apt-get install -y \
+   build-essential \
+   pkg-config \
+   cmake \
+   libssl-dev \
+   libsqlite3-dev \
+   libzmq3-dev \
+   libncursesw5-dev \
+   curl \
+   docker.io \
+   python3-pip \
+   cargo \
+   tcpdump \
+   openssh-server \
+   git \
+   wireshark \
+   wireguard \
+   python3-tk \
+   python3-pil \
+   python3-pil.imagetk \
+   resolvconf 
+
+- Docker compose : https://docs.docker.com/compose/install/
+- pip install pyqrcode netifaces pypng aries-cloudagent python3_indy
+
+- git clone https://github.com/bcgov/von-network
+cd von-network
+./manage build
+
+- git clone https://github.com/jedisct1/libsodium --branch stable
+cd libsodium/
+./configure
+make && make check
+sudo make install
+
+- git clone https://github.com/hyperledger/indy-sdk.git
+cd ./indy-sdk/libindy
+cargo build
+cd
+Mettre dans .bashrc :
+export LD_LIBRARY_PATH=:/root/indy-sdk/libindy/target/debug/
+sudo ldconfig
+source .bashrc
+
+- git clone https://github.com/hyperledger/aries-cloudagent-python.git
+
+- git clone https://github.com/Sixelas/PFE
