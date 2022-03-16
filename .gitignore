@@ -19,3 +19,8 @@ src/Cloud-Agent/Front-end/serveurB/invitClientW.json
 src/Cloud-Agent/Front-end/serveurB/invitClientW.png
 src/Cloud-Agent/Front-end/serveurB/privatekey
 src/Cloud-Agent/Front-end/serveurB/publickey
+src/Cloud-Agent/Front-end/clientW/publickey
+src/Cloud-Agent/Front-end/clientW/privatekey
+src/Cloud-Agent/Front-end/clientW/wg.png
+src/Cloud-Agent/Front-end/clientW/Aries.png
+
