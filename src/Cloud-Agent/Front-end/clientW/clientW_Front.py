@@ -231,7 +231,6 @@ class App:
 # Fonction appelée quand on clique sur le bouton "Générer clés WireGuard"
     def GButton_1_command(self):
         global pubKey
-        global credID
         subprocess.call("echo Génération des clés WireGuard", shell=True)
         #Ici on génère le couple publickey / privatekey
         subprocess.call("umask 077", shell=True)
@@ -244,6 +243,7 @@ class App:
 # Fonction appelée quand on clique sur le bouton "OK" de l'invitation ServeurB
     def GButton_2_command(self):
         global InvitRequest1
+        global credID
         reqMSG = InvitRequest1 + self.GLineEdit_2.get() +''' ' '''
         invitProc = subprocess.Popen(reqMSG, shell=True, preexec_fn=os.setsid)
         invitProc.wait()
