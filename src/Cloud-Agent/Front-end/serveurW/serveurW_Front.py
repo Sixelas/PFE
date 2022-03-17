@@ -291,24 +291,25 @@ class App:
         connectJson = loadJSON(selfFolderPath + "/Connection_logs.json")  # Enregistre l'invitation dans un fichier json.
         connectID = json.dumps(connectJson['results'][0]['connection_id'])
         # Envoie le proof request à clientW
-        proofCommand = ''' curl -X 'POST' 'http://localhost:11000/present-proof-2.0/send-request' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{ "comment": "ServerW proof request", "connection_id": ''' + connectID + ''', "presentation_request": { "indy": { "name": "Proof of Identity", "version": "1.0", "requested_attributes": { "0_public_key_uuid": { "name": "public key", "restrictions": [{"cred_def_id": ''' + credID + '''}]}, "0_name_uuid": {"name": "name", "restrictions": [{"cred_def_id": ''' + credID + '''}]}, "0_self_attested_thing_uuid": { }}, "requested_predicates": { }}}}' '''
+        proofCommand = ''' curl -X 'POST'  'http://localhost:11000/present-proof-2.0/send-request' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{ "comment": "ServerW proof request", "connection_id": '''+connectID+''', "presentation_request": {"indy": {"name": "Proof of Identity","version": "1.0","requested_attributes": {"0_public_key_uuid": {"name": "public key","restrictions": [{"cred_def_id": '''+credID+'''}]},"0_name_uuid": {"name": "name","restrictions": [{"cred_def_id": '''+credID+'''}]},"0_self_attested_thing_uuid": {"name": "self_attested_thing"}},"requested_predicates": { }}}} '''
+
         proofProc = subprocess.Popen(proofCommand, shell=True, preexec_fn=os.setsid)
         proofProc.wait()
         time.sleep(15)
 
-        proofCommand = ''' curl -X 'GET'  'http://localhost:11000/present-proof-2.0/records' -H 'accept: application/json' > ProofData.json '''
-        proofProc = subprocess.Popen(proofCommand, shell=True, preexec_fn=os.setsid)
-        proofProc.wait()
-        time.sleep(3)
-
-        ProofData = loadJSON(selfFolderPath + "/ProofData.json")  # Enregistre l'invitation dans un fichier json.
-        presExID = json.dumps(ProofData['results'][0]['pres_ex_id'])
-
-        presExID = ''.join(x for x in presExID if x not in '''"''')
-        sendRequest = ''' curl -X 'POST' 'http://localhost:11000/present-proof-2.0/records/''' + presExID + '''/send-request' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{  "trace": true}' '''
-        proofProc = subprocess.Popen(sendRequest, shell=True, preexec_fn=os.setsid)
-        proofProc.wait()
-        time.sleep(15)
+        # proofCommand = ''' curl -X 'GET'  'http://localhost:11000/present-proof-2.0/records' -H 'accept: application/json' > ProofData.json '''
+        # proofProc = subprocess.Popen(proofCommand, shell=True, preexec_fn=os.setsid)
+        # proofProc.wait()
+        # time.sleep(3)
+        #
+        # proofData = loadJSON(selfFolderPath + "/ProofData.json")  # Enregistre l'invitation dans un fichier json.
+        # presExID = json.dumps(proofData['results'][0]['pres_ex_id'])
+        #
+        # presExID = ''.join(x for x in presExID if x not in '''"''')
+        # sendRequest = ''' curl -X 'POST' 'http://localhost:11000/present-proof-2.0/records/''' + presExID + '''/send-request' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{  "trace": true}' '''
+        # proofProc = subprocess.Popen(sendRequest, shell=True, preexec_fn=os.setsid)
+        # proofProc.wait()
+        # time.sleep(15)
 
         proofRecord = ''' curl -X 'GET' 'http://localhost:11000/present-proof-2.0/records' -H 'accept: application/json' > ProofRecord.json '''
         proofProc = subprocess.Popen(proofRecord, shell=True, preexec_fn=os.setsid)
