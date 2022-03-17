@@ -40,6 +40,7 @@ connectID = ""
 
 pubKey = ""
 credID = ""
+servPubKey = ""
 # Si on a le von-network en local :
 #genesisIP = 'localhost'
 # Si le von-network est sur serveurB :
@@ -280,6 +281,7 @@ class App:
         global credID
         global connectID
         global pubKey
+        global servPubKey
 
         connectID = ''.join(x for x in connectID if x not in '''"''')
         # Suppression de la connection avec serverB

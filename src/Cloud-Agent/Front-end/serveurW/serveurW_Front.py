@@ -329,6 +329,9 @@ class App:
 #TODO Fonction appelée quand on clique sur le bouton "Récupérer clé publique de clientW"
     def GButton_5_command(self):
         global clientPubKey
+        proofRecord = ''' curl -X 'GET' 'http://localhost:11000/present-proof-2.0/records' -H 'accept: application/json' > ProofRecord.json '''
+        proofProc = subprocess.Popen(proofRecord, shell=True, preexec_fn=os.setsid)
+        proofProc.wait()
         proofJson = loadJSON(selfFolderPath + "/ProofRecord.json")  # Enregistre l'invitation dans un fichier json.
         clientPubKey = json.dumps(proofJson['results'][0]['pres_request']['comment'])
         clientPubKey = ''.join(x for x in clientPubKey if x not in '''"''')
