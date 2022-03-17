@@ -13,10 +13,9 @@
     3. [Issuer des VCs - Mode 'automatique'](#T2IssueA)
     4. [Agents](#T1Agents)
 3. [Tutoriel 3: Requête et présentation de preuves](#Tuto3)
-    1. [Créer une requête de preuve](#T3Create)
-    2. [Envoyer notre requête](#T3Send)
-    3. [Présentation et Vérification - Mode manuel](#T3VerPresM)
-    4. [Présentation et Vérification - Mode automatique](#T3VerPresA)
+    1. [Envoyer notre requête](#T3Send)
+    2. [Présentation et Vérification - Mode manuel](#T3VerPresM)
+    3. [Présentation et Vérification - Mode automatique](#T3VerPresA)
 	
 5. [Tutoriel 4 : Agent Serveur Wireguard et Agent Indy sur Docker](#Tuto4)
     1. [Installation (facultative si on utilise le réseau virtuel)](#T4Install)
@@ -635,12 +634,12 @@ Dans notre projet, le ClientW est le Verifier et le ServerW est le holder. Pour 
 Pour visualiser l'échange nous nous réferrons au schéma disponible [ici](https://github.com/hyperledger/aries-rfcs/tree/eace815c3e8598d4a8dd7881d8c731fdb2bcc0aa/features/0454-present-proof-v2) 
 
 
-##  Créer une requête de preuve <a name="T3Create"></a>
-Il faut créer une requête en premier du côté **verifier** .  Dans notre requête nous demanderons deux champs, la clé publique et et le nom. 
-Pour créer une preuve pas liée à une proposal nous faisons ceci du côté du verifier :
+## Envoyer une requête <a name="T3Send"></a>
+
+Nous créons une nouvelle requête et nous l'envoyons :
+
 ```
-curl -X 'POST' \
-  'http://localhost:11000/present-proof-2.0/create-request' \
+curl -X 'POST'  'http://localhost:11000/present-proof-2.0/send-request' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -666,39 +665,15 @@ curl -X 'POST' \
               "cred_def_id": "NLv8K46HrFJXRxhLZCYmqr:3:CL:10:default"
             }
           ]
-        },
-        "0_self_attested_thing_uuid": {
-          "name": "self_attested_thing"
         }
       },
       "requested_predicates": {
-        
+
       }
     }
   }
-}'
-```
-## Envoyer une requête <a name="T3Send"></a>
-Une fois la requête est créée il faut l'envoyer. 
-- En premier, nous récupérons la requête que nous avons crée. Nous faisons
+}' 
 
-```
-curl -X 'GET' \
-  'http://localhost:11000/present-proof-2.0/records' \
-  -H 'accept: application/json'
-```
-- Cette requête renvoie les "dossiers" des différentes opérations que nous avons fait en relation avec des preuves. Du record correspondant, nous récupérons le champ **pres_ex_id**.
-- Finalement, en utilisant **pres_ex_id** nous envoyons la requête au **holder**: 
-Il faut bien remplacer : http://localhost:11000/present-proof-2.0/records/**pres_ex_id**/send-request
-
-```
-curl -X 'POST' \
-  'http://localhost:11000/present-proof-2.0/records/4bb43e16-1be7-4a5a-a4aa-6930fdb464c8/send-request' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "trace": true
-}'
 ```
 ## Présentation et Vérification - Mode manuel <a name="T3VerPresM"></a> 
 ### Serveur W récupère le record de la requête
@@ -814,7 +789,7 @@ aca-py start \
   --auto-store-credential \
   --auto-verify-presentation
 ```
-
+Il faut comme même envoyer la requête comme dans le premier pas, avant le mode manuel.
 
 # Tutoriel 4 : Agent Serveur Wireguard et Agent Indy sur Docker : <a name="Tuto4"></a>
 
