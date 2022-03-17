@@ -39,7 +39,7 @@ for ifaceName in interfaces():
 #connectID = ""
 
 pubKey = ""
-
+credID = ""
 # Si on a le von-network en local :
 #genesisIP = 'localhost'
 # Si le von-network est sur serveurB :
@@ -231,6 +231,7 @@ class App:
 # Fonction appelée quand on clique sur le bouton "Générer clés WireGuard"
     def GButton_1_command(self):
         global pubKey
+        global credID
         subprocess.call("echo Génération des clés WireGuard", shell=True)
         #Ici on génère le couple publickey / privatekey
         subprocess.call("umask 077", shell=True)
@@ -256,8 +257,11 @@ class App:
         proposeCommand = ''' curl -X POST http://localhost:11000/issue-credential-2.0/send-proposal -H "Content-Type: application/json" -d '{"comment": "VC WG Please","connection_id": ''' +connectID+ ''',"credential_preview": {"@type": "issue-credential/2.0/credential-preview","attributes": [{"mime-type": "plain/text","name": "public key", "value": "'''+ pubKey +'''"},{"mime-type": "plain/text","name": "name", "value": "ClientW"}]},"filter": {"indy": {  }}}' '''
         invitProc = subprocess.Popen(proposeCommand, shell=True, preexec_fn=os.setsid)
         invitProc.wait()
+        time.sleep(5)
         print("VC obtenu : ")
-        subprocess.Popen(''' curl -X GET "http://localhost:11000/credentials" ''', shell=True, preexec_fn=os.setsid)
+        subprocess.Popen(''' curl -X GET "http://localhost:11000/credentials" > WG_VC.json''', shell=True, preexec_fn=os.setsid)
+        connectJson = loadJSON(selfFolderPath + "/WG_VC.json")
+        credID = json.dumps(connectJson['results'][0]['cred_def_id'])
 
 # Fonction appelée quand on clique sur le bouton "OK" de l'invitation ServeurW
     def GButton_3_command(self):
