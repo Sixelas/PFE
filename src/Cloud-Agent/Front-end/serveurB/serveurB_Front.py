@@ -93,11 +93,11 @@ print("von-network OK http://localhost:9000/")
 # Commandes pour enregistrer les utilisateurs dans le von-network
 print("Enregistrement des utilisateurs ...")
 subprocess.Popen(RegisterCommand_1, shell=True, preexec_fn=os.setsid)
-time.sleep(1)
+# time.sleep(1)
 subprocess.Popen(RegisterCommand_2, shell=True, preexec_fn=os.setsid)
-time.sleep(1)
+# time.sleep(1)
 subprocess.Popen(RegisterCommand_3, shell=True, preexec_fn=os.setsid)
-time.sleep(1)
+time.sleep(3)
 print("Utilisateurs enregistrés")
 
 # Commande pour lancer l'agent Cloud du ServeurB (en tâche de fond si possible, faut pas qu'il bloque le terminal). 
