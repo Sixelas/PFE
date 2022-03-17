@@ -331,7 +331,14 @@ class App:
 
 #TODO Fonction appelée quand on clique sur le bouton "Configuration du Tunnel VPN"
     def GButton_6_command(self):
-        subprocess.call("echo TODO : Configuration du Tunnel VPN", shell=True)
+        global servPubKey
+        #servPubKey = self.GLineEdit_4.get()
+        confWG = ''' echo "[Interface]\nPrivateKey = ''' +loadFile("privatekey")+'''\nAddress = 120.0.0.2/24\n\n[Peer]\nPublicKey = ''' + servPubKey + '''\nEndpoint = 192.168.1.15:51820\nAllowedIPs = 120.0.0.1/32\nPersistentKeepalive = 25" > /etc/wireguard/wg0.conf'''
+        startVPN = subprocess.Popen(confWG, shell=True)
+        startVPN.wait()
+        startVPN = subprocess.Popen("wg-quick up wg0", shell=True, preexec_fn=os.setsid)
+        startVPN.wait()
+        subprocess.call('''echo "Connecté au serveur VPN serveurW !" ''', shell=True)
 
 if __name__ == "__main__":
     root = tk.Tk()

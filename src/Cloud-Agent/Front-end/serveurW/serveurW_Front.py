@@ -43,6 +43,7 @@ connectID = ""
 
 pubKey = ""
 credID = ""
+clientPubKey = ""
 # Si on a le von-network en local :
 #genesisIP = 'localhost'
 # Si le von-network est sur serveurB :
@@ -198,7 +199,7 @@ class App:
         self.GButton_5["font"] = ft
         self.GButton_5["fg"] = "#000000"
         self.GButton_5["justify"] = "center"
-        self.GButton_5["text"] = "Echange de clés publiques WireGuard"
+        self.GButton_5["text"] = "Récupérer clé publique de clientW"
         self.GButton_5["relief"] = "groove"
         self.GButton_5["borderwidth"] = "3px"
         self.GButton_5.place(x=30,y=450,width=261,height=40)
@@ -279,6 +280,7 @@ class App:
     def GButton_4_command(self):
         global credID
         global connectID
+        global clientPubKey
 
         connectID = ''.join(x for x in connectID if x not in '''"''')
         # Suppression de la connection avec serverB
@@ -315,27 +317,34 @@ class App:
         proofProc = subprocess.Popen(proofRecord, shell=True, preexec_fn=os.setsid)
         proofProc.wait()
         connectJson = loadJSON(selfFolderPath + "/ProofRecord.json")  # Enregistre l'invitation dans un fichier json.
-        servPubKey = json.dumps(connectJson['results'][0]['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw'])
-        servPubKey = ''.join(x for x in servPubKey if x not in '''"''')
+        clientPubKey = json.dumps(connectJson['results'][0]['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw'])
+        clientPubKey = ''.join(x for x in clientPubKey if x not in '''"''')
         # on remplie le champ
         self.GLineEdit_4.delete(0, len(self.GLineEdit_4.get()))
-        self.GLineEdit_4.insert(1, servPubKey)
+        self.GLineEdit_4.insert(1, clientPubKey)
 
 
-#TODO Fonction appelée quand on clique sur le bouton "Echange des clés publiques WireGuard avec ClientW"
+#TODO Les deux dernières commandes sont à fusionner en 1 seul bouton si les clients-profs veulent une proof à sens unique.
+
+#TODO Fonction appelée quand on clique sur le bouton "Récupérer clé publique de clientW"
     def GButton_5_command(self):
-        subprocess.call("echo TODO : Echange des clés publiques WireGuard avec ClientW", shell=True)
-
+        global clientPubKey
+        proofJson = loadJSON(selfFolderPath + "/ProofRecord.json")  # Enregistre l'invitation dans un fichier json.
+        clientPubKey = json.dumps(proofJson['results'][0]['pres_request']['comment'])
+        clientPubKey = ''.join(x for x in clientPubKey if x not in '''"''')
+        self.GLineEdit_4.delete(0, len(self.GLineEdit_4.get()))
+        self.GLineEdit_4.insert(1, clientPubKey)
 
 #TODO Fonction appelée quand on clique sur le bouton "Configuration du Tunnel VPN"
     def GButton_6_command(self):
+        global clientPubKey
         #clientPubKey = self.GLineEdit_4.get()
-        clientPubKey = "0123456789"
         confWG = ''' echo "[Interface]\nPrivateKey = '''+loadFile("privatekey") +''' \nAddress = 120.0.0.1 \nSaveConfig = false \nListenPort = 51820 \nPostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o '''+listeInterfaces[1]+''' -j MASQUERADE \nPostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o '''+listeInterfaces[1]+''' -j MASQUERADE \nDNS = 8.8.8.8 \n\n[Peer] \n# ClientW \nPublicKey = ''' +clientPubKey+ '''\nAllowedIPs = 120.0.0.2/32" > /etc/wireguard/wg0.conf'''
-        subprocess.Popen(confWG, shell=True)
+        startVPN = subprocess.Popen(confWG, shell=True)
+        startVPN.wait()
         startVPN = subprocess.Popen("wg-quick up wg0", shell=True, preexec_fn=os.setsid)
         startVPN.wait()
-        subprocess.call("echo Tunnel VPN établi !", shell=True)
+        subprocess.call('''echo "Serveur VPN ouvert pour clientW !" ''', shell=True)
 
 if __name__ == "__main__":
     root = tk.Tk()
