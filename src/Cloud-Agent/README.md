@@ -13,9 +13,10 @@
     3. [Issuer des VCs - Mode 'automatique'](#T2IssueA)
     4. [Agents](#T1Agents)
 3. [Tutoriel 3: Requête et présentation de preuves](#Tuto3)
-    1. [Création et envoie de requêtes](#T3CreateSend)
-    2. [Envoie de présentation](#T3PresSend)
-    3. [Vérification de la présentation](#T3VerPres)
+    1. [Créer une requête de preuve](#T3Create)
+    2. [Envoyer notre requête](#T3Send)
+    3. [Présentation et Vérification - Mode manuel](#T3VerPresM)
+    4. [Présentation et Vérification - Mode automatique](#T3VerPresA)
 	
 5. [Tutoriel 4 : Agent Serveur Wireguard et Agent Indy sur Docker](#Tuto4)
     1. [Installation (facultative si on utilise le réseau virtuel)](#T4Install)
@@ -633,9 +634,9 @@ Si tout s'est bien passé, le VC doit être affiché sur notre terminal, et si d
 Dans notre projet, le ClientW est le Verifier et le ServerW est le holder. Pour mettre en place une connexion VPN entre les deux, le ClientW devra verifier la validité des VCs du ServeurW. 
 Pour visualiser l'échange nous nous réferrons au schéma disponible [ici](https://github.com/hyperledger/aries-rfcs/tree/eace815c3e8598d4a8dd7881d8c731fdb2bcc0aa/features/0454-present-proof-v2) 
 
-## ClientW crée et envoie une requête <a name="T3CreateSend"></a> 
-### Créer une requête
-Il faut créer une requête en premier.  Dans notre requête nous demanderons deux champs, la clé publique et et le nom. 
+
+##  Créer une requête de preuve <a name="T3Create"></a>
+Il faut créer une requête en premier du côté **verifier** .  Dans notre requête nous demanderons deux champs, la clé publique et et le nom. 
 Pour créer une preuve pas liée à une proposal nous faisons ceci du côté du verifier :
 ```
 curl -X 'POST' \
@@ -677,9 +678,9 @@ curl -X 'POST' \
   }
 }'
 ```
-### Envoyer une requête
+## Envoyer une requête <a name="T3Send"></a>
 Une fois la requête est créée il faut l'envoyer. 
-- En premier, nous récupérons la requête que nous avons crée. Nous faisos
+- En premier, nous récupérons la requête que nous avons crée. Nous faisons
 
 ```
 curl -X 'GET' \
@@ -687,8 +688,9 @@ curl -X 'GET' \
   -H 'accept: application/json'
 ```
 - Cette requête renvoie les "dossiers" des différentes opérations que nous avons fait en relation avec des preuves. Du record correspondant, nous récupérons le champ **pres_ex_id**.
-- Finalement, en utilisant **pres_ex_id** nous envoyons la requête: 
+- Finalement, en utilisant **pres_ex_id** nous envoyons la requête au **holder**: 
 Il faut bien remplacer : http://localhost:11000/present-proof-2.0/records/**pres_ex_id**/send-request
+
 ```
 curl -X 'POST' \
   'http://localhost:11000/present-proof-2.0/records/4bb43e16-1be7-4a5a-a4aa-6930fdb464c8/send-request' \
@@ -698,9 +700,8 @@ curl -X 'POST' \
   "trace": true
 }'
 ```
-
-## ServeurW envoie la présentation <a name="T3PresSend"></a> 
-### Serveur W récupère le record
+## Présentation et Vérification - Mode manuel <a name="T3VerPresM"></a> 
+### Serveur W récupère le record de la requête
 Il faut récupèrer le record de la requête reçue du côté ServeurW. Pour faire ceci, on fait encore une fois : 
 ```
 curl -X 'GET' \
@@ -744,7 +745,6 @@ curl -X 'POST' \
 }'
 ```
 
-## ClientW vérifie la présentation <a name="T3VerPres"></a> 
 ### ClientW récupère la présentation
 Il faut que le ClientW récupère encore une fois le champ **pres_ex_id**. 
 
@@ -758,6 +758,62 @@ curl -X 'POST' \
   -H 'accept: application/json' \
   -d ''
   ```
+  
+ ## Présentation et Vérification - Mode automatique <a name="T3VerPresM"></a> 
+ Pour répondre à une requête de preuve et la valider, il faut juste mettre les options automatiques quand on lance nos agents. 
+ On considère que Alice est notre **ServerB**, donc notre **holder**. Et que Bob est notre **ServeurW**, donc notre **verifier**. 
+ 
+ ```
+   aca-py start \
+  --label Alice \
+  -it http 0.0.0.0 8000 \
+  -ot http \
+  --admin 0.0.0.0 11000 \
+  --admin-insecure-mode \
+  --genesis-url http://localhost:9000/genesis \
+  --seed Alice000000000000000000000000000 \
+  --endpoint http://192.168.1.15:8000/ \
+  --debug-connections \
+  --public-invites \
+  --auto-provision \
+  --wallet-type indy \
+  --wallet-name Alice \
+  --wallet-key secret \
+  --auto-accept-requests \
+  --auto-accept-invites \
+  --auto-respond-credential-proposal \
+  --auto-respond-credential-offer \
+  --auto-respond-credential-request \
+  --auto-store-credential \
+  --auto-respond-presentation-request 
+
+```
+
+Et sur Bob: 
+
+```
+aca-py start \
+  --label Bob \
+  -it http 0.0.0.0 8001 \
+  -ot http \
+  --admin 0.0.0.0 11001 \
+  --admin-insecure-mode \
+  --genesis-url http://192.168.1.15:9000/genesis \
+  --seed Bob00000000000000000000000000000 \
+  --endpoint http://192.168.2.13:8001/ \
+  --debug-connections \
+  --auto-provision \
+  --wallet-type indy \
+  --wallet-name Bob \
+  --wallet-key secret \
+  --auto-accept-requests \
+  --auto-accept-invites \
+  --auto-respond-credential-proposal \
+  --auto-respond-credential-offer \
+  --auto-respond-credential-request \
+  --auto-store-credential \
+  --auto-verify-presentation
+```
 
 
 # Tutoriel 4 : Agent Serveur Wireguard et Agent Indy sur Docker : <a name="Tuto4"></a>
