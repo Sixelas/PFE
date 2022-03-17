@@ -279,6 +279,8 @@ class App:
     def GButton_4_command(self):
         global credID
         global connectID
+
+        connectID = ''.join(x for x in connectID if x not in '''"''')
         # Suppression de la connection avec serverB
         deleteConnectID = ''' curl -X 'DELETE' 'http://localhost:11000/connections/'''+connectID+''' ' -H 'accept: application/json' '''
         proofProc = subprocess.Popen(deleteConnectID, shell=True, preexec_fn=os.setsid)
@@ -302,6 +304,7 @@ class App:
         ProofData = loadJSON(selfFolderPath + "/ProofData.json")  # Enregistre l'invitation dans un fichier json.
         presExID = json.dumps(ProofData['results'][0]['pres_ex_id'])
 
+        presExID = ''.join(x for x in presExID if x not in '''"''')
         sendRequest = ''' curl -X 'POST' 'http://localhost:11000/present-proof-2.0/records/'''+presExID+'''/send-request' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{  "trace": true}' '''
         proofProc = subprocess.Popen(sendRequest, shell=True, preexec_fn=os.setsid)
         proofProc.wait()
