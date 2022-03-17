@@ -39,10 +39,10 @@ for ifaceName in interfaces():
     listeInterfaces.append(ifaceName)
 
 # Id de la connexion établie avec serveurB 
-#connectID = ""
+# connectID = ""
 
 pubKey = ""
-
+credID = ""
 # Si on a le von-network en local :
 #genesisIP = 'localhost'
 # Si le von-network est sur serveurB :
@@ -240,6 +240,7 @@ class App:
 # Fonction appelée quand on clique sur le bouton "OK"
     def GButton_2_command(self):
         global InvitRequest
+        global  credID
         reqMSG = InvitRequest + self.GLineEdit_2.get() +''' ' '''
         invitProc = subprocess.Popen(reqMSG, shell=True, preexec_fn=os.setsid)
         invitProc.wait()
@@ -255,8 +256,11 @@ class App:
         proposeCommand = ''' curl -X POST http://localhost:11000/issue-credential-2.0/send-proposal -H "Content-Type: application/json" -d '{"comment": "VC WG Please","connection_id": ''' +connectID+ ''',"credential_preview": {"@type": "issue-credential/2.0/credential-preview","attributes": [{"mime-type": "plain/text","name": "public key", "value": "'''+ pubKey +'''"},{"mime-type": "plain/text","name": "name", "value": "ServeurW"}]},"filter": {"indy": {  }}}' '''
         invitProc = subprocess.Popen(proposeCommand, shell=True, preexec_fn=os.setsid)
         invitProc.wait()
+        time.sleep(5)
         print("VC obtenu : ")
-        subprocess.Popen(''' curl -X GET "http://localhost:11000/credentials" ''', shell=True, preexec_fn=os.setsid)
+        subprocess.Popen(''' curl -X GET "http://localhost:11000/credentials" > WG_VC.json''', shell=True, preexec_fn=os.setsid)
+        connectJson = loadJSON(selfFolderPath + "/WG_VC.json")
+        credID = json.dumps(connectJson['results'][0]['cred_def_id'])
 
 
 # Fonction appelée quand on clique sur le bouton "Générer invitation pour ClientW"
