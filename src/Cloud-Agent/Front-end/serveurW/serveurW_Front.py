@@ -293,6 +293,20 @@ class App:
         proofProc = subprocess.Popen(proofCommand, shell=True, preexec_fn=os.setsid)
         proofProc.wait()
         time.sleep(15)
+
+        proofCommand = ''' curl -X 'GET'  'http://localhost:11000/present-proof-2.0/records' -H 'accept: application/json' > ProofData.json '''
+        proofProc = subprocess.Popen(proofCommand, shell=True, preexec_fn=os.setsid)
+        proofProc.wait()
+        time.sleep(3)
+
+        ProofData = loadJSON(selfFolderPath + "/ProofData.json")  # Enregistre l'invitation dans un fichier json.
+        presExID = json.dumps(ProofData['results'][0]['pres_ex_id'])
+
+        sendRequest = ''' curl -X 'POST' 'http://localhost:11000/present-proof-2.0/records/''' + presExID + '''/send-request' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{  "trace": true}' '''
+        proofProc = subprocess.Popen(sendRequest, shell=True, preexec_fn=os.setsid)
+        proofProc.wait()
+        time.sleep(15)
+
         proofRecord = ''' curl -X 'GET' 'http://localhost:11000/present-proof-2.0/records' -H 'accept: application/json' > ProofRecord.json '''
         proofProc = subprocess.Popen(proofRecord, shell=True, preexec_fn=os.setsid)
         proofProc.wait()
