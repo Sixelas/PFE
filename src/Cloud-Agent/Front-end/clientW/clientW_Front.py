@@ -36,7 +36,7 @@ for ifaceName in interfaces():
     listeAdresses.append(addresses)
 
 # Id de la connexion établie avec serveurB
-#connectID = ""
+connectID = ""
 
 pubKey = ""
 credID = ""
@@ -46,7 +46,7 @@ credID = ""
 genesisIP = '192.168.1.15'
 
 # "&" pour lancer en tâche de fond.
-AgentStartCommand = "aca-py start   --label ClientW   -it http 0.0.0.0 8000   -ot http   --admin 0.0.0.0 11000   --admin-insecure-mode   --genesis-url http://"+genesisIP+":9000/genesis   --seed ClientW0000000000000000000000000   --endpoint http://"+listeAdresses[1][0]+":8000/   --debug-connections   --public-invites   --auto-provision   --wallet-type indy   --wallet-name ClientW   --wallet-key secret   --auto-accept-requests --auto-accept-invites  --auto-respond-credential-proposal  --auto-respond-credential-offer  --auto-respond-credential-request  --auto-store-credential &"
+AgentStartCommand = "aca-py start   --label ClientW   -it http 0.0.0.0 8000   -ot http   --admin 0.0.0.0 11000   --admin-insecure-mode   --genesis-url http://"+genesisIP+":9000/genesis   --seed ClientW0000000000000000000000000   --endpoint http://"+listeAdresses[1][0]+":8000/   --debug-connections   --public-invites   --auto-provision   --wallet-type indy   --wallet-name ClientW   --wallet-key secret   --auto-accept-requests --auto-accept-invites  --auto-respond-credential-proposal  --auto-respond-credential-offer  --auto-respond-credential-request  --auto-store-credential --auto-respond-presentation-request --auto-respond-presentation-proposal --auto-verify-presentation &"
 
 InvitRequest1 = ''' curl -X POST "http://localhost:11000/out-of-band/receive-invitation" -H 'Content-Type: application/json' -d ' '''
 InvitRequest2 = ''' curl -X POST "http://localhost:11000/out-of-band/receive-invitation" -H 'Content-Type: application/json' -d ' '''
@@ -244,6 +244,7 @@ class App:
     def GButton_2_command(self):
         global InvitRequest1
         global credID
+        global connectID
         reqMSG = InvitRequest1 + self.GLineEdit_2.get() +''' ' '''
         invitProc = subprocess.Popen(reqMSG, shell=True, preexec_fn=os.setsid)
         invitProc.wait()
@@ -276,7 +277,34 @@ class App:
 
 #TODO Fonction appelée quand on clique sur le bouton "Echanges de Proofs avec ServeurW"
     def GButton_4_command(self):
-        subprocess.call("echo TODO : Echanges de Proofs avec ServeurW", shell=True)
+        global credID
+        global connectID
+        # Suppression de la connection avec serverB
+        deleteConnectID = ''' curl -X 'DELETE' 'http://localhost:11000/connections/'''+connectID+''' ' -H 'accept: application/json' '''
+        proofProc = subprocess.Popen(deleteConnectID, shell=True, preexec_fn=os.setsid)
+        proofProc.wait()
+        # Enregistrement de la connection avec serverW
+        proofProc = subprocess.Popen(''' curl http://localhost:11000/connections > Connection_logs.json ''', shell=True,preexec_fn=os.setsid)
+        proofProc.wait()
+        connectJson = loadJSON(selfFolderPath + "/Connection_logs.json")  # Enregistre l'invitation dans un fichier json.
+        connectID = json.dumps(connectJson['results'][0]['connection_id'])
+        # Envoie le proof request à serverW
+        proofCommand  = ''' curl -X 'POST' 'http://localhost:11000/present-proof-2.0/send-request' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{ "comment": "ServerW proof request", "connection_id": '''+ connectID +''', "presentation_request": { "indy": { "name": "Proof of Identity", "version": "1.0", "requested_attributes": { "0_public_key_uuid": { "name": "public key", "restrictions": [{"cred_def_id": '''+ credID +'''}]}, "0_name_uuid": {"name": "name", "restrictions": [{"cred_def_id": '''+ credID +'''}]}, "0_self_attested_thing_uuid": {"name": "self_attested_thing"}}, "requested_predicates": { }}}}' '''
+        proofProc = subprocess.Popen(proofCommand, shell=True, preexec_fn=os.setsid)
+        proofProc.wait()
+        time.sleep(15)
+        proofRecord = ''' curl -X 'GET' 'http://localhost:11000/present-proof-2.0/records' -H 'accept: application/json' > ProofRecord.json '''
+        proofProc = subprocess.Popen(proofRecord, shell=True, preexec_fn=os.setsid)
+        proofProc.wait()
+        connectJson = loadJSON(selfFolderPath + "/ProofRecord.json")  # Enregistre l'invitation dans un fichier json.
+        servPubKey = json.dumps(connectJson['results'][0]['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw'])
+        servPubKey = ''.join(x for x in servPubKey if x not in '''"''')
+        # on remplie le champ
+        self.GLineEdit_4.delete(0, len(self.GLineEdit_4.get()))
+        self.GLineEdit_4.insert(1, servPubKey)
+
+
+
 
 
 #TODO Fonction appelée quand on clique sur le bouton "Echange des clés publiques WireGuard avec ServeurW"
