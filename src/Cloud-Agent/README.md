@@ -12,10 +12,16 @@
     2. [Issuer des VC - Méthode étape par étape](#T2IssueE)
     3. [Issuer des VCs - Mode 'automatique'](#T2IssueA)
     4. [Agents](#T1Agents)
-4. [Tutoriel 3 : Agent Serveur Wireguard et Agent Indy sur Docker](#Tuto3)
-    1. [Installation (facultative si on utilise le réseau virtuel)](#T3Install)
-    2. [Préparation des fichiers](#T3Fichiers)
-    3. [Éxecution des agents](#T3Agents)
+3. [Tutoriel 3: Requête et présentation de preuves](#Tuto3)
+    1. [Création et envoie de requêtes](#T3CreateSend)
+    2. [Envoie de présentation](#T3PresSend)
+    3. [Vérification de la présentation](#T3VerPres)
+	
+5. [Tutoriel 4 : Agent Serveur Wireguard et Agent Indy sur Docker](#Tuto4)
+    1. [Installation (facultative si on utilise le réseau virtuel)](#T4Install)
+    2. [Préparation des fichiers](#T4Fichiers)
+    3. [Éxecution des agents](#t4Agents)
+
  
 
 
@@ -623,14 +629,144 @@ curl -X POST http://localhost:11000/issue-credential-2.0/send \
 
 Si tout s'est bien passé, le VC doit être affiché sur notre terminal, et si du côté de Bob nous consultons ses credentials dans son wallet, il devrait s'y trouver.
 
+# Tutoriel 3 : Requête et présentation de preuves : <a name="Tuto3"></a>
+Dans notre projet, le ClientW est le Verifier et le ServerW est le holder. Pour mettre en place une connexion VPN entre les deux, le ClientW devra verifier la validité des VCs du ServeurW. 
+Pour visualiser l'échange nous nous réferrons au schéma disponible [ici](https://github.com/hyperledger/aries-rfcs/tree/eace815c3e8598d4a8dd7881d8c731fdb2bcc0aa/features/0454-present-proof-v2) 
 
-# Tutoriel 3 : Agent Serveur Wireguard et Agent Indy sur Docker : <a name="Tuto3"></a>
+## ClientW crée et envoie une requête <a name="T3CreateSend"></a> 
+### Créer une requête
+Il faut créer une requête en premier.  Dans notre requête nous demanderons deux champs, la clé publique et et le nom. 
+Pour créer une preuve pas liée à une proposal nous faisons ceci du côté du verifier :
+```
+curl -X 'POST' \
+  'http://localhost:11000/present-proof-2.0/create-request' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "comment": "ServerW proof request",
+  "connection_id": "269ecf2b-6ae9-4102-be84-b39d68b0f6f1",
+  "presentation_request": {
+    "indy": {
+      "name": "Proof of Identity",
+      "version": "1.0",
+      "requested_attributes": {
+        "0_public_key_uuid": {
+          "name": "public key",
+          "restrictions": [
+            {
+              "cred_def_id": "NLv8K46HrFJXRxhLZCYmqr:3:CL:10:default"
+            }
+          ]
+        },
+        "0_name_uuid": {
+          "name": "name",
+          "restrictions": [
+            {
+              "cred_def_id": "NLv8K46HrFJXRxhLZCYmqr:3:CL:10:default"
+            }
+          ]
+        },
+        "0_self_attested_thing_uuid": {
+          "name": "self_attested_thing"
+        }
+      },
+      "requested_predicates": {
+        
+      }
+    }
+  }
+}'
+```
+### Envoyer une requête
+Une fois la requête est créée il faut l'envoyer. 
+- En premier, nous récupérons la requête que nous avons crée. Nous faisos
+
+```
+curl -X 'GET' \
+  'http://localhost:11000/present-proof-2.0/records' \
+  -H 'accept: application/json'
+```
+- Cette requête renvoie les "dossiers" des différentes opérations que nous avons fait en relation avec des preuves. Du record correspondant, nous récupérons le champ **pres_ex_id**.
+- Finalement, en utilisant **pres_ex_id** nous envoyons la requête: 
+Il faut bien remplacer : http://localhost:11000/present-proof-2.0/records/**pres_ex_id**/send-request
+```
+curl -X 'POST' \
+  'http://localhost:11000/present-proof-2.0/records/4bb43e16-1be7-4a5a-a4aa-6930fdb464c8/send-request' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "trace": true
+}'
+```
+
+## ServeurW envoie la présentation <a name="T3PresSend"></a> 
+### Serveur W récupère le record
+Il faut récupèrer le record de la requête reçue du côté ServeurW. Pour faire ceci, on fait encore une fois : 
+```
+curl -X 'GET' \
+  'http://localhost:11000/present-proof-2.0/records' \
+  -H 'accept: application/json'
+```
+
+On récupère le champ **pres_ex_id**.
+
+### ServeurW envoie la présentation
+Une fois, nous avons récupéré le champ il faut l'utiliser dans le endpoint pour envoyer la présentation.
+Le champ de la presentation **cred_id** est l'identifiant de notre **Verifiable Credential**. 
+
+```
+curl -X 'POST' \
+  'http://localhost:11000/present-proof-2.0/records/16c43ece-0fcc-420b-9141-903177bd3f8e/send-presentation' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+
+  "indy": {
+    "requested_attributes": {
+      "0_public_key_uuid": {
+        "cred_id": "4073d1fa-f375-4441-ab7b-4de78f82277c",
+        "revealed": true
+      },
+      "0_name_uuid": {
+        "cred_id": "4073d1fa-f375-4441-ab7b-4de78f82277c",
+        "revealed": true
+      }
+    },
+    "requested_predicates": {
+
+    },
+    "self_attested_attributes": {
+      "0_self_attested_thing_uuid": "self_attested_thing"
+    },
+    "trace": false
+  },
+  "trace": true
+}'
+```
+
+## ClientW vérifie la présentation <a name="T3VerPres"></a> 
+### ClientW récupère la présentation
+Il faut que le ClientW récupère encore une fois le champ **pres_ex_id**. 
+
+### ClientW vérifie la présentation 
+Une fois le champ **pres_ex_id** récupéré il suffit de verifier la présentation : 
+( Ne pas oublier de remplacer le champ **pres_ex_id** dans le endpoint. )
+
+```
+curl -X 'POST' \
+  'http://localhost:11000/present-proof-2.0/records/27b7b92c-9c04-4b01-a8c3-4208ac245f9d/verify-presentation' \
+  -H 'accept: application/json' \
+  -d ''
+  ```
+
+
+# Tutoriel 4 : Agent Serveur Wireguard et Agent Indy sur Docker : <a name="Tuto4"></a>
 
 - agentb.py = Agent Indy (sur la VM serveurB du réseau virtuel du projet).
 
 - agentw.py = Agent Serveur Wireguard (sur la VM serveurW du réseau virtuel du projet).
 
-## 1. Installation (facultative si on utilise le réseau virtuel) : <a name="T3Install"></a>
+## 1. Installation (facultative si on utilise le réseau virtuel) : <a name="T4Install"></a>
 Dans le cas où vous n'utilisez pas notre réseau virtuel et VMs  (qui se trouve [ici](https://github.com/Sixelas/PFE/tree/main/src/NEmu)) :
 - Après avoir récupéré nos fichiers, clonez les fichiers de Aries Cloud Agent et allez au dossier /demo
 ``` 
@@ -639,11 +775,11 @@ cd aries-cloudagent-python/demo
 
 ```
 
-## 2. Préparation des fichiers : <a name="T3Fichiers"></a>
+## 2. Préparation des fichiers : <a name="T4Fichiers"></a>
 - Remplacer le fichier run_demo dans /demo par celui proposé ici.
 - Mettre les fichiers agentb.py et agentw.py dans le dossier aries-coudagent-python/demo/runners.
 
-## Éxecution des agents : <a name="T3Agents"></a>
+## Éxecution des agents : <a name="T4Agents"></a>
 Pour lancer l'Agent Indy : 
 ```
 LEDGER_URL=http://dev.greenlight.bcovrin.vonx.io ./run_demo agentb
