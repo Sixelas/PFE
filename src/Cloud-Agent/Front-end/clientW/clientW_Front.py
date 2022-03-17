@@ -291,7 +291,7 @@ class App:
         connectJson = loadJSON(selfFolderPath + "/Connection_logs.json")  # Enregistre l'invitation dans un fichier json.
         connectID = json.dumps(connectJson['results'][0]['connection_id'])
         # Envoie le proof request à serverW
-        proofCommand  = ''' curl -X 'POST' 'http://localhost:11000/present-proof-2.0/send-request' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{ "comment": "ServerW proof request", "connection_id": '''+ connectID +''', "presentation_request": { "indy": { "name": "Proof of Identity", "version": "1.0", "requested_attributes": { "0_public_key_uuid": { "name": "public key", "restrictions": [{"cred_def_id": '''+ credID +'''}]}, "0_name_uuid": {"name": "name", "restrictions": [{"cred_def_id": '''+ credID +'''}]}, "0_self_attested_thing_uuid": {"name": "self_attested_thing"}}, "requested_predicates": { }}}}' '''
+        proofCommand  = ''' curl -X 'POST' 'http://localhost:11000/present-proof-2.0/send-request' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{ "comment": "ServerW proof request", "connection_id": '''+ connectID +''', "presentation_request": { "indy": { "name": "Proof of Identity", "version": "1.0", "requested_attributes": { "0_public_key_uuid": { "name": "public key", "restrictions": [{"cred_def_id": '''+ credID +'''}]}, "0_name_uuid": {"name": "name", "restrictions": [{"cred_def_id": '''+ credID +'''}]}, "0_self_attested_thing_uuid": { }}, "requested_predicates": { }}}}' '''
         proofProc = subprocess.Popen(proofCommand, shell=True, preexec_fn=os.setsid)
         proofProc.wait()
         time.sleep(15)
