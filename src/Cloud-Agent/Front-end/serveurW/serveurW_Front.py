@@ -258,7 +258,8 @@ class App:
         invitProc.wait()
         time.sleep(5)
         print("VC obtenu : ")
-        subprocess.Popen(''' curl -X GET "http://localhost:11000/credentials" > WG_VC.json''', shell=True, preexec_fn=os.setsid)
+        invitProc = subprocess.Popen(''' curl -X GET "http://localhost:11000/credentials" > WG_VC.json''', shell=True, preexec_fn=os.setsid)
+        invitProc.wait()
         connectJson = loadJSON(selfFolderPath + "/WG_VC.json")
         credID = json.dumps(connectJson['results'][0]['cred_def_id'])
 
