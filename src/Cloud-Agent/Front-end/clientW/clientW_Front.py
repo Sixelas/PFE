@@ -336,7 +336,7 @@ class App:
     def GButton_6_command(self):
         global servPubKey
         #servPubKey = self.GLineEdit_4.get()
-        confWG = ''' echo "[Interface]\nPrivateKey = ''' +loadFile("privatekey")+'''\nAddress = 120.0.0.2/24\n\n[Peer]\nPublicKey = ''' + servPubKey + '''\nEndpoint = 192.168.1.15:51820\nAllowedIPs = 120.0.0.1/32\nPersistentKeepalive = 25" > /etc/wireguard/wg0.conf'''
+        confWG = ''' echo "[Interface]\nPrivateKey = ''' +loadFile("privatekey")+'''\nAddress = 120.0.0.2/24\n\n[Peer]\nPublicKey = ''' + servPubKey + '''\nEndpoint = 192.168.2.13:51820\nAllowedIPs = 120.0.0.1/32\nPersistentKeepalive = 25" > /etc/wireguard/wg0.conf'''
         startVPN = subprocess.Popen(confWG, shell=True)
         startVPN.wait()
         startVPN = subprocess.Popen("wg-quick up wg0", shell=True, preexec_fn=os.setsid)
