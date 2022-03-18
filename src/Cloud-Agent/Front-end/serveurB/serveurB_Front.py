@@ -99,7 +99,8 @@ print("Utilisateurs enregistrés")
 print("Démarrage du CloudAgent ...")
 Agentproc = subprocess.Popen(AgentStartCommand, shell=True, preexec_fn=os.setsid)
 Agentproc.wait()
-time.sleep(5)
+print("Veuillez attendre 30s ...")
+time.sleep(30)
 print("CloudAgent ServeurB OK")
 
 ### Commande pour enregistrer le Credential Schema :
