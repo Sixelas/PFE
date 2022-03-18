@@ -324,8 +324,6 @@ class App:
         self.GLineEdit_4.insert(1, clientPubKey)
 
 
-###TODO Les deux dernières commandes sont à fusionner en 1 seul bouton si les clients-profs veulent une proof à sens unique.
-
 ### Fonction appelée quand on clique sur le bouton "Récupérer clé publique de clientW"
     def GButton_5_command(self):
 

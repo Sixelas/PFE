@@ -35,7 +35,8 @@ VRouter("router", nics=[VNic(), VNic(), VNic(), VNic()],
 ## Le mode cow pour les VFs va dériver l'image disque à partir de l'image de base
 VHost("serveurB", conf='common', hds=[VFs(DEBIAN_PATH, "cow", tag='serveurB.img')], nics=[VNic(hw='0a:0a:0a:00:01:01'), VNic(hw='0a:0a:0a:00:01:02'), VNic(hw='0c:0c:0c:00:01:01')])
 VHost("serveurW", conf='common', hds=[VFs(DEBIAN_PATH, "cow", tag='serveurW.img')], nics=[VNic(hw='0a:0a:0a:00:02:01'), VNic(hw='0a:0a:0a:00:02:02'), VNic(hw='0c:0c:0c:00:02:01')])
-VHost("clientW", conf='common', hds=[VFs(ANDROID_PATH, "cow", tag='clientW.img')], nics=[VNic(model='pcnet', hw='0a:0a:0a:00:03:01')])
+#VHost("clientW", conf='common', hds=[VFs(ANDROID_PATH, "cow", tag='clientW.img')], nics=[VNic(model='pcnet', hw='0a:0a:0a:00:03:01')])
+VHost("clientW", conf='common', hds=[VFs(DEBIAN_PATH, "cow", tag='clientW.img')], nics=[VNic(hw='0a:0a:0a:00:03:01'), VNic(hw='0a:0a:0a:00:03:02'), VNic(hw='0c:0c:0c:00:03:01')])
 
 
 ## Le lien vers Internet relié au VRouter
