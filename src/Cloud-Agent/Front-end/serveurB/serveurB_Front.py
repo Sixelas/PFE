@@ -7,21 +7,15 @@ import subprocess
 import signal
 import json
 import time
-#from QrCode_Generation import QRCode
 from socket import *
 from netifaces import interfaces, ifaddresses, AF_INET
 
 
 
-# Dépendances manquantes sur les VM à installer :
-#
-# apt-get install python3-tk python3-pil python3-pil.imagetk
-# pip install pyqrcode netifaces pypng
-
 # ATTENTION Important :
 #
 # Script pensé pour être lancé sur ServeurB car il est root ! Sur pc perso faudra modif le code pour ajouter le "sudo" à von-network.
-# Pour l'instant ça lance les processus von-network et aca-py en arrière plan donc faut bien les kill avant de relancer quoi que ce soit avec :
+# Si par erreur on ferme l'interface avec ctrl+c dans le terminal, ça kill pas les processus fils aca-py donc il faut les tuer avant de relancer :
 # 
 # Pour aca-py :
 # ps aux | grep aca-py
@@ -60,19 +54,21 @@ InvitCommand = ''' curl -X POST "http://localhost:11000/out-of-band/create-invit
 CredentialSchemaCommand = ''' curl -X POST http://localhost:11000/schemas -H 'Content-Type: application/json' -d '{"attributes": ["public key","name"],"schema_name": "wg-schema","schema_version": "1.0"}' > CredSchema.json '''
 
 backgroundColor = 'white'
-windowTitle = "Agent ServeurW"
-#font = 'times 12'
+windowTitle = "Agent ServeurB"
+
 #setting window size
 width=400
 height=300
+
 # ///// END CONFIG /////
 
-# Open a json file
+
+### Cette fonction retourne le contenu d'un fichier .json
 def loadJSON(filePath):
     with open(filePath, 'r') as file:
         return json.load(file)
 
-#Cette fonction lit un fichier de nom "file" et retourne la première ligne sans le retour à la ligne \n
+### Cette fonction lit un fichier de nom "file" et retourne la première ligne sans le retour à la ligne \n
 def loadFile(file) :
     if os.path.exists(selfFolderPath + "/"+ file):
         fichier = open(selfFolderPath + "/"+ file, "r")
@@ -83,31 +79,30 @@ def loadFile(file) :
     return "Erreur lors de la génération des clés" #Message d'erreur à retourner au choix, ici pensé pour retourner la clé publique wireguard
 
 
-# Commande pour lancer l'agent Von du ServeurB. 
+### Commande pour lancer l'agent Von du ServeurB. 
 print("Démarrage du von-network ...")
 Vonproc = subprocess.Popen(VonStartCommand, shell=True, preexec_fn=os.setsid)
 Vonproc.wait()
-time.sleep(15)
-print("von-network OK http://localhost:9000/")
+print("Veuillez attendre 60s ...")
+time.sleep(60)
+print("von-network OK : http://localhost:9000/")
 
-# Commandes pour enregistrer les utilisateurs dans le von-network
+### Commandes pour enregistrer les utilisateurs dans le von-network
 print("Enregistrement des utilisateurs ...")
 subprocess.Popen(RegisterCommand_1, shell=True, preexec_fn=os.setsid)
-# time.sleep(1)
 subprocess.Popen(RegisterCommand_2, shell=True, preexec_fn=os.setsid)
-# time.sleep(1)
 subprocess.Popen(RegisterCommand_3, shell=True, preexec_fn=os.setsid)
-time.sleep(3)
+time.sleep(10)
 print("Utilisateurs enregistrés")
 
-# Commande pour lancer l'agent Cloud du ServeurB (en tâche de fond si possible, faut pas qu'il bloque le terminal). 
+### Commande pour lancer l'agent Cloud du ServeurB. 
 print("Démarrage du CloudAgent ...")
 Agentproc = subprocess.Popen(AgentStartCommand, shell=True, preexec_fn=os.setsid)
 Agentproc.wait()
 time.sleep(5)
 print("CloudAgent ServeurB OK")
 
-# Commande pour enregistrer le Credential Schema :
+### Commande pour enregistrer le Credential Schema :
 print("Enregistrement du schéma de VC ...")
 Credproc = subprocess.Popen(CredentialSchemaCommand, shell=True, preexec_fn=os.setsid)
 Credproc.wait()
@@ -117,14 +112,14 @@ CredentialDefCommand = ''' curl http://localhost:11000/credential-definitions -H
 Credproc = subprocess.Popen(CredentialDefCommand, shell=True, preexec_fn=os.setsid)
 Credproc.wait()
 
+
+### Classe qui gère l'Interface Utilisateur Tkinter
 class App:
 
     def __init__(self, root):
 
-        #setting title
         root.title(windowTitle)
         root.configure(bg=backgroundColor)
-        #root.option_add('*Font', font)
         
         screenwidth = root.winfo_screenwidth()
         screenheight = root.winfo_screenheight()
@@ -166,7 +161,7 @@ class App:
         self.GButton_3["font"] = ft
         self.GButton_3["fg"] = "#000000"
         self.GButton_3["justify"] = "center"
-        self.GButton_3["text"] = "Inviter ServeurW"
+        self.GButton_3["text"] = "Générer Invitation"
         self.GButton_3["relief"] = "groove"
         self.GButton_3["borderwidth"] = "3px"
         self.GButton_3.place(x=220,y=140,width=130,height=40)
@@ -182,15 +177,15 @@ class App:
         self.GLineEdit_3.place(x=15,y=230,width=350,height=40)
 
 
-# Fonction appelée quand on clique sur le bouton "STOP"
+# Fonction appelée quand on clique sur le bouton Stop von-network
     def GButton_1_command(self):
         global stop
-        os.killpg(Agentproc.pid, signal.SIGTERM)                    #Pour tuer le processus aca-py Agent lancé au départ
+        #os.killpg(Agentproc.pid, signal.SIGTERM)                    #Pour tuer le processus aca-py Agent lancé au départ
         subprocess.call("~/von-network/manage stop", shell=True)    #Pour tuer le von-network
         stop = True
 
 
-# Fonction appelée quand on clique sur le bouton "Générer invitation pour ClientW"
+# Fonction appelée quand on clique sur le bouton "Générer invitation"
     def GButton_3_command(self):
         #Commande pour lancer l'agent Cloud du ServeurB (en tâche de fond si possible, faut pas qu'il bloque le terminal). 
         Invitproc = subprocess.Popen(InvitCommand, shell=True, preexec_fn=os.setsid)
@@ -205,9 +200,8 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = App(root)
     root.mainloop()
-    if not stop :
-        os.killpg(Agentproc.pid, signal.SIGTERM)                    #Pour tuer le processus aca-py Agent lancé au départ
-        #subprocess.call("~/von-network/manage stop", shell=True)    #Pour tuer le von-network
+    os.killpg(Agentproc.pid, signal.SIGTERM)                    #Pour tuer le processus aca-py Agent lancé au départ
+    #subprocess.call("~/von-network/manage stop", shell=True)    #Pour tuer le von-network
 
     
 

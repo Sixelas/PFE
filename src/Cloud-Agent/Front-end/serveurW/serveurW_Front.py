@@ -11,15 +11,10 @@ from socket import *
 from netifaces import interfaces, ifaddresses, AF_INET
 import time
 
-# Dépendances manquantes sur les VM à installer :
-#
-# apt-get install python3-tk python3-pil python3-pil.imagetk
-# pip install pyqrcode netifaces pypng
-
 # ATTENTION Important :
 #
 # Script pensé pour être lancé sur ServeurW car il est root !
-# Pour l'instant ça lance le aca-py en arrière plan donc faut bien les kill avant de relancer quoi que ce soit avec :
+# Si par erreur on ferme l'interface avec ctrl+c dans le terminal, ça kill pas les processus fils aca-py donc il faut les tuer avant de relancer :
 #
 # ps aux | grep aca-py
 # kill -9 <pid aca-py> 
@@ -30,7 +25,7 @@ import time
 # Chemin du dossier qui contient ce fichier .py
 selfFolderPath = os.getcwd() 
 
-# Permet de récupérer automatiquement l'@ip de l'interface de la machine reliée au LAN. 
+# Permet de récupérer automatiquement l'@ip et l'interface de la machine reliée au LAN. 
 listeAdresses = []*len(interfaces())
 listeInterfaces = []*len(interfaces())
 for ifaceName in interfaces():
@@ -38,12 +33,12 @@ for ifaceName in interfaces():
     listeAdresses.append(addresses)
     listeInterfaces.append(ifaceName)
 
-# Id de la connexion établie avec serveurB 
-connectID = ""
 
+connectID = ""
 pubKey = ""
 credID = ""
 clientPubKey = ""
+
 # Si on a le von-network en local :
 #genesisIP = 'localhost'
 # Si le von-network est sur serveurB :
@@ -58,17 +53,17 @@ InvitRequest = ''' curl -X POST "http://localhost:11000/out-of-band/receive-invi
 
 backgroundColor = 'white'
 windowTitle = "Agent ServeurW"
-#font = 'times 12'
-#setting window size
+
 width=810
 height=606
 
 # ///// END CONFIG /////
 
-#TODO Commande pour lancer l'agent Cloud du ServeurW (en tâche de fond si possible, faut pas qu'il bloque le terminal). 
+
+### Commande pour lancer l'agent Cloud du ServeurW. 
 Agentproc = subprocess.Popen(AgentStartCommand, shell=True, preexec_fn=os.setsid)
 
-#Cette fonction lit un fichier de nom "file" et retourne la première ligne sans le retour à la ligne \n
+### Cette fonction lit un fichier de nom "file" et retourne la première ligne sans le retour à la ligne \n
 def loadFile(file) :
     if os.path.exists(selfFolderPath + "/"+ file):
         fichier = open(selfFolderPath + "/"+ file, "r")
@@ -78,19 +73,19 @@ def loadFile(file) :
     print( "Erreur : " + selfFolderPath + "/" + file +" non trouvé")
     return "Erreur lors de la génération des clés" #Message d'erreur à retourner au choix, ici pensé pour retourner la clé publique wireguard
 
-# Open a json file
+### Cette fonction retourne le contenu d'un fichier .json
 def loadJSON(filePath):
     with open(filePath, 'r') as file:
         return json.load(file)
 
+
+### Classe qui gère l'Interface Utilisateur Tkinter
 class App:
 
     def __init__(self, root):
 
-        #setting title
         root.title(windowTitle)
         root.configure(bg=backgroundColor)
-        #root.option_add('*Font', font)
         
         screenwidth = root.winfo_screenwidth()
         screenheight = root.winfo_screenheight()
@@ -226,9 +221,11 @@ class App:
         self.GButton_6["command"] = self.GButton_6_command
 
 
-# Fonction appelée quand on clique sur le bouton "Générer clés WireGuard"
+### Fonction appelée quand on clique sur le bouton "Générer clés WireGuard"
     def GButton_1_command(self):
+
         global pubKey
+
         subprocess.call("echo Génération des clés WireGuard", shell=True)
         #Ici on génère le couple publickey / privatekey
         subprocess.call("umask 077", shell=True)
@@ -238,113 +235,123 @@ class App:
         pubKey = loadFile("publickey")
         self.GLineEdit_1.insert(1,pubKey)
 
-# Fonction appelée quand on clique sur le bouton "OK"
+### Fonction appelée quand on clique sur le bouton "OK" de l'invitation ServeurB
     def GButton_2_command(self):
+
         global InvitRequest
         global  credID
         global connectID
+
+        ## Etape 1 : On établit la connexion avec serveurB à l'aide de l'invitation reçue :
         reqMSG = InvitRequest + self.GLineEdit_2.get() +''' ' '''
         invitProc = subprocess.Popen(reqMSG, shell=True, preexec_fn=os.setsid)
         invitProc.wait()
         time.sleep(5)
         self.GLineEdit_2.delete(0, len(self.GLineEdit_2.get()))
+
+        ## Etape 2 : On demande un VC selon le modèle voulu à serveurB :
+
+        # On récupère l'identifiant de la connexion connectID
         invitProc = subprocess.Popen(''' curl http://localhost:11000/connections > Connection_logs.json ''', shell=True, preexec_fn=os.setsid)
         invitProc.wait()
         time.sleep(5)
-        connectJson = loadJSON(selfFolderPath + "/Connection_logs.json") #Enregistre l'invitation dans un fichier json.
-        #print("COUCOU")
-        #print(connectJson)
+        connectJson = loadJSON(selfFolderPath + "/Connection_logs.json") #Récupère les données d'invitation enregistrées dans le fichier json.
         connectID = json.dumps(connectJson['results'][0]['connection_id'])
+
+        # On envoie notre demande de VC
         proposeCommand = ''' curl -X POST http://localhost:11000/issue-credential-2.0/send-proposal -H "Content-Type: application/json" -d '{"comment": "VC WG Please","connection_id": ''' +connectID+ ''',"credential_preview": {"@type": "issue-credential/2.0/credential-preview","attributes": [{"mime-type": "plain/text","name": "public key", "value": "'''+ pubKey +'''"},{"mime-type": "plain/text","name": "name", "value": "ServeurW"}]},"filter": {"indy": {  }}}' '''
         invitProc = subprocess.Popen(proposeCommand, shell=True, preexec_fn=os.setsid)
         invitProc.wait()
         time.sleep(5)
-        print("VC obtenu : ")
+
+        # On récupère le VC obtenu et on le stocke dan WG_VC.json. On récupère également le credID du VC.
+        print("\nVC obtenu : ")
         invitProc = subprocess.Popen(''' curl -X GET "http://localhost:11000/credentials" > WG_VC.json''', shell=True, preexec_fn=os.setsid)
         invitProc.wait()
         connectJson = loadJSON(selfFolderPath + "/WG_VC.json")
         credID = json.dumps(connectJson['results'][0]['cred_def_id'])
 
 
-# Fonction appelée quand on clique sur le bouton "Générer invitation pour ClientW"
+### Fonction appelée quand on clique sur le bouton "Générer invitation pour ClientW"
     def GButton_3_command(self):
+
         subprocess.call(InvitCommand, shell=True)
-        invitJson = loadJSON(selfFolderPath + "/invitClientW.json") #Enregistre l'invitation dans un fichier json.
+        invitJson = loadJSON(selfFolderPath + "/invitClientW.json")
         invitURL = json.dumps(invitJson['invitation'])
         self.GLineEdit_3.delete(0, len(self.GLineEdit_3.get()))
         self.GLineEdit_3.insert(1,invitURL)
-        QRCode(json.dumps(invitJson['invitation_url'])).toPNG(selfFolderPath + "/invitClientW.png") #Génère un QRcode d'invitation à partir de l'URL d'invitation.
+        #Génère un QRcode d'invitation à partir de l'URL d'invitation.
+        QRCode(json.dumps(invitJson['invitation_url'])).toPNG(selfFolderPath + "/invitClientW.png")
 
 
-#TODO Fonction appelée quand on clique sur le bouton "Echanges de Proofs avec ClientW"
+### Fonction appelée quand on clique sur le bouton "Echanges de Proofs avec ClientW" --> Inutile actuellement !
     def GButton_4_command(self):
+
         global credID
         global connectID
         global clientPubKey
 
+        ## Etape 1 : On récupère le connectID de la connexion avec clientW (nécessite de supprimer l'ancienne connexion avec serveurB)
+
+        # Suppression de la connection avec serveurB :
         connectID = ''.join(x for x in connectID if x not in '''"''')
-        # Suppression de la connection avec serverB
         deleteConnectID = ''' curl -X 'DELETE' 'http://localhost:11000/connections/''' + connectID + ''' ' -H 'accept: application/json' '''
         proofProc = subprocess.Popen(deleteConnectID, shell=True, preexec_fn=os.setsid)
         proofProc.wait()
+
         # Enregistrement de la connection avec clientW
         proofProc = subprocess.Popen(''' curl http://localhost:11000/connections > Connection_logs.json ''', shell=True,preexec_fn=os.setsid)
         proofProc.wait()
-        connectJson = loadJSON(selfFolderPath + "/Connection_logs.json")  # Enregistre l'invitation dans un fichier json.
+        connectJson = loadJSON(selfFolderPath + "/Connection_logs.json")
         connectID = json.dumps(connectJson['results'][0]['connection_id'])
-        # Envoie le proof request à clientW
-        proofCommand = ''' curl -X 'POST'  'http://localhost:11000/present-proof-2.0/send-request' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{ "comment": "ServerW proof request", "connection_id": '''+connectID+''', "presentation_request": {"indy": {"name": "Proof of Identity","version": "1.0","requested_attributes": {"0_public_key_uuid": {"name": "public key","restrictions": [{"cred_def_id": '''+credID+'''}]},"0_name_uuid": {"name": "name","restrictions": [{"cred_def_id": '''+credID+'''}]} },"requested_predicates": { }}}} ' '''
 
+        ## Etape 2 : Envoie du proof request à clientW :
+
+        # On envoie le proof request à clientW
+        proofCommand = ''' curl -X 'POST'  'http://localhost:11000/present-proof-2.0/send-request' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{ "comment": "ServerW proof request", "connection_id": '''+connectID+''', "presentation_request": {"indy": {"name": "Proof of Identity","version": "1.0","requested_attributes": {"0_public_key_uuid": {"name": "public key","restrictions": [{"cred_def_id": '''+credID+'''}]},"0_name_uuid": {"name": "name","restrictions": [{"cred_def_id": '''+credID+'''}]} },"requested_predicates": { }}}} ' '''
         proofProc = subprocess.Popen(proofCommand, shell=True, preexec_fn=os.setsid)
         proofProc.wait()
         time.sleep(15)
 
-        # proofCommand = ''' curl -X 'GET'  'http://localhost:11000/present-proof-2.0/records' -H 'accept: application/json' > ProofData.json '''
-        # proofProc = subprocess.Popen(proofCommand, shell=True, preexec_fn=os.setsid)
-        # proofProc.wait()
-        # time.sleep(3)
-        #
-        # proofData = loadJSON(selfFolderPath + "/ProofData.json")  # Enregistre l'invitation dans un fichier json.
-        # presExID = json.dumps(proofData['results'][0]['pres_ex_id'])
-        #
-        # presExID = ''.join(x for x in presExID if x not in '''"''')
-        # sendRequest = ''' curl -X 'POST' 'http://localhost:11000/present-proof-2.0/records/''' + presExID + '''/send-request' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{  "trace": true}' '''
-        # proofProc = subprocess.Popen(sendRequest, shell=True, preexec_fn=os.setsid)
-        # proofProc.wait()
-        # time.sleep(15)
-
+        # On enregistre le résultat dans un fichier json pour ensuite extraire la servPubKey WireGuard du Verifiable presentation de clientW.
         proofRecord = ''' curl -X 'GET' 'http://localhost:11000/present-proof-2.0/records' -H 'accept: application/json' > ProofRecord.json '''
         proofProc = subprocess.Popen(proofRecord, shell=True, preexec_fn=os.setsid)
         proofProc.wait()
-        connectJson = loadJSON(selfFolderPath + "/ProofRecord.json")  # Enregistre l'invitation dans un fichier json.
+        connectJson = loadJSON(selfFolderPath + "/ProofRecord.json")
         clientPubKey = json.dumps(connectJson['results'][0]['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw'])
         clientPubKey = ''.join(x for x in clientPubKey if x not in '''"''')
-        # on remplie le champ
         self.GLineEdit_4.delete(0, len(self.GLineEdit_4.get()))
         self.GLineEdit_4.insert(1, clientPubKey)
 
 
-#TODO Les deux dernières commandes sont à fusionner en 1 seul bouton si les clients-profs veulent une proof à sens unique.
+###TODO Les deux dernières commandes sont à fusionner en 1 seul bouton si les clients-profs veulent une proof à sens unique.
 
-#TODO Fonction appelée quand on clique sur le bouton "Récupérer clé publique de clientW"
+### Fonction appelée quand on clique sur le bouton "Récupérer clé publique de clientW"
     def GButton_5_command(self):
+
         global clientPubKey
+
         proofRecord = ''' curl -X 'GET' 'http://localhost:11000/present-proof-2.0/records' -H 'accept: application/json' > ProofRecord.json '''
         proofProc = subprocess.Popen(proofRecord, shell=True, preexec_fn=os.setsid)
         proofProc.wait()
-        proofJson = loadJSON(selfFolderPath + "/ProofRecord.json")  # Enregistre l'invitation dans un fichier json.
+        proofJson = loadJSON(selfFolderPath + "/ProofRecord.json")
         clientPubKey = json.dumps(proofJson['results'][0]['pres_request']['comment'])
         clientPubKey = ''.join(x for x in clientPubKey if x not in '''"''')
         self.GLineEdit_4.delete(0, len(self.GLineEdit_4.get()))
         self.GLineEdit_4.insert(1, clientPubKey)
 
-#TODO Fonction appelée quand on clique sur le bouton "Configuration du Tunnel VPN"
+### Fonction appelée quand on clique sur le bouton "Configuration du Tunnel VPN"
     def GButton_6_command(self):
+
         global clientPubKey
         #clientPubKey = self.GLineEdit_4.get()
+
+        ## Etape 1 : On configure  le fichier /etc/wireguard/wg0.conf avec les informations obtenues précédemment :
         confWG = ''' echo "[Interface]\nPrivateKey = '''+loadFile("privatekey") +''' \nAddress = 120.0.0.1 \nSaveConfig = false \nListenPort = 51820 \nPostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o '''+listeInterfaces[1]+''' -j MASQUERADE \nPostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o '''+listeInterfaces[1]+''' -j MASQUERADE \nDNS = 8.8.8.8 \n\n[Peer] \n# ClientW \nPublicKey = ''' +clientPubKey+ '''\nAllowedIPs = 120.0.0.2/32" > /etc/wireguard/wg0.conf'''
         startVPN = subprocess.Popen(confWG, shell=True)
         startVPN.wait()
+
+        ## Etape 2 : On active l'interface wg0 du VPN :
         startVPN = subprocess.Popen("wg-quick up wg0", shell=True, preexec_fn=os.setsid)
         startVPN.wait()
         subprocess.call('''echo "Serveur VPN ouvert pour clientW !" ''', shell=True)
