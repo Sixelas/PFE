@@ -80,7 +80,7 @@ def extractPubKey(serverName, file) :
     
     for case in dataJson['results'] :
         comment = serverName+' proof request'
-        if(case['pres_request']['comment'] == comment) :
+        if(case['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_name_uuid']['raw'] == serverName) :
                 extractKey = case['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw']
                 return ''.join(x for x in extractKey if x not in '''"''')
 
@@ -318,8 +318,6 @@ class App:
         invitProc.wait()
         time.sleep(5)
         connectID = json.dumps(extractConnectID("ServeurB","Connection_logs.json"))
-        #connectJson = loadJSON(selfFolderPath + "/Connection_logs.json") #Récupère les données d'invitation enregistrées dans le fichier json.
-        #connectID = json.dumps(connectJson['results'][0]['connection_id'])
 
         # On envoie notre demande de VC
         proposeCommand = ''' curl -X POST http://localhost:11000/issue-credential-2.0/send-proposal -H "Content-Type: application/json" -d '{"comment": "VC WG Please","connection_id": ''' +connectID+ ''',"credential_preview": {"@type": "issue-credential/2.0/credential-preview","attributes": [{"mime-type": "plain/text","name": "public key", "value": "'''+ pubKey +'''"},{"mime-type": "plain/text","name": "name", "value": "ClientW"}]},"filter": {"indy": {  }}}' '''
@@ -358,17 +356,9 @@ class App:
 
         ## Etape 1 : On récupère le connectID de la connexion avec serveurW
 
-        # Suppression de la connection avec serveurB :
-        #connectID = ''.join(x for x in connectID if x not in '''"''')
-        #deleteConnectID = ''' curl -X 'DELETE' 'http://localhost:11000/connections/'''+connectID+''' ' -H 'accept: application/json' '''
-        #proofProc = subprocess.Popen(deleteConnectID, shell=True, preexec_fn=os.setsid)
-        #proofProc.wait()
-
         # Enregistrement de la connection avec ServeurW dans un fichier json puis récupération du connectID :
         proofProc = subprocess.Popen(''' curl http://localhost:11000/connections > Connection_logs.json ''', shell=True,preexec_fn=os.setsid)
         proofProc.wait()
-        #connectJson = loadJSON(selfFolderPath + "/Connection_logs.json")
-        #connectID = json.dumps(connectJson['results'][0]['connection_id'])
         connectID = json.dumps(extractConnectID("ServeurW","Connection_logs.json"))
 
         ## Etape 2 : Envoie du proof request à serveurW :
@@ -384,10 +374,7 @@ class App:
         proofProc = subprocess.Popen(proofRecord, shell=True, preexec_fn=os.setsid)
         proofProc.wait()
 
-        servPubKey = extractPubKey("ClientW","ProofRecord.json")
-        #connectJson = loadJSON(selfFolderPath + "/ProofRecord.json")
-        #servPubKey = json.dumps(connectJson['results'][0]['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw'])
-        #servPubKey = ''.join(x for x in servPubKey if x not in '''"''')
+        servPubKey = extractPubKey("ServeurW","ProofRecord.json")
         self.GLineEdit_4.delete(0, len(self.GLineEdit_4.get()))
         self.GLineEdit_4.insert(1, servPubKey)
 

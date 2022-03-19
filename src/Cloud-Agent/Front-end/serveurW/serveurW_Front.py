@@ -81,7 +81,7 @@ def extractPubKey(serverName, file) :
     
     for case in dataJson['results'] :
         comment = serverName+' proof request'
-        if(case['pres_request']['comment'] == comment) :
+        if(case['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_name_uuid']['raw'] == serverName) :
                 extractKey = case['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw']
                 return ''.join(x for x in extractKey if x not in '''"''')
 
@@ -346,12 +346,6 @@ class App:
 
         ## Etape 1 : On récupère le connectID de la connexion avec ClientW
 
-        # Suppression de la connection avec serveurB :
-        #connectID = ''.join(x for x in connectID if x not in '''"''')
-        #deleteConnectID = ''' curl -X 'DELETE' 'http://localhost:11000/connections/''' + connectID + ''' ' -H 'accept: application/json' '''
-        #proofProc = subprocess.Popen(deleteConnectID, shell=True, preexec_fn=os.setsid)
-        #proofProc.wait()
-
         # Enregistrement de la connection avec clientW
         proofProc = subprocess.Popen(''' curl http://localhost:11000/connections > Connection_logs.json ''', shell=True,preexec_fn=os.setsid)
         proofProc.wait()
@@ -371,9 +365,6 @@ class App:
         proofProc.wait()
         clientPubKey = extractPubKey("ClientW","ProofRecord.json")
 
-        #connectJson = loadJSON(selfFolderPath + "/ProofRecord.json")
-        #clientPubKey = json.dumps(connectJson['results'][0]['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw'])
-        #clientPubKey = ''.join(x for x in clientPubKey if x not in '''"''')
         self.GLineEdit_4.delete(0, len(self.GLineEdit_4.get()))
         self.GLineEdit_4.insert(1, clientPubKey)
 
