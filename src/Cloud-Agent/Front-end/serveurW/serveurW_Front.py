@@ -78,6 +78,25 @@ def loadJSON(filePath):
     with open(filePath, 'r') as file:
         return json.load(file)
 
+### Fonction qui permet d'extraire la clé publique de la Présentation 
+def extractPubKey(serverName, file) :
+    dataJson = loadJSON(selfFolderPath + "/"+file)
+    
+    for case in dataJson['results'] :
+        ## Si on est l'Agent ClientW, on veut récupérer la clé de ServeurW
+        if(serverName == "ClientW") :
+            if(case['pres_request']['comment'] == 'ServerW proof request') :
+                extractKey = case['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw']
+                return ''.join(x for x in extractKey if x not in '''"''')
+
+        ## Si on est l'Agent ServeurW, on veut récupérer la clé de ClientW
+        if(serverName == "ServerW") :
+            if(case['pres_request']['comment'] == 'ClientW proof request') :
+                extractKey = case['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw']
+                return ''.join(x for x in extractKey if x not in '''"''')
+        else :
+            print(serverName+" n'est pas un Agent reconnu")
+            return ""
 
 ### Classe qui gère l'Interface Utilisateur Tkinter
 class App:
@@ -284,7 +303,7 @@ class App:
         QRCode(json.dumps(invitJson['invitation_url'])).toPNG(selfFolderPath + "/invitClientW.png")
 
 
-### Fonction appelée quand on clique sur le bouton "Echanges de Proofs avec ClientW" --> Inutile actuellement !
+### Fonction appelée quand on clique sur le bouton "Echanges de Proofs avec ClientW"
     def GButton_4_command(self):
 
         global credID
@@ -313,30 +332,33 @@ class App:
         proofProc.wait()
         time.sleep(15)
 
-        # On enregistre le résultat dans un fichier json pour ensuite extraire la servPubKey WireGuard du Verifiable presentation de clientW.
+        # On enregistre le résultat dans un fichier json pour ensuite extraire la clientPubKey WireGuard du Verifiable presentation de clientW.
         proofRecord = ''' curl -X 'GET' 'http://localhost:11000/present-proof-2.0/records' -H 'accept: application/json' > ProofRecord.json '''
         proofProc = subprocess.Popen(proofRecord, shell=True, preexec_fn=os.setsid)
         proofProc.wait()
-        connectJson = loadJSON(selfFolderPath + "/ProofRecord.json")
-        clientPubKey = json.dumps(connectJson['results'][0]['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw'])
-        clientPubKey = ''.join(x for x in clientPubKey if x not in '''"''')
+        clientPubKey = extractPubKey("serverW","ProofRecord.json")
+
+        #connectJson = loadJSON(selfFolderPath + "/ProofRecord.json")
+        #clientPubKey = json.dumps(connectJson['results'][0]['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw'])
+        #clientPubKey = ''.join(x for x in clientPubKey if x not in '''"''')
         self.GLineEdit_4.delete(0, len(self.GLineEdit_4.get()))
         self.GLineEdit_4.insert(1, clientPubKey)
 
 
-### Fonction appelée quand on clique sur le bouton "Récupérer clé publique de clientW"
+### Fonction appelée quand on clique sur le bouton "Récupérer clé publique de clientW" (Inutilisable avec la nouvelle version de proof+extract dans les deux sens)
     def GButton_5_command(self):
 
-        global clientPubKey
+        #global clientPubKey
 
-        proofRecord = ''' curl -X 'GET' 'http://localhost:11000/present-proof-2.0/records' -H 'accept: application/json' > ProofRecord.json '''
-        proofProc = subprocess.Popen(proofRecord, shell=True, preexec_fn=os.setsid)
-        proofProc.wait()
-        proofJson = loadJSON(selfFolderPath + "/ProofRecord.json")
-        clientPubKey = json.dumps(proofJson['results'][0]['pres_request']['comment'])
-        clientPubKey = ''.join(x for x in clientPubKey if x not in '''"''')
-        self.GLineEdit_4.delete(0, len(self.GLineEdit_4.get()))
-        self.GLineEdit_4.insert(1, clientPubKey)
+        #proofRecord = ''' curl -X 'GET' 'http://localhost:11000/present-proof-2.0/records' -H 'accept: application/json' > ProofRecord.json '''
+        #proofProc = subprocess.Popen(proofRecord, shell=True, preexec_fn=os.setsid)
+        #proofProc.wait()
+        #proofJson = loadJSON(selfFolderPath + "/ProofRecord.json")
+        #clientPubKey = json.dumps(proofJson['results'][0]['pres_request']['comment'])
+        #clientPubKey = ''.join(x for x in clientPubKey if x not in '''"''')
+        #self.GLineEdit_4.delete(0, len(self.GLineEdit_4.get()))
+        #self.GLineEdit_4.insert(1, clientPubKey)
+        subprocess.Popen(''' echo "Fonctionnalité inutile à supprimer" ''', shell=True, preexec_fn=os.setsid)
 
 ### Fonction appelée quand on clique sur le bouton "Configuration du Tunnel VPN"
     def GButton_6_command(self):
