@@ -345,7 +345,7 @@ class App:
         proofProc = subprocess.Popen(proofRecord, shell=True, preexec_fn=os.setsid)
         proofProc.wait()
 
-        servPubKey = extractPubKey("clientW","ProofRecord.json")
+        servPubKey = extractPubKey("ClientW","ProofRecord.json")
         #connectJson = loadJSON(selfFolderPath + "/ProofRecord.json")
         #servPubKey = json.dumps(connectJson['results'][0]['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw'])
         #servPubKey = ''.join(x for x in servPubKey if x not in '''"''')

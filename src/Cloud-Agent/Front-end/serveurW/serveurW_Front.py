@@ -85,12 +85,12 @@ def extractPubKey(serverName, file) :
     for case in dataJson['results'] :
         ## Si on est l'Agent ClientW, on veut récupérer la clé de ServeurW
         if(serverName == "ClientW") :
-            if(case['pres_request']['comment'] == 'ServerW proof request') :
+            if(case['pres_request']['comment'] == 'ServeurW proof request') :
                 extractKey = case['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw']
                 return ''.join(x for x in extractKey if x not in '''"''')
 
         ## Si on est l'Agent ServeurW, on veut récupérer la clé de ClientW
-        if(serverName == "ServerW") :
+        if(serverName == "ServeurW") :
             if(case['pres_request']['comment'] == 'ClientW proof request') :
                 extractKey = case['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw']
                 return ''.join(x for x in extractKey if x not in '''"''')
@@ -213,7 +213,7 @@ class App:
         self.GButton_5["font"] = ft
         self.GButton_5["fg"] = "#000000"
         self.GButton_5["justify"] = "center"
-        self.GButton_5["text"] = "Récupérer clé publique de clientW"
+        self.GButton_5["text"] = "Récupérer clé publique de ClientW"
         self.GButton_5["relief"] = "groove"
         self.GButton_5["borderwidth"] = "3px"
         self.GButton_5.place(x=30,y=450,width=261,height=40)
@@ -327,7 +327,7 @@ class App:
         ## Etape 2 : Envoie du proof request à clientW :
 
         # On envoie le proof request à clientW
-        proofCommand = ''' curl -X 'POST'  'http://localhost:11000/present-proof-2.0/send-request' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{ "comment": "ServerW proof request", "connection_id": '''+connectID+''', "presentation_request": {"indy": {"name": "Proof of Identity","version": "1.0","requested_attributes": {"0_public_key_uuid": {"name": "public key","restrictions": [{"cred_def_id": '''+credID+'''}]},"0_name_uuid": {"name": "name","restrictions": [{"cred_def_id": '''+credID+'''}]} },"requested_predicates": { }}}} ' '''
+        proofCommand = ''' curl -X 'POST'  'http://localhost:11000/present-proof-2.0/send-request' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{ "comment": "ServeurW proof request", "connection_id": '''+connectID+''', "presentation_request": {"indy": {"name": "Proof of Identity","version": "1.0","requested_attributes": {"0_public_key_uuid": {"name": "public key","restrictions": [{"cred_def_id": '''+credID+'''}]},"0_name_uuid": {"name": "name","restrictions": [{"cred_def_id": '''+credID+'''}]} },"requested_predicates": { }}}} ' '''
         proofProc = subprocess.Popen(proofCommand, shell=True, preexec_fn=os.setsid)
         proofProc.wait()
         time.sleep(15)
@@ -336,7 +336,7 @@ class App:
         proofRecord = ''' curl -X 'GET' 'http://localhost:11000/present-proof-2.0/records' -H 'accept: application/json' > ProofRecord.json '''
         proofProc = subprocess.Popen(proofRecord, shell=True, preexec_fn=os.setsid)
         proofProc.wait()
-        clientPubKey = extractPubKey("serverW","ProofRecord.json")
+        clientPubKey = extractPubKey("ServeurW","ProofRecord.json")
 
         #connectJson = loadJSON(selfFolderPath + "/ProofRecord.json")
         #clientPubKey = json.dumps(connectJson['results'][0]['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw'])
@@ -374,7 +374,7 @@ class App:
         ## Etape 2 : On active l'interface wg0 du VPN :
         startVPN = subprocess.Popen("wg-quick up wg0", shell=True, preexec_fn=os.setsid)
         startVPN.wait()
-        subprocess.call('''echo "Serveur VPN ouvert pour clientW !" ''', shell=True)
+        subprocess.call('''echo "Serveur VPN ouvert pour ClientW !" ''', shell=True)
 
 if __name__ == "__main__":
     root = tk.Tk()
