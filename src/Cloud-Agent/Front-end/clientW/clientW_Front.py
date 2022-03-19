@@ -58,9 +58,6 @@ height=606
 # ///// END CONFIG ////
 
 
-### Commande pour lancer l'agent Cloud du ClientW. 
-Agentproc = subprocess.Popen(AgentStartCommand, shell=True, preexec_fn=os.setsid)
-
 ### Cette fonction lit un fichier de nom "file" et retourne la première ligne sans le retour à la ligne \n
 def loadFile(file) :
     if os.path.exists(selfFolderPath + "/"+ file):
@@ -76,25 +73,58 @@ def loadJSON(filePath):
     with open(filePath, 'r') as file:
         return json.load(file)
 
-### Fonction qui permet d'extraire la clé publique de la Présentation 
+### Fonction qui permet d'extraire la clé publique de serverName qui se trouve dans le VP qu'il a envoyé 
 def extractPubKey(serverName, file) :
+    
     dataJson = loadJSON(selfFolderPath + "/"+file)
     
     for case in dataJson['results'] :
-        ## Si on est l'Agent ClientW, on veut récupérer la clé de ServeurW
-        if(serverName == "ClientW") :
-            if(case['pres_request']['comment'] == 'ServerW proof request') :
+        comment = serverName+' proof request'
+        if(case['pres_request']['comment'] == comment) :
                 extractKey = case['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw']
                 return ''.join(x for x in extractKey if x not in '''"''')
 
-        ## Si on est l'Agent ServeurW, on veut récupérer la clé de ClientW
-        if(serverName == "ServerW") :
-            if(case['pres_request']['comment'] == 'ClientW proof request') :
-                extractKey = case['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw']
-                return ''.join(x for x in extractKey if x not in '''"''')
-        else :
-            print(serverName+" n'est pas un Agent reconnu")
-            return ""
+    print(serverName+" n'est pas un Agent reconnu")
+    return ""
+
+### Fonction qui permet d'extraire l'id de la connection avec serverName
+def extractConnectID(serverName, file) :
+
+    dataJson = loadJSON(selfFolderPath + "/"+file)
+    
+    for case in dataJson['results'] :
+        if(case['their_label'] == serverName) :
+                return case['connection_id']
+    print(serverName+" n'est pas un Agent reconnu")
+    return ""
+
+### Fonction qui supprime toutes les connexions actives de l'Agent
+def deleteConnexions(file) :
+    #A voir si dans certains cas il faut pas faire une maj du fichier de logs avant de s'en servir
+    dataJson = loadJSON(selfFolderPath + "/"+file)
+    
+    for case in dataJson['results'] :
+        id = ''.join(x for x in case['connection_id'] if x not in '''"''')
+        deleteCommand = ''' curl -X 'DELETE' 'http://localhost:11000/connections/''' + id + ''' ' -H 'accept: application/json' '''
+        print("\nSuppression de la connexion avec "+case['their_label']+"d'identifiant "+id+"\n")
+        deleteProc = subprocess.Popen(deleteCommand, shell=True, preexec_fn=os.setsid)
+        deleteProc.wait()
+        time.sleep(3)
+
+###TODO Fonction pour révoquer tous les VC possédés par l'Agent
+def revokeVC(file) :
+    print("TODO revokeVC")
+
+###TODO Fonction pour supprimer la config WireGuard active
+def resetWG() :
+    resetVPN = subprocess.Popen("wg-quick down wg0", shell=True, preexec_fn=os.setsid)
+    resetVPN.wait()
+    resetVPN = subprocess.Popen("rm /etc/wireguard/wg0.conf", shell=True, preexec_fn=os.setsid)
+    resetVPN.wait()
+
+### Commande pour lancer l'agent Cloud du ClientW. 
+Agentproc = subprocess.Popen(AgentStartCommand, shell=True, preexec_fn=os.setsid)
+
 
 ### Classe qui gère l'Interface Utilisateur Tkinter
 class App:
@@ -213,15 +243,22 @@ class App:
         self.GButton_4.place(x=240,y=370,width=293,height=40)
         self.GButton_4["command"] = self.GButton_4_command
 
+        self.GText_3 = tk.Label(text = "Clé publique de ClientW : ")
+        self.GText_3["bg"] = "#e88787"
+        self.GText_3["font"] = ft
+        self.GText_3["fg"] = "#333333"
+        self.GText_3["justify"] = "center"
+        self.GText_3.place(x=30,y=450,width=261,height=40)
+
         self.GButton_5=tk.Button(root)
         self.GButton_5["bg"] = "#e88787"
         self.GButton_5["font"] = ft
         self.GButton_5["fg"] = "#000000"
         self.GButton_5["justify"] = "center"
-        self.GButton_5["text"] = "Echange de clés publiques WireGuard"
+        self.GButton_5["text"] = "Reset"
         self.GButton_5["relief"] = "groove"
         self.GButton_5["borderwidth"] = "3px"
-        self.GButton_5.place(x=30,y=450,width=261,height=40)
+        self.GButton_5.place(x=700,y=550,width=60,height=35)
         self.GButton_5["command"] = self.GButton_5_command
 
         self.GLineEdit_4=tk.Entry(root)
@@ -280,8 +317,9 @@ class App:
         invitProc = subprocess.Popen(''' curl http://localhost:11000/connections > Connection_logs.json ''', shell=True, preexec_fn=os.setsid)
         invitProc.wait()
         time.sleep(5)
-        connectJson = loadJSON(selfFolderPath + "/Connection_logs.json") #Récupère les données d'invitation enregistrées dans le fichier json.
-        connectID = json.dumps(connectJson['results'][0]['connection_id'])
+        connectID = json.dumps(extractConnectID("ServeurB","Connection_logs.json"))
+        #connectJson = loadJSON(selfFolderPath + "/Connection_logs.json") #Récupère les données d'invitation enregistrées dans le fichier json.
+        #connectID = json.dumps(connectJson['results'][0]['connection_id'])
 
         # On envoie notre demande de VC
         proposeCommand = ''' curl -X POST http://localhost:11000/issue-credential-2.0/send-proposal -H "Content-Type: application/json" -d '{"comment": "VC WG Please","connection_id": ''' +connectID+ ''',"credential_preview": {"@type": "issue-credential/2.0/credential-preview","attributes": [{"mime-type": "plain/text","name": "public key", "value": "'''+ pubKey +'''"},{"mime-type": "plain/text","name": "name", "value": "ClientW"}]},"filter": {"indy": {  }}}' '''
@@ -318,19 +356,20 @@ class App:
         global pubKey
         global servPubKey
 
-        ## Etape 1 : On récupère le connectID de la connexion avec serveurW (nécessite de supprimer l'ancienne connexion avec serveurB)
+        ## Etape 1 : On récupère le connectID de la connexion avec serveurW
 
         # Suppression de la connection avec serveurB :
-        connectID = ''.join(x for x in connectID if x not in '''"''')
-        deleteConnectID = ''' curl -X 'DELETE' 'http://localhost:11000/connections/'''+connectID+''' ' -H 'accept: application/json' '''
-        proofProc = subprocess.Popen(deleteConnectID, shell=True, preexec_fn=os.setsid)
-        proofProc.wait()
+        #connectID = ''.join(x for x in connectID if x not in '''"''')
+        #deleteConnectID = ''' curl -X 'DELETE' 'http://localhost:11000/connections/'''+connectID+''' ' -H 'accept: application/json' '''
+        #proofProc = subprocess.Popen(deleteConnectID, shell=True, preexec_fn=os.setsid)
+        #proofProc.wait()
 
-        # Enregistrement de la connection avec serveurW dans un fichier json puis récupération du connectID :
+        # Enregistrement de la connection avec ServeurW dans un fichier json puis récupération du connectID :
         proofProc = subprocess.Popen(''' curl http://localhost:11000/connections > Connection_logs.json ''', shell=True,preexec_fn=os.setsid)
         proofProc.wait()
-        connectJson = loadJSON(selfFolderPath + "/Connection_logs.json")
-        connectID = json.dumps(connectJson['results'][0]['connection_id'])
+        #connectJson = loadJSON(selfFolderPath + "/Connection_logs.json")
+        #connectID = json.dumps(connectJson['results'][0]['connection_id'])
+        connectID = json.dumps(extractConnectID("ServeurW","Connection_logs.json"))
 
         ## Etape 2 : Envoie du proof request à serveurW :
 
@@ -355,10 +394,12 @@ class App:
 
 
 
-
-###TODO Fonction appelée quand on clique sur le bouton "Echange des clés publiques WireGuard avec ServeurW" (Inutilisable avec la nouvelle version de proof+extract dans les deux sens)
+###TODO Fonction appelée quand on appuie sur le bouton Reset. Elle supprime toutes les connexions et les configs WireGuard en cours sur l'Agent.
     def GButton_5_command(self):
-        subprocess.Popen(''' echo "Fonctionnalité inutile à supprimer" ''', shell=True, preexec_fn=os.setsid)
+        deleteConnexions("Connection_logs.json")
+        revokeVC("ProofRecord.json")
+        resetWG()
+        #subprocess.Popen(''' echo "TODO delete all Connexions + revoke VC + reset WireGuard" ''', shell=True, preexec_fn=os.setsid)
 
 
 ### Fonction appelée quand on clique sur le bouton "Configuration du Tunnel VPN"
