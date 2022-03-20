@@ -107,7 +107,7 @@ def deleteConnexions(file) :
     for case in dataJson['results'] :
         id = ''.join(x for x in case['connection_id'] if x not in '''"''')
         deleteCommand = ''' curl -X 'DELETE' 'http://localhost:11000/connections/''' + id + ''' ' -H 'accept: application/json' '''
-        print("\nSuppression de la connexion avec "+case['their_label']+"d'identifiant "+id+"\n")
+        print("\nSuppression de la connexion avec "+case['their_label']+" d'identifiant "+id+"\n")
         deleteProc = subprocess.Popen(deleteCommand, shell=True, preexec_fn=os.setsid)
         deleteProc.wait()
         time.sleep(3)
