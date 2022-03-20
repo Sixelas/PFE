@@ -396,7 +396,7 @@ class App:
         #servPubKey = self.GLineEdit_4.get()
 
         ## Etape 1 : On configure  le fichier /etc/wireguard/wg0.conf avec les informations obtenues précédemment :
-        confWG = ''' echo "[Interface]\nPrivateKey = ''' +loadFile("privatekey")+'''\nAddress = 120.0.0.2/24\n\n[Peer]\nPublicKey = ''' + servPubKey + '''\nEndpoint = 192.168.2.13:51820\nAllowedIPs = 120.0.0.1/32\nPersistentKeepalive = 25" > /etc/wireguard/wg0.conf'''
+        confWG = ''' echo "[Interface]\nPrivateKey = ''' +loadFile("privatekey")+'''\nAddress = 120.0.0.2/24\nDNS = 192.168.2.1\n\n[Peer]\nPublicKey = ''' + servPubKey + '''\nEndpoint = 192.168.2.13:51820\nAllowedIPs = 0.0.0.0/0\nPersistentKeepalive = 25" > /etc/wireguard/wg0.conf'''
         startVPN = subprocess.Popen(confWG, shell=True)
         startVPN.wait()
 
