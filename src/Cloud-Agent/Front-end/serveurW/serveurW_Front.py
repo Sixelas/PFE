@@ -323,6 +323,7 @@ class App:
         invitProc.wait()
         connectJson = loadJSON(selfFolderPath + "/WG_VC.json")
         credID = json.dumps(connectJson['results'][0]['cred_def_id'])
+        print(connectJson)
 
 
 ### Fonction appelée quand on clique sur le bouton "Générer invitation pour ClientW"
