@@ -240,6 +240,13 @@ class App:
         global credID
         global connectID
 
+        if (len(self.GLineEdit_2.get()) == 0):
+            self.GLineEdit_2.delete(0, len(self.GLineEdit_2.get()))
+            self.GLineEdit_2.insert(1, "Veillez remplir le champ inviation...")
+            #time.sleep(1)
+            #self.GLineEdit_3.delete(0, len(self.GLineEdit_3.get()))
+            return
+
         ## Etape 1 : On établit la connexion avec serveurB à l'aide de l'invitation reçue :
         reqMSG = InvitRequest1 + self.GLineEdit_2.get() +''' ' '''
         invitProc = subprocess.Popen(reqMSG, shell=True, preexec_fn=os.setsid)
@@ -273,6 +280,13 @@ class App:
     def GButton_3_command(self):
 
         global InvitRequest2
+
+        if (len(self.GLineEdit_3.get()) == 0):
+            self.GLineEdit_3.delete(0, len(self.GLineEdit_3.get()))
+            self.GLineEdit_3.insert(1, "Veillez remplir le champ inviation...")
+            #time.sleep(1)
+            #self.GLineEdit_3.delete(0, len(self.GLineEdit_3.get()))
+            return
 
         ## On établit la connexion avec serveurW à l'aide de l'invitation reçue :
         reqMSG = InvitRequest2 + self.GLineEdit_3.get() +''' ' '''
