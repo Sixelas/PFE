@@ -1,6 +1,8 @@
 # Liste des fichiers .py de ce dossier :
 
+- config_Interfaces.py : Ce script permet de configurer les interfaces des Vms si le service dnsmask/dhcp du VRouter est désactivé.
 - creator.py : Ce script permet de créer une image de debian réutilisable ensuite comme base pour les scripts des réseaux virtuels de notre choix.
+- install.txt : Ce fichier liste l'ensemble des dépendances nécessaires à installer sur l'image debian11.img de base du réseau virtuel.
 - network.py : Ce script correspond à notre réseau virtuel final.
 
 # Tuto installation NEmu au Cremi 
