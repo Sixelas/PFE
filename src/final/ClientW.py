@@ -243,8 +243,6 @@ class App:
         if (len(self.GLineEdit_2.get()) == 0):
             self.GLineEdit_2.delete(0, len(self.GLineEdit_2.get()))
             self.GLineEdit_2.insert(1, "Veillez remplir le champ inviation...")
-            #time.sleep(1)
-            #self.GLineEdit_3.delete(0, len(self.GLineEdit_3.get()))
             return
 
         ## Etape 1 : On établit la connexion avec serveurB à l'aide de l'invitation reçue :
@@ -284,8 +282,6 @@ class App:
         if (len(self.GLineEdit_3.get()) == 0):
             self.GLineEdit_3.delete(0, len(self.GLineEdit_3.get()))
             self.GLineEdit_3.insert(1, "Veillez remplir le champ inviation...")
-            #time.sleep(1)
-            #self.GLineEdit_3.delete(0, len(self.GLineEdit_3.get()))
             return
 
         ## On établit la connexion avec serveurW à l'aide de l'invitation reçue :
