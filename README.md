@@ -21,6 +21,10 @@ Toutes les étapes d'installation et de configuration devront être documentées
 - src/ : Contient le code du projet.
 - Tests/ : Contient les scripts de test.
 
+## Tester le projet :
+
+Pour lancer le réseau virtuel et tester les Agents, suivre [ce tutoriel](https://github.com/Sixelas/PFE/tree/main/src/final) 
+
 ## Dépendances & Licence :
 
 - [Apache License Version 2.0](https://github.com/Sixelas/PFE/blob/main/LICENSE.md)
