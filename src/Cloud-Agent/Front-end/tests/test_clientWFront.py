@@ -1,5 +1,4 @@
 import pytest
-#import tkinter as tk
 from tkinter import *
 import sys
 sys.path.append("..")
@@ -20,10 +19,8 @@ def test_loadFile():
     falsePublicKey = "PJlMSMWMRgz2AZRHEJGQwiUczZ365dzOn5gM8n+ujz0"
     privateKey = clientW_Front.loadFile("../clientW/privatekey")
     publicKey = clientW_Front.loadFile("../clientW/publickey")
-
     assert falsePrivateKey != privateKey
     assert falsePublicKey != publicKey
-    # assert publicKey == privateKey
     assert publicKey != privateKey
     falsePublicKey = publicKey + "\n"
     assert publicKey != falsePublicKey
@@ -41,10 +38,7 @@ def test_GButton_1_command():
     assert len(clientW_Front.loadFile("publickey")) == len(app.GLineEdit_1.get())
     assert clientW_Front.loadFile("publickey")[7] in app.GLineEdit_1.get()
 
-### Teste de l'invitation du ServeurB
 def test_GButton_2_command():
-    global app
-    # app.GButton_2_command()
     ...
 
 def test_GButton_3_command():
