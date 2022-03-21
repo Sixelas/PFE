@@ -13,6 +13,7 @@
 \usepackage{pifont}
 \usepackage{ragged2e}
 \usepackage{tabto}
+\usepackage{float}
 
 
 \setlength{\parindent}{0cm}
@@ -43,7 +44,7 @@
     Déploiement d'un VPN sur des équipements mobiles ou IoT\\[1cm] }
     \rule{1\linewidth}{2pt}
     \\[1cm]
-    \includegraphics[scale=0.35]{topo.jpg}
+    \includegraphics[scale=0.7]{topo.png}
     \\ %[1cm]
 
     % Membres du groupe
@@ -105,64 +106,74 @@ Un "credential" correspond à une accréditation, un certificat ou une référen
 Il y est stipulé qu'un détenteur (ou "Holder") de VC peut générer une présentation à partager à quelqu'un voulant une preuve d'accréditation selon certaines caractéristiques, et ce sans forcément transmettre l'entièreté des caractéristiques de son VC. Par exemple pour obtenir un service nécessitant d'être majeur, une preuve de notre âge peut nous être demandée. Il n'est alors pas obligatoire de transmettre le champ de son VC d'identité contenant sa date de naissance, mais par exemple juste prouver dans la présentation que l'on a "plus de 18 ans".\\
 
 Pour mieux comprendre les différents rôles et informations concernant les VCs, voici ci-dessous le schéma proposé par la W3C :\\
-\begin{center}
+\begin{figure}[h]
 \includegraphics[scale=0.5]{vc.png}
-\end{center}
+\centering
+\caption{Schema des rôles et des échanges d'information}
+\end{figure}
 
 Des mécanismes de preuves et de signatures numériques sont nécessaires afin d'assurer la protection d'un Verifiable Credential. L'obtention de la validation des preuves peut dépendre de la syntaxe de la preuve, cependant dans le cadre de ce projet les VCs correspondront à des JSON Web Tokens sécurisés par l'utilisation de JSON Web Signatures. Voici ci-dessous un exemple de de VC JWT présenté par le W3C :\\
-\begin{center}
+\begin{figure}[h]
 \includegraphics[scale=0.4]{vc2.png}
-\end{center}
+\centering
+\end{figure}
+
 \end{flushleft}
 
 \newpage
 \subsection{Aries Hyperledger}
 \noindent 
 \begin{flushleft}
-Aries Hyperledger est un projet developpé par l'Hyperledger Foundation. Hyperledger Foundation est une communauté centrée sur le développement d'outils, librairies et frameworks permettant de déployer des blockchains qui seront majoritairement mises au service d'entreprises. \\
-Il y a différents projets lancées par la Fondation Hyperledger. Aries Hyerledger est le 13ème projet lancé par cette communauté. Aries Hyperedger est une infrastructure permettant l'échange de données en relation à la blockchain ainsi que l'échange de messages peer-to-peer. \\
+Aries Hyperledger est un projet developpé par l'Hyperledger Foundation. Hyperledger Foundation est une communauté centrée sur le développement d'outils, librairies et frameworks permettant de déployer des blockchains qui seront majoritairement utilisées par des entreprises. \\
+Il y a différents projets lancées par la Fondation Hyperledger. Aries Hyperledger est le 13ème projet lancé par cette communauté. Aries Hyperledger est une infrastructure permettant l'échange de données en relation à une blockchain ainsi que l'échange de messages peer-to-peer. \\
 \vspace{2mm}
 Aries Hyperledger inclut plusieurs services dans son infrastructure :
 \begin{itemize}
-\item Une couche interface appelée resolver qui permet de créer et signer des transactions blockchain
-\item Un wallet sécurisé permettant de garder des secrets et autres informations 
-\item Un système de messagerie encrypté pour l'échange entre clients hors blockchain
-\item Une implementation des W3C Verifiable Credentials 
+\item Une couche interface appelée \textbf{resolver} qui permet de créer et signer des transactions blockchain
+\item Un \textbf{wallet} sécurisé permettant de garder des secrets et autres informations 
+\item Un système de \textbf{messagerie} encrypté pour l'échange entre clients hors blockchain
+\item Une implementation des \textbf{W3C Verifiable Credentials} 
 \item Une implementation du Decentralized Key Management System (DKMS)
 \item Un mechanisme qui permet de construire protocoles et des API
 
 \end{itemize}
-\begin{center}
+\begin{figure}[h]
 \includegraphics[scale=0.4]{aries-hyper.png}
-\end{center}
+\centering
+\caption{Différents projets Aries et leur intéractions}
+\end{figure}
 
 \vspace{5mm}
-Le plus grand objectif du projet Aries Hyperledger est de pouvoir offrir une infrastructure qui peut travailler et s'adapter à d'autres technologies développées par Indy ou qui se servent d'autres technologies blockchain. 
+Le plus grand objectif du projet Aries Hyperledger est de pouvoir offrir une infrastructure capable de s'adapter et de travailler avec des technologies développées par Indy ou qui se servent d'autres technologies blockchain. 
 \end{flushleft}
 
 \newpage
 \subsubsection{Aries Cloud Agent}
 \noindent 
 \begin{flushleft}
-Hyperledger Aries Cloud Agent Python (ACA-Py) est une projet visé à servir de base pour contruire des agent pouvant utiliser des Verifiable Credentials. Ses protocols et fonctionnalités de base permettent de délivrer, vérifier et stocker des Verifiable Credentials. Les agent ACA-Py peuvent contrôler des Verifiable Credentials de format Hyperledger Indy AnonCreds et de format W3C, dans ce projet nous nous intéréssons eu dernier format. \\
-Aries Cloud Agent fonctionne avec des requêtes HTTP et des notifications webhook. Ceci ouvre la possibilité d'écrire un controlleur qui 'discute' avec notre agent en n'importe quel langage pouvant gérer des requêtes HTTP. \\
-L'Agent Aries Cloud met aussi en oeuvre une interface  OpenAPI REST pouvant servir à comprendre comment les protocols dans notre agent fonctionnent. Le controller peut donc utiliser ceci pour gérer le comportement de l'agent. Voici un résume de l'architecture de l'agent Aries Cloud : \\
+Hyperledger Aries Cloud Agent Python (ACA-Py) est une projet visé à servir de base pour contruire des Agents pouvant utiliser des Verifiable Credentials. Ses protocols et fonctionnalités de base permettent de délivrer, vérifier et stocker des Verifiable Credentials. Les agent ACA-Py peuvent contrôler des Verifiable Credentials de format Hyperledger Indy AnonCreds et de format W3C, dans ce projet nous nous intéréssons au dernier format (W3C). \\
+Aries Cloud Agent fonctionne avec des requêtes HTTP et des notifications webhook. Ceci donne la possibilité aux développeurs d'écrire un controlleur qui 'discute' avec notre agent en n'importe quel langage pouvant gérer des requêtes HTTP. \\
+L'Agent Aries Cloud met aussi en oeuvre une interface  OpenAPI REST pouvant servir à comprendre comment les protocols dans notre agent fonctionnent. Le dévéloppeur peut donc utiliser ceci pour gérer le comportement de l'agent. Voici un résume de l'architecture de l'agent Aries Cloud : \\
 
-\begin{center}
+\begin{figure}[h]
 \includegraphics[scale=0.6]{ACA-py.png}
-\end{center}
+\centering
+\caption{Architecture d'un Agent Aries}
+\end{figure}
 \end{flushleft}
 
-\vspace{5mm}
-Dans notre architecture, nous pouvons voir que notre Agent communique avec un Distributed Ledger, donc un Blockchain. Pour précision, dans notre projet nous utilisons Von Network comme Blockchain.
+\vspace{2mm}
+Dans l'architecture, nous pouvons voir que l' Agent communique avec un Distributed Ledger, donc un Blockchain. Pour précision, dans notre projet nous utilisons Von Network comme réseau Blockchain.
 
 \vspace{2mm}
-Pour controler et faire des actions dans l'API il suffit juste de retrouver le endpoint qui fera l'action qu'on veut, le sélectionner et rentrer les champs nécessaires s'il en faut. C'est un outil très outil pour comprendre et développer son agent. \\
-Voici l'API d'un agent Aries Cloud : 
+Pour controler et faire des actions dans l'API il suffit juste de retrouver l'endpoint qui fera la requête que nous voulons éxecuter, le sélectionner et rentrer les champs nécessaires s'il en faut. C'est un outil très efficace pour comprendre et développer son agent. \\
+ 
 
-\begin{center}
+\begin{figure}[H]
 \includegraphics[scale=0.2]{adminApi.png}
-\end{center}
+\centering
+\caption{API d'un Aries Cloud Agent}
+\end{figure}
 
 
 \subsubsection{Aries Mobile Agent React-Native}
@@ -175,20 +186,45 @@ TODO
 \noindent 
 \begin{flushleft}
 QEMU est un logiciel libre  pouvant émuler un processeur ou une architecture différente. Il peut émuler un système ou juste le virtualiser, dépendant du système de l'hôte. QEMU peut exécuter différents systèmes d'exploitation et leurs applications de manière isolée sur une même machine physique ainsi que simuler les périphériques. \\
-Dans notre projet nous nous sommes servis de QEMU pour émuler deux machines Debian et une machine Android
+Dans notre projet nous nous sommes servis de QEMU pour émuler deux machines Debian et une machine Android. Cependant, pour des raisons techniques expliquées plus tard, nous avons dû abandonner la machine Android. 
 \end{flushleft}
 
 \subsection{NEmu}
 \noindent 
 \begin{flushleft}
-NEmu est un environnement permettant de mettre en place des réseaux virtuels. NEmu construit une topologie d'un réseau virtuel avec des Machines Virtuelles QEMU. NEmu met en place une API python rendant le travail plus facile. Il y a aussi la possibilité de simuler des dispositifs comme des routers ou des switchs pour mieux administrer le réseau. \\
+NEmu est un environnement permettant de mettre en place des réseaux virtuels. NEmu construit une topologie d'un réseau virtuel avec des Machines Virtuelles QEMU. Il met en place aussi une API python rendant le travail plus facile. Il y a aussi la possibilité de simuler des dispositifs comme des routers ou des switchs pour administrer le réseau plus facilement. \\
 Nous avons utilisé NEmu en combinaison avec QEMU pour construire un réseau de machines virtuelles.
 \end{flushleft}
 
-\section{Scénarios fonctionnels}
+\section{Scénarios}
+L'objectif de ce projet était d'installer et configurer un VPN Wireguard tout en utilisant la technologie Blockchain à la place de certificats pour s'authentifier et échanger des clés publiques. 
+
+\subsection{Scénario initial}
 \noindent 
 \begin{flushleft}
-TODO
+Le premier scénario de ce projet était composé de deux machines Debian, et une machine Android. Ces trois machines appartennaient toutes au même réseau. Le client Android n'ayant qu'une interface réseau, elle devait passer par un proxy sur le Serveur Wireguard pour avoir accès à Internet quand le VPN était activé. \\
+\vspace{2mm}
+Il y avait 3 types d'Agent à mettre en place : un Cloud Agent pour la machine Serveur Blockchain, un Cloud Agent pour la machine Serveur Wireguard et un Static Agent pour la machine Android. \\
+Le Serveur Blockchain devait générer des clés publiques en utilisant OpenSSL, les mettre dans un Verifiable Credential et les envoyer au Client et au Serveur Wireguard. \\
+Cependant, après des recherches, nous avons constaté que notre scénario avait des problèmes qu'ont empeché l'implémentation de celui-ci. Le principal concernait le Static Agent. Le Static Agent était sensé d'être implémenté sur le Client Android mais après quelques recherches, nous avons appris que le Static Agent n'avait pas de wallet donc, il ne pouvait pas stocker des Verifiable Credentials. Cet Agent est juste capable de recevoir des messages du Cloud Agent et en échanger avec d'autres Static Agents. 
+\end{flushleft}
+
+\subsection{Scénario intermédiaire}
+\noindent
+\begin{flushleft}
+Le scénario initial a dû être changé. Au lieu d'avoir un Static Agent, le Client Wireguard implemente un Mobile Agent dans notre scénario intermédiaire. \\
+Notre scénario intermédiaire était composé de deux machines Debian implémentant toutes les deux des Cloud Agents et une machine Android implémentant un Mobile Agent. \\
+\vspace{2mm}
+Le projet Aries Mobile Agent est un projet qui est toujours en cours de développement. Ceci fait qu'il y a des problèmes de compatibilité entre le Mobile Agent et le Cloud Agent. Nous avons décidé de remplacer le Mobile Agent sur le Client Wireguard par un Cloud Agent. Comme le Cloud Agent ne fonctionnait pas sur Android, nous avons utilisé Debian 11 à la place. \\
+\vspace{2mm}
+Au niveau des clés Wireguard, OpenSSL n'est pas capable de générer des clés Wireguard. Donc, chaque machine Wireguard devra générer ses propres clés en utilisant l'algorithme de Wireguard.
+\end{flushleft}
+
+\subsection{Scénario fonctionnel}
+\noindent
+\begin{flushleft}
+Notre scénario final est composé de trois machines Debian. Les trois implémentent un Cloud Agent. Chaque machine appartient à un réseau différent, et un VRouter faisant du NAT les met en relation. \\
+Les clés Wireguard sont générées par l'algorithme de Wireguard par le Client et le Serveur Wireguard, puis envoyées au Serveur Blockchain qui les stocke dans des Verifiable Credential. Ces Verifiable Credentials sont envoyés aux machines Wireguard et utilisés pour s'authentifier et s'échanger les clés afin de mettre en place un tunnel VPN Wireguard.
 \end{flushleft}
 
 \section{Architecture et implémentation}
@@ -196,17 +232,70 @@ TODO
 \subsection{Réseau virtuel NEmu}
 \noindent 
 \begin{flushleft}
-TODO
+
+Nous avons mis en place un réseau virtuel NEmu pour mettre en relation Notre Serveur Blockchain, notre Serveur Wireguard et notre Client Wireguard. Chaque machine se trouve dans un réseau différent : 
+\begin{itemize}
+\item \textbf{Serveur Blockchain} possède l'addresse IP : 192.168.1.15/24
+\item \textbf{Serveur Wireguard} possède l'addresse IP : 192.168.2.13/24
+\item \textbf{Client Wireguard} possède l'adresse IP : 192.168.3.20/24
+\end{itemize}
+Il faut prendre en compte aussi que notre VPN Wireguard met en place une interface réseau virtuelle du côté client et serveur Wireguard, leur adresses sont 120.0.0.2 et 120.0.0.1 respectivement. \\
+Pour mettre tout ceci en fonctionnement, nous avons décidé d'utiliser un VRouter mis en place par NEmu. Un VRouter est un router Linux virtuel qui simplifie la gestion des réseaux virtuels. Ce router utilise DHCP pour gèrer ses tables de routage et NAT.
+
+\begin{figure}[H]
+\includegraphics[scale=0.85]{topo.png}
+\centering
+\caption{Topologie du réseau NEmu}
+\end{figure}
+
+TODO - Expliquer le script network.py
+
+\subsection{Choix de l'implémentation}
+
+Le fonctionnement de notre implémentation est le suivant : 
+
+\begin{itemize}
+\color{green}
+\item[1.] \color{black} Nos Agents Client et Serveur Wireguard se connectent avec le Serveur Blockchain par Aries DIDComm
+
+\color{orange}
+\item[2.] \color{black} Le Serveur BlockChain qui est considéré le \textbf{Issuer} délivre les Verifiable Credentials au Client et Serveur Wireguard qui dans ce cas sont les \textbf{Holders}.
+
+\color{violet}
+\item[3.] \color{black} Le Serveur Wireguard et le Client établissent le canal sécurisé Aries à l’aide de l’Agent ACA-py.\\
+Ils peuvent ensuite prouver leur identité avec le VC qu’ils détiennent.
+Une fois la proof de VC effectuée, ils échangent leurs clés publiques WireGuard via le canal chiffré (DIDcomm messages).
+
+\color{red}
+\item[4.] \color{black} Établissement du tunnel VPN avec Wireguard entre le Client et le Serveur Wireguard en utilisant les clés obtenues précédemment.
+
+\end{itemize}
+
+
 \end{flushleft}
 
 \subsection{Cloud Agent du Serveur BlockChain}
 \noindent 
 \begin{flushleft}
-Le serveur Blockchain et le serveur qui est directement relié au réseau de noeuds Blockchain.  Dans le cas où on veut avoir notre propre réseau de noeuds Blockchain, le serveur Blockchain sera celui qui déploie ce réseau en utilisant Von Network pour déployer les noeuds Blockchain. Nous avons aussi la possibilité de prendre comme référence un réseau de noeuds déjà éxistant. \\
-Le Serveur Blockchain est donc celui qui est directemment rélié au réseau de noeuds Blockchain. À cause de ça, c'est ce serveur qui enregistre les utilisateur auprès de la Blockchain. Il enregistre aussi les schemas et les définitions de credentials. Les Schemas et Définitions de Credentials permettent de mettre en place un format et des champs pour les Verifiable Credentials. Les Verifiable Credentials que nous avons choisi d'utiliser ont deux champs : un champ pour la \textbf{clé publique} et un autre pour le nom de la machine qui détient ce Verifiable Credential. Il y a aussi un champ contenant la signature du Verifiable Credential.\\
-TODO ADD PICTURE OF CREDENTIAL
+Le serveur Blockchain est le serveur qu'est directement relié au réseau de noeuds Blockchain.  Dans le cas où on veut avoir notre propre réseau de noeuds Blockchain, le serveur Blockchain sera celui qui déploie ce réseau en utilisant Von Network pour déployer les noeuds Blockchain. Nous avons aussi la possibilité de prendre comme référence un réseau de noeuds déjà éxistant. \\
+
+\begin{figure}[h]
+\vspace{2mm}
+\includegraphics[scale=0.7]{serveurB.png}
+\centering
+\caption{Interface graphique de notre Serveur Blockchain}
+\end{figure}
+
+Le Serveur Blockvhain est l'acteur qu'enregistre les utilisateur auprès de la Blockchain. Il enregistre aussi les schemas et les définitions de credentials. Les Schemas et Définitions de Credentials permettent de mettre en place un format et des champs pour les Verifiable Credentials. Les Verifiable Credentials que nous avons choisi d'utiliser ont deux champs : un champ pour la \textbf{clé publique} et un autre pour le nom de la machine qui détient ce Verifiable Credential. Il y a aussi un champ contenant la signature du Verifiable Credential.\\
+
+\begin{figure}[H]
+	\includegraphics[scale=0.5]{cred_def.png}
+	\centering
+	\caption{Définition de notre Credential}
+\end{figure}
 
 \end{flushleft}
+
 
 
 \subsection{Cloud Agent du Serveur WireGuard}
@@ -214,22 +303,36 @@ TODO ADD PICTURE OF CREDENTIAL
 \begin{flushleft}
 Le Serveur Wireguard est une machine Debian qui hoste un service VPN Wireguard.  Dans cette machine il y a aussi un Agent Cloud. Cet Agent Cloud est capable de communiquer avec d'autres agents, notamment dans ce cas l'Agent du Serveur Blockchain et l'Agent du Client Wireguard. Il aura de différentes intéractions avec chacun des deux agents. \\
 \vspace{2mm}
-Avec l'Agent Server Blockchain il aura des interactions qui auront comme objectif la réception de Verifiable Credentials. \\
+Avec l'Agent Server Blockchain il aura des interactions ayant comme objectif la réception de Verifiable Credentials. Le Serveur Wireguard génère des clés Wireguard et envoie sa clé publique dans une proposal de Verifiable Credential. Un proposal est une proposition de VC basée sur une Definition de Credential ( celle que nous avons enregistrée avec le Serveur Blockchain ). Le Serveur Blockchain lui délivre un VC avec la clé publique et son nom. \\
+\vspace{2mm}
 Les échanges avec le Client Wireguard seront différents. En premier, le Serveur Wireguard doit répondre aux requêtes de preuves de la part du Client Wireguard. Le Serveur Wireguard doit en premier lieu produire une Verifiable Presentation puis l'envoyer. Cette Verifiable Presentation dépend de la requête du Client Wireguard, c'est à dire, la construction et les champs inclus dans cette Presentation dépendent de ce que le Client demande. Normalement, il va envoyer une Verifiable Presentation contenant sa clé publique et son 'nom'. \\
 Dans la requête de preuve, le Client inclut sa clé publique Wireguard. Une fois que notre présentation est bien validée, le client aura récuperé notre clé publique. Finalement, le VPN Wireguard peut être mis en place des deux côtés. \\
-\vspace{2mm}
+
 Nous avons mis en place une interface graphique en python pour pouvoir gérer les différentes intéractions et événements.\\
-TODO : AJOUTER IMAGE INTERFACE + 
+
+\begin{figure}[H]
+\includegraphics[scale=0.5]{serveurW.png}
+\centering
+\caption{Interface graphique de notre Serveur Wireguard}
+\end{figure}
+
 \end{flushleft}
 
-\subsection{Mobile Agent du Client WireGuard}
+\subsection{Agent du Client WireGuard}
+\subsubsection{Mobile Agent}
+\noindent
+\begin{flushleft}
+
+\end{flushleft}
+
+
+\subsubsection{Cloud Agent}
 \noindent 
 \begin{flushleft}
-Le Client Wireguard est donc, une machine Debian qui a comme finalité se connecter sur le VPN du serveur Wireguard. \\
-Comme pour le Serveur Wireguard, le Serveur Blockchain doit délivrer un Verifiable Credential avec la clé publique Wireguard du client dedans. \\
-Quand le Client voudra se connecter sur le Serveur Wireguard, il devra en premier faire une requête de preuve auprès du Serveur Wireguard, contenant la clé publique du client et demandant entre autres, la clé publique du serveur. Celui-ci envoie une Verifiable Presentation avec sa clé publique Wireguard. La requête du client contennait aussi sa clé publique, donc quand la Presentation est validé, le serveur et client Wireguard ont tous les deux les clés de l'autre. Le VPN peut être mis en place. 
+Le Client Wireguard est une machine Debian qui a comme finalité se connecter sur le VPN du serveur Wireguard. \\
+Comme pour le Serveur Wireguard, le Serveur Blockchain doit délivrer un Verifiable Credential avec la clé publique Wireguard du client dedans. Ceci se fait avec une proposal de Verifiable Credential. \\
+Quand le Client voudra se connecter sur le Serveur Wireguard, il devra en premier faire une requête de preuve auprès du Serveur Wireguard, contenant la clé publique du client et demandant entre autres, la clé publique du serveur. Celui-ci envoie une Verifiable Presentation avec sa clé publique Wireguard. La requête du client contennait aussi sa clé publique, donc quand la Presentation est validé, le serveur et client Wireguard ont tous les deux les clés de l'autre.
 
-TODO - explique limitations
 \end{flushleft}
 
 
