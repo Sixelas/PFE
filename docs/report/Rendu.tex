@@ -125,16 +125,16 @@ Des mécanismes de preuves et de signatures numériques sont nécessaires afin d
 \noindent 
 \begin{flushleft}
 Aries Hyperledger est un projet developpé par l'Hyperledger Foundation. Hyperledger Foundation est une communauté centrée sur le développement d'outils, librairies et frameworks permettant de déployer des blockchains qui seront majoritairement utilisées par des entreprises. \\
-Il y a différents projets lancées par la Fondation Hyperledger. Aries Hyperledger est le 13ème projet lancé par cette communauté. Aries Hyperledger est une infrastructure permettant l'échange de données en relation à une blockchain ainsi que l'échange de messages peer-to-peer. \\
+Il y a différents projets lancées par la Fondation Hyperledger. Aries Hyperledger est le 13ème projet fondé par cette communauté. Aries Hyperledger est une infrastructure permettant l'échange de données en relation à une blockchain ainsi que l'échange de messages en peer-to-peer. \\
 \vspace{2mm}
 Aries Hyperledger inclut plusieurs services dans son infrastructure :
 \begin{itemize}
-\item Une couche interface appelée \textbf{resolver} qui permet de créer et signer des transactions blockchain
-\item Un \textbf{wallet} sécurisé permettant de garder des secrets et autres informations 
-\item Un système de \textbf{messagerie} encrypté pour l'échange entre clients hors blockchain
-\item Une implementation des \textbf{W3C Verifiable Credentials} 
-\item Une implementation du Decentralized Key Management System (DKMS)
-\item Un mechanisme qui permet de construire protocoles et des API
+\item Une couche interface appelée \textbf{resolver} qui permet de créer et signer des transactions blockchain.
+\item Un \textbf{wallet} sécurisé permettant de garder des secrets et autres informations. 
+\item Un système de \textbf{messagerie} encryptée pour l'échange entre clients hors blockchain.
+\item Une implémentation des \textbf{W3C Verifiable Credentials} 
+\item Une implémentation du Decentralized Key Management System (DKMS).
+\item Un méchanisme qui permet de construire des protocoles et des API.
 
 \end{itemize}
 \begin{figure}[h]
@@ -151,26 +151,24 @@ Le plus grand objectif du projet Aries Hyperledger est de pouvoir offrir une inf
 \subsubsection{Aries Cloud Agent}
 \noindent 
 \begin{flushleft}
-Hyperledger Aries Cloud Agent Python (ACA-Py) est une projet visé à servir de base pour contruire des Agents pouvant utiliser des Verifiable Credentials. Ses protocols et fonctionnalités de base permettent de délivrer, vérifier et stocker des Verifiable Credentials. Les agent ACA-Py peuvent contrôler des Verifiable Credentials de format Hyperledger Indy AnonCreds et de format W3C, dans ce projet nous nous intéréssons au dernier format (W3C). \\
+Hyperledger Aries Cloud Agent Python (ACA-Py) est une projet visant à servir de base pour contruire des Agents pouvant utiliser des Verifiable Credentials. Ses protocols et fonctionnalités de base permettent de délivrer, vérifier et stocker des Verifiable Credentials. Les agent ACA-Py peuvent contrôler des Verifiable Credentials de format Hyperledger Indy AnonCreds et de format W3C. Dans ce projet nous nous intéréssons au dernier format proposé, le W3C. \\
 Aries Cloud Agent fonctionne avec des requêtes HTTP et des notifications webhook. Ceci donne la possibilité aux développeurs d'écrire un controlleur qui 'discute' avec notre agent en n'importe quel langage pouvant gérer des requêtes HTTP. \\
-L'Agent Aries Cloud met aussi en oeuvre une interface  OpenAPI REST pouvant servir à comprendre comment les protocols dans notre agent fonctionnent. Le dévéloppeur peut donc utiliser ceci pour gérer le comportement de l'agent. Voici un résume de l'architecture de l'agent Aries Cloud : \\
+L'Agent Aries Cloud met aussi en oeuvre une interface OpenAPI REST pouvant servir à comprendre comment les protocols dans notre agent fonctionnent. Le dévéloppeur peut donc utiliser ceci pour gérer le comportement de l'agent. Voici un résumé de l'architecture de l'agent Aries Cloud : \\
 
 \begin{figure}[h]
-\includegraphics[scale=0.6]{ACA-py.png}
+\includegraphics[scale=0.5]{ACA-py.png}
 \centering
 \caption{Architecture d'un Agent Aries}
 \end{figure}
 \end{flushleft}
 
 \vspace{2mm}
-Dans l'architecture, nous pouvons voir que l' Agent communique avec un Distributed Ledger, donc un Blockchain. Pour précision, dans notre projet nous utilisons Von Network comme réseau Blockchain.
+Dans l'architecture ci-dessus, nous pouvons voir que l' Agent communique avec un Distributed Ledger, donc un Blockchain. Pour précision, dans notre projet nous utilisons Von Network comme réseau Blockchain.
 
 \vspace{2mm}
-Pour controler et faire des actions dans l'API il suffit juste de retrouver l'endpoint qui fera la requête que nous voulons éxecuter, le sélectionner et rentrer les champs nécessaires s'il en faut. C'est un outil très efficace pour comprendre et développer son agent. \\
- 
-
+Pour contrôler et agir dans l'API il suffit juste de retrouver l'endpoint qui se charge de la requête que nous voulons exécuter, le sélectionner et rentrer les champs nécessaires s'il en faut. C'est un outil très efficace pour comprendre et développer son propre agent. On peut en voir un exemple ci-dessous :\\
 \begin{figure}[H]
-\includegraphics[scale=0.2]{adminApi.png}
+\includegraphics[scale=0.17]{adminApi.png}
 \centering
 \caption{API d'un Aries Cloud Agent}
 \end{figure}
@@ -179,21 +177,44 @@ Pour controler et faire des actions dans l'API il suffit juste de retrouver l'en
 \subsubsection{Aries Mobile Agent React-Native}
 \noindent 
 \begin{flushleft}
-TODO
+L'Aries Mobile Agent (ou Aries Bifold) est une application Open Source développée sur React Native 0.64.1 qui a pour but de regrouper les efforts de la communauté Aries Hyperledger orientée application mobile vers un projet centralisé, afin d'éviter la duplication du code et les similitudes entre les projets. Ce projet est aussi destiné à aider d'autres projets spécifiques voulant utiliser sur mobile les technologies de la fondation Aries Hyperledger sans avoir à redéfinir la complexité interne des agents Aries. Il est conçu pour permettre de démarrer rapidement un projet en ayant un agent Aries de base.\
+
+Aries Mobile Agent est basé sur deux dépendances principales qui sont les suivantes :\\
+\begin{itemize}
+
+\item Aries Framework Javascript, un framework écrit en TypeScript pour la création d'agents Self Sovereign Identity. SSI est une approche visant l'idée que chacun contrôle ses propres données informatiques, ainsi qu'un contrôle de quand et comment elles sont fournies aux autres. De plus, lorsqu'une donnée est partagée, cela doit être fait avec fiabilité. Avec SSI, il n'y a pas d'autorité centrale détenant les données les transmettant à d'autres entités sur demande. Vous seul en êtes le possesseur. Ce framework a également pour but d'utiliser les services DIDComm qui visent à être en conformité avec les normes définies dans les RFC d'Aries.
+
+\item Indy-sdk-react-Native : Il s’agit d’un Wrapper de Indy destiné à React Native. Son rôle est d’implémenter les fonctionnalités de Indy SDK afin qu’elles soient utilisables avec React Native. 
+
+React Native est un framework d'applications mobiles Open Source conçu par Facebook. Il est utilisé pour développer des applications natives pour Android et iOS. Aries Bifold étant développé en React native 0.64.1, il cible l’API 29.0.3 d’Android, tandis que sur IOS il vise la version 10.0+ et il ne peut être utilisé que sur des appareils physiques pour le moment. La virtualisation est possible que sur Androidx86.
+
+Aries Bifold nécessite un médiateur pour fonctionner. Le mobile Agent est configuré pour utiliser la médiation implicite. Il utilise par défaut Indicio Public Mediator, médiateur public de tests en ligne basé sur un Agent ACA-Py.
+Un médiateur est un agent dont le but est de faire l'intermédiaire entre un Mobile Agent et un autre Agent (par exemple un Cloud Agent ACA-py), en relayant les messages transmis entre eux. Une connexion DIDComm est établie avec le médiateur.\
+Ci-dessous nous pouvons voir le principe et fonctionnement d'un médiateur entre deux Agents Alice et Bob comme cela est présenté dans la norme "Aries RFC 0211: Coordinate Mediation Protocol"\footnote{\url{https://github.com/hyperledger/aries-rfcs/blob/main/features/0211-route-coordination/README.md
+}} :\\
+
+\begin{center}
+\includegraphics[scale=0.25]{mediator.png}
+\end{center}
+
+\end{itemize} 
 \end{flushleft}
 
 \subsection{QEMU}
 \noindent 
+\begin{center}
+\includegraphics[scale=0.2]{qemu.png}
+\end{center}
 \begin{flushleft}
 QEMU est un logiciel libre  pouvant émuler un processeur ou une architecture différente. Il peut émuler un système ou juste le virtualiser, dépendant du système de l'hôte. QEMU peut exécuter différents systèmes d'exploitation et leurs applications de manière isolée sur une même machine physique ainsi que simuler les périphériques. \\
-Dans notre projet nous nous sommes servis de QEMU pour émuler deux machines Debian et une machine Android. Cependant, pour des raisons techniques expliquées plus tard, nous avons dû abandonner la machine Android. 
+Dans notre projet nous nous sommes servis de QEMU pour émuler deux machines Debian11 et une machine Androidx86. Cependant, pour des raisons techniques expliquées plus tard, nous avons dû remplacer la machine Androidx86 par une autre machine Debian11. 
 \end{flushleft}
 
 \subsection{NEmu}
 \noindent 
 \begin{flushleft}
-NEmu est un environnement permettant de mettre en place des réseaux virtuels. NEmu construit une topologie d'un réseau virtuel avec des Machines Virtuelles QEMU. Il met en place aussi une API python rendant le travail plus facile. Il y a aussi la possibilité de simuler des dispositifs comme des routers ou des switchs pour administrer le réseau plus facilement. \\
-Nous avons utilisé NEmu en combinaison avec QEMU pour construire un réseau de machines virtuelles.
+NEmu pour Network Emulator for Mobile Universes est un environnement permettant de mettre en place des réseaux virtuels développé par Monsieur Vincent Autefage. NEmu permet de construire un environnement virtuel distribué ne nécessitant pas de droits d'administration pour fonctionner. Il contrôle un ensemble de machines virtuelles QEMU dans le but de construire une topologie de réseau virtuel. Il dispose d'une API python rendant le travail plus facile. Il dispose également de fonctionnalités de simulation de dispositifs réseaux comme des routeurs, des switchs ou encore des Smartphones pour étendre ses fonctionnalités et administrer avec plus de facilité un réseau. \\
+Dans le cadre de ce projet nous devons utiliser NEmu pour construire le réseau virtuel sur lequel nous simulerons les interactions entre Agents Aries et le VPN WireGuard.
 \end{flushleft}
 
 \section{Scénarios}
