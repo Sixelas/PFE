@@ -44,7 +44,7 @@
     Déploiement d'un VPN sur des équipements mobiles ou IoT\\[1cm] }
     \rule{1\linewidth}{2pt}
     \\[1cm]
-    \includegraphics[scale=0.7]{topo.png}
+    \includegraphics[scale=0.37]{topo.png}
     \\ %[1cm]
 
     % Membres du groupe
@@ -223,29 +223,29 @@ L'objectif de ce projet était d'installer et configurer un VPN Wireguard tout e
 \subsection{Scénario initial}
 \noindent 
 \begin{flushleft}
-Le premier scénario de ce projet était composé de deux machines Debian, et une machine Android. Ces trois machines appartennaient toutes au même réseau. Le client Android n'ayant qu'une interface réseau, elle devait passer par un proxy sur le Serveur Wireguard pour avoir accès à Internet quand le VPN était activé. \\
+Le premier scénario de ce projet était composé de deux machines Debian11 et d'une machine Androidx86. Ces trois machines appartennaient toutes au même réseau. Afin de fournir à la fois un accès à internet et au réseau local, un routeur virtuel délivrant les services dnsmsak, dhcp et Masquerading reliait les 3 machines à internet et leur fournissait leurs adresses ip.\\
 \vspace{2mm}
 Il y avait 3 types d'Agent à mettre en place : un Cloud Agent pour la machine Serveur Blockchain, un Cloud Agent pour la machine Serveur Wireguard et un Static Agent pour la machine Android. \\
-Le Serveur Blockchain devait générer des clés publiques en utilisant OpenSSL, les mettre dans un Verifiable Credential et les envoyer au Client et au Serveur Wireguard. \\
-Cependant, après des recherches, nous avons constaté que notre scénario avait des problèmes qu'ont empeché l'implémentation de celui-ci. Le principal concernait le Static Agent. Le Static Agent était sensé d'être implémenté sur le Client Android mais après quelques recherches, nous avons appris que le Static Agent n'avait pas de wallet donc, il ne pouvait pas stocker des Verifiable Credentials. Cet Agent est juste capable de recevoir des messages du Cloud Agent et en échanger avec d'autres Static Agents. 
+Le Serveur Blockchain devait générer des clés publiques compatibles avec WireGuard en utilisant OpenSSL, les mettre dans un Verifiable Credential et les envoyer au Client et au Serveur Wireguard. \\
+Cependant, après des recherches nous avons constaté que ce scénario avait des problèmes limitant son implémentation. Le principal problème concernait le Static Agent. Le Static Agent était sensé être implémenté sur le Client Android, mais nous avons découvert après s'être penchés en détail sur sa documentation ainsi qu'effectué des tests qu'il n'avait pas de wallet. Il ne peut donc pas stocker des Verifiable Credentials. Cet Agent a été pensé seulement pour établir une communication DIDComm avec un CloudAgent, et échanger en peer-to-peer de simples messages DIDComm.
 \end{flushleft}
 
 \subsection{Scénario intermédiaire}
 \noindent
 \begin{flushleft}
-Le scénario initial a dû être changé. Au lieu d'avoir un Static Agent, le Client Wireguard implemente un Mobile Agent dans notre scénario intermédiaire. \\
-Notre scénario intermédiaire était composé de deux machines Debian implémentant toutes les deux des Cloud Agents et une machine Android implémentant un Mobile Agent. \\
+Après avoir testé et démontré que le Static Agent n'était pas utilisable dans le cadre de ce projet, nous avons du modifier notre scénario initial. Le Static Agent sur le client Mobile Android a été remplacé par un projet novateur cherchant à implémenter un équivalent de Cloud Agent sur Mobile, à savoir le projet Aries Mobile Agent React Native.\\
+Notre scénario intermédiaire était donc composé de deux machines Debian11 implémentant toutes les deux des Cloud Agents, et une machine Androidx86 implémentant un Mobile Agent. \\
 \vspace{2mm}
-Le projet Aries Mobile Agent est un projet qui est toujours en cours de développement. Ceci fait qu'il y a des problèmes de compatibilité entre le Mobile Agent et le Cloud Agent. Nous avons décidé de remplacer le Mobile Agent sur le Client Wireguard par un Cloud Agent. Comme le Cloud Agent ne fonctionnait pas sur Android, nous avons utilisé Debian 11 à la place. \\
+Malheureusement lors des tests et de l'implémentation du Mobile Agent dans le but de l'adapter à notre projet, nous nous sommes heurtés à de nombreux problèmes. Le projet Aries Mobile Agent est un projet réçent toujours en cours de développement dont le but est de centraliser toutes les avancées dans les portage sous mobile d'Agents Aries Hyperledgers. Comme nous le détaillerons plus tard dans la partie lui étant concernée, nous nous sommes heurtés à des problèmes de compatibilité entre ce Mobile Agent et les Cloud Agents de nos machines. Nous avons donc décidé de remplacer ce Mobile Agent sur le Client Wireguard par un Cloud Agent classique. Comme le Cloud Agent n'est pas prévu pour fonctionner sur Android, nous avons utilisé Debian11 à la place. \\
 \vspace{2mm}
-Au niveau des clés Wireguard, OpenSSL n'est pas capable de générer des clés Wireguard. Donc, chaque machine Wireguard devra générer ses propres clés en utilisant l'algorithme de Wireguard.
+Au niveau des clés Wireguard, OpenSSL n'est pas capable de générer des clés Wireguard. En effet, WireGuard utilise un Algorithme propriétaire pour générer des paires de clés X25519 qui sont une méthode d'accord de clé et donc pas utilisables pour la signature. Donc chaque machine Wireguard devra générer ses propres clés en utilisant l'algorithme de Wireguard.
 \end{flushleft}
 
 \subsection{Scénario fonctionnel}
 \noindent
 \begin{flushleft}
-Notre scénario final est composé de trois machines Debian. Les trois implémentent un Cloud Agent. Chaque machine appartient à un réseau différent, et un VRouter faisant du NAT les met en relation. \\
-Les clés Wireguard sont générées par l'algorithme de Wireguard par le Client et le Serveur Wireguard, puis envoyées au Serveur Blockchain qui les stocke dans des Verifiable Credential. Ces Verifiable Credentials sont envoyés aux machines Wireguard et utilisés pour s'authentifier et s'échanger les clés afin de mettre en place un tunnel VPN Wireguard.
+Notre scénario final est composé de trois machines Debian11. Les trois implémentent un Cloud Agent. Chaque machine appartient à un sous-réseau différent du VRouter possédant les services dnsmask, dhcp et NAT Masquerading. Le routeur garantit l'accessibilité entre les différentes machines virtuelles ServeurB, ServeurW et ClientW.\\
+Les clés Wireguard sont générées en utilisant l'algorithme de Wireguard par le ClientW et le ServeurW Wireguard, puis envoyées au Serveur Blockchain qui les stocke dans des Verifiable Credential. Ces Verifiable Credentials sont envoyés aux machines Wireguard et utilisés pour s'authentifier et s'échanger les clés afin de mettre en place un tunnel VPN Wireguard. Dans ce scénario, il a été convenu que les deux machines WireGuard doivent s'authentifier mutuellement.
 \end{flushleft}
 
 \section{Architecture et implémentation}
@@ -254,25 +254,32 @@ Les clés Wireguard sont générées par l'algorithme de Wireguard par le Client
 \noindent 
 \begin{flushleft}
 
-Nous avons mis en place un réseau virtuel NEmu pour mettre en relation Notre Serveur Blockchain, notre Serveur Wireguard et notre Client Wireguard. Chaque machine se trouve dans un réseau différent : 
+Nous avons mis en place un réseau virtuel à l'aide de NEmu pour mettre en relation notre Serveur Blockchain ServeurB, notre Serveur Wireguard ServeurW et notre Client Wireguard ClientW. Chaque machine se trouve dans un sous-réseau différent : 
 \begin{itemize}
 \item \textbf{Serveur Blockchain} possède l'addresse IP : 192.168.1.15/24
 \item \textbf{Serveur Wireguard} possède l'addresse IP : 192.168.2.13/24
 \item \textbf{Client Wireguard} possède l'adresse IP : 192.168.3.20/24
 \end{itemize}
-Il faut prendre en compte aussi que notre VPN Wireguard met en place une interface réseau virtuelle du côté client et serveur Wireguard, leur adresses sont 120.0.0.2 et 120.0.0.1 respectivement. \\
-Pour mettre tout ceci en fonctionnement, nous avons décidé d'utiliser un VRouter mis en place par NEmu. Un VRouter est un router Linux virtuel qui simplifie la gestion des réseaux virtuels. Ce router utilise DHCP pour gèrer ses tables de routage et NAT.
+Il faut prendre en compte aussi que notre VPN Wireguard met en place une interface réseau virtuelle entre le client et le serveur, leur adresses virtuelles sont 120.0.0.2 et 120.0.0.1 respectivement. \\
+Afin de faciliter la configuration des adresses et l'accès à internet, nous avons décidé d'utiliser un VRouter de NEmu. Un VRouter est un router Linux TinyCore virtuel qui simplifie la gestion des réseaux virtuels à l'aide de ses services dnsmask, dhcp et nat masquerading.
 
 \begin{figure}[H]
-\includegraphics[scale=0.85]{topo.png}
+\includegraphics[scale=0.4]{topo.png}
 \centering
 \caption{Topologie du réseau NEmu}
 \end{figure}
 
-TODO - Expliquer le script network.py
+Le script de configuration du réseau virtuel network.py a été défini pour être utilisable au CREMI en se basant sur une seule image debian11.img (et android.img à l'origine) de base pour toutes les VMs dans /net/stockage/PFE-VPN-2022/. Cela nous as permis d'éviter d'avoir à nous transférer à chaque fois en local sur nos machines la nouvelle image de base. Par défaut le script est configuré avec un VHostConf attribuant 2 coeurs de CPU à chaque VM, ce qui suffit largement pour notre projet.\\
+Afin de générer les images de base debian11.img et android.img nous avons réalisé un script creator.py.
 
 \subsection{Choix de l'implémentation}
 
+Au niveau des technologies utilisées pour chaque machine nous retrouvons :\\
+\begin{itemize}
+\item \textbf{ServeurB :} Un von-network dockerisé permettant d'obtenir un noeud de blockchain Indy + Un Aries Cloud Agent Python.
+\item \textbf{ServeurW :} Un Aries Cloud Agent Python + un Serveur WireGuard.
+\item \textbf{ClientW :} Un Aries cloud Agent Python + un Client WireGuard.
+\end{itemize}
 Le fonctionnement de notre implémentation est le suivant : 
 
 \begin{itemize}
@@ -386,10 +393,11 @@ TODO
 \begin{itemize}
 
 \item WireGuard : \url{https://www.wireguard.com/} (consulté le 06/03/2022) 
+\item World Wide Web Consortium (W3C) : \url{https://www.w3.org/} (consulté le 06/03/2022)
 \item Verifiable Credentials : \url{https://www.w3.org/TR/vc-data-model/} (consulté le 06/03/2022) 
-\item Aries Cloud Agent : \url{https://github.com/hyperledger/aries-cloudagent-python (consulté le 15/03/2022} 
-\item QEMU : \url{https://www.qemu.org/} , \url{https://wiki.qemu.org/Main_Page}
-\item NEmu : \url{https://gitlab.com/v-a/nemu}
+\item Aries Cloud Agent : \url{https://github.com/hyperledger/aries-cloudagent-python} (consulté le 15/03/2022)
+\item QEMU : \url{https://www.qemu.org/} , \url{https://wiki.qemu.org/Main_Page} (consulté le 15/03/2022)
+\item NEmu : \url{https://gitlab.com/v-a/nemu} (consulté le 15/03/2022)
 
 \end{itemize}
 
