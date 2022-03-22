@@ -70,8 +70,12 @@ def loadFile(file) :
 
 ### Cette fonction retourne le contenu d'un fichier .json
 def loadJSON(filePath):
-    with open(filePath, 'r') as file:
-        return json.load(file)
+    try:
+        with open(filePath, 'r') as file:
+            return json.load(file)
+    except IOError:
+        print("Erreur: Le fichier ne semble pas exister")
+        return 0
 
 ### Fonction qui permet d'extraire la clé publique de serverName qui se trouve dans le VP qu'il a envoyé 
 def extractPubKey(serverName, file) :

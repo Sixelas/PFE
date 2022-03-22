@@ -27,6 +27,33 @@ def test_loadFile():
     assert "Erreur lors de la génération des clés" == clientW_Front.loadFile("blabla")
 
 
+def test_loadJSON():
+    data = clientW_Front.loadJSON("../../../final/ressources/WG_VC.json")
+    assert len(data) != 0
+    assert data['results'][0] != 'result'
+    assert data['results'][0]['cred_def_id'] == 'NLv8K46HrFJXRxhLZCYmqr:3:CL:10:default'
+    assert data['results'][0]['rev_reg_id'] != 'blabla'
+
+
+def test_extractPubKey():
+    extractKey = clientW_Front.extractPubKey("ServeurW", "../../../final/ressources/ProofRecord.json")
+    assert extractKey == 'XomcZlNwEJd4wANISm0YuqLfgcgc3MPDsmwFvobFvjI='
+    assert 'Xomc' in extractKey
+    assert 'blabla' not in extractKey
+
+
+def test_extractConnectID():
+    connectID = clientW_Front.extractConnectID("ServeurB","../../../final/ressources/Connection_logs.json")
+    assert connectID == '0ec16362-acee-4cf7-99dc-cb99d54f204c'
+    assert connectID != '0ec16362-acee-4cf70ec16362-acee-4cf7'
+    assert '0ec16362-acee-4cf7' in connectID
+    assert "" == clientW_Front.extractConnectID("Serveur","../../../final/ressources/Connection_logs.json")
+
+def test_deleteConnexions():
+    data = clientW_Front.loadJSON("../../../final/ressources/Connection_logs.json")
+    assert data['results'][0]['connection_id'] == '0ec16362-acee-4cf7-99dc-cb99d54f204c'
+    assert data['results'][0]['their_label'] == 'ServeurB'
+    clientW_Front.deleteConnexions("../../../final/ressources/Connection_logs.json")
 
 ### Teste du bouton "Générer clés WireGuard"
 def test_GButton_1_command():
@@ -49,4 +76,6 @@ def test_GButton_4_command():
 
 def test_GButton_6_command():
     ...
+
+
 
