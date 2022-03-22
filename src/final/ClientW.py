@@ -2,12 +2,10 @@ import tkinter as tk
 import tkinter.font as tkFont
 from PIL import Image, ImageTk
 import os
-import sys
 import subprocess
 import signal
 import json
 from socket import *
-from netifaces import interfaces, ifaddresses, AF_INET
 import time
 from global_fun import *
 
@@ -26,12 +24,6 @@ from global_fun import *
 # Chemin du dossier qui contient ce fichier .py
 selfFolderPath = os.getcwd() 
 
-# Permet de récupérer automatiquement l'@ip de l'interface de la machine reliée au LAN. 
-listeAdresses = []*len(interfaces())
-for ifaceName in interfaces():
-    addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
-    listeAdresses.append(addresses)
-
 # Id de la connexion établie avec serveurB
 connectID = ""
 pubKey = ""
@@ -43,8 +35,10 @@ servPubKey = ""
 # Si le von-network est sur serveurB :
 genesisIP = '192.168.1.15'
 
+address,interface = listIntAddr()
+
 # "&" pour lancer en tâche de fond.
-AgentStartCommand = "aca-py start   --label ClientW   -it http 0.0.0.0 8000   -ot http   --admin 0.0.0.0 11000   --admin-insecure-mode   --genesis-url http://"+genesisIP+":9000/genesis   --seed ClientW0000000000000000000000000   --endpoint http://"+listeAdresses[1][0]+":8000/   --debug-connections   --public-invites   --auto-provision   --wallet-type indy   --wallet-name ClientW   --wallet-key secret   --auto-accept-requests --auto-accept-invites  --auto-respond-credential-proposal  --auto-respond-credential-offer  --auto-respond-credential-request  --auto-store-credential --auto-respond-presentation-request --auto-respond-presentation-proposal --auto-verify-presentation &"
+AgentStartCommand = "aca-py start   --label ClientW   -it http 0.0.0.0 8000   -ot http   --admin 0.0.0.0 11000   --admin-insecure-mode   --genesis-url http://"+genesisIP+":9000/genesis   --seed ClientW0000000000000000000000000   --endpoint http://"+address+":8000/   --debug-connections   --public-invites   --auto-provision   --wallet-type indy   --wallet-name ClientW   --wallet-key secret   --auto-accept-requests --auto-accept-invites  --auto-respond-credential-proposal  --auto-respond-credential-offer  --auto-respond-credential-request  --auto-store-credential --auto-respond-presentation-request --auto-respond-presentation-proposal --auto-verify-presentation &"
 
 InvitRequest1 = ''' curl -X POST "http://localhost:11000/out-of-band/receive-invitation" -H 'Content-Type: application/json' -d ' '''
 InvitRequest2 = ''' curl -X POST "http://localhost:11000/out-of-band/receive-invitation" -H 'Content-Type: application/json' -d ' '''

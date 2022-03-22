@@ -3,6 +3,8 @@ import subprocess
 import json
 from socket import *
 import time
+from netifaces import interfaces, ifaddresses, AF_INET
+
 
 # Chemin du dossier qui contient ce fichier .py
 selfFolderPath = os.getcwd() 
@@ -64,9 +66,21 @@ def deleteConnexions(file) :
 def revokeVC(file) :
     print("TODO revokeVC")
 
-###TODO Fonction pour supprimer la config WireGuard active
+### Fonction pour supprimer la config WireGuard active
 def resetWG() :
     resetVPN = subprocess.Popen("wg-quick down wg0", shell=True, preexec_fn=os.setsid)
     resetVPN.wait()
     resetVPN = subprocess.Popen("rm /etc/wireguard/wg0.conf", shell=True, preexec_fn=os.setsid)
     resetVPN.wait()
+
+
+### Fonction pour récupérer automatiquement l'@ip et l'interface de la machine reliée au LAN.
+# https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
+def listIntAddr():
+    listeAdresses = []*len(interfaces())
+    listeInterfaces = []*len(interfaces())
+    for ifaceName in interfaces():
+        addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
+        listeAdresses.append(addresses)
+        listeInterfaces.append(ifaceName)
+    return listeAdresses[1][0], listeInterfaces[1]

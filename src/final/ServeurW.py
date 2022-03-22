@@ -2,13 +2,11 @@ import tkinter as tk
 import tkinter.font as tkFont
 from PIL import Image, ImageTk
 import os
-import sys
 import subprocess
 import signal
 import json
 from QrCode_Generation import QRCode
 from socket import *
-from netifaces import interfaces, ifaddresses, AF_INET
 import time
 from global_fun import *
 
@@ -27,13 +25,6 @@ from global_fun import *
 # Chemin du dossier qui contient ce fichier .py
 selfFolderPath = os.getcwd() 
 
-# Permet de récupérer automatiquement l'@ip et l'interface de la machine reliée au LAN. 
-listeAdresses = []*len(interfaces())
-listeInterfaces = []*len(interfaces())
-for ifaceName in interfaces():
-    addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
-    listeAdresses.append(addresses)
-    listeInterfaces.append(ifaceName)
 
 
 connectID = ""
@@ -46,8 +37,10 @@ clientPubKey = ""
 # Si le von-network est sur serveurB :
 genesisIP = '192.168.1.15'
 
+address,interface = listIntAddr()
+
 # "&" pour lancer en tâche de fond.
-AgentStartCommand = "aca-py start   --label ServeurW   -it http 0.0.0.0 8000   -ot http   --admin 0.0.0.0 11000   --admin-insecure-mode   --genesis-url http://"+genesisIP+":9000/genesis   --seed ServeurW000000000000000000000000   --endpoint http://"+listeAdresses[1][0]+":8000/   --debug-connections   --public-invites   --auto-provision   --wallet-type indy   --wallet-name ServeurW   --wallet-key secret   --auto-accept-requests --auto-accept-invites  --auto-respond-credential-proposal  --auto-respond-credential-offer  --auto-respond-credential-request  --auto-store-credential --auto-respond-presentation-request --auto-respond-presentation-proposal --auto-verify-presentation &"
+AgentStartCommand = "aca-py start   --label ServeurW   -it http 0.0.0.0 8000   -ot http   --admin 0.0.0.0 11000   --admin-insecure-mode   --genesis-url http://"+genesisIP+":9000/genesis   --seed ServeurW000000000000000000000000   --endpoint http://"+address+":8000/   --debug-connections   --public-invites   --auto-provision   --wallet-type indy   --wallet-name ServeurW   --wallet-key secret   --auto-accept-requests --auto-accept-invites  --auto-respond-credential-proposal  --auto-respond-credential-offer  --auto-respond-credential-request  --auto-store-credential --auto-respond-presentation-request --auto-respond-presentation-proposal --auto-verify-presentation &"
 
 InvitCommand = ''' curl -X POST "http://localhost:11000/out-of-band/create-invitation" -H 'Content-Type: application/json' -d '{ "handshake_protocols": ["did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"],"use_public_did": false}' > '''+ selfFolderPath+'''/ressources/invitClientW.json '''
 
@@ -328,7 +321,7 @@ class App:
         #clientPubKey = self.GLineEdit_4.get()
 
         ## Etape 1 : On configure  le fichier /etc/wireguard/wg0.conf avec les informations obtenues précédemment :
-        confWG = ''' echo "[Interface]\nPrivateKey = '''+loadFile("privatekey") +''' \nAddress = 120.0.0.1 \nSaveConfig = false \nListenPort = 51820 \nPostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o '''+listeInterfaces[1]+''' -j MASQUERADE \nPostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o '''+listeInterfaces[1]+''' -j MASQUERADE \nDNS = 192.168.2.1 \n\n[Peer] \n# ClientW \nPublicKey = ''' +clientPubKey+ '''\nAllowedIPs = 120.0.0.2/32" > /etc/wireguard/wg0.conf'''
+        confWG = ''' echo "[Interface]\nPrivateKey = '''+loadFile("privatekey") +''' \nAddress = 120.0.0.1 \nSaveConfig = false \nListenPort = 51820 \nPostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o '''+interface+''' -j MASQUERADE \nPostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o '''+interface+''' -j MASQUERADE \nDNS = 192.168.2.1 \n\n[Peer] \n# ClientW \nPublicKey = ''' +clientPubKey+ '''\nAllowedIPs = 120.0.0.2/32" > /etc/wireguard/wg0.conf'''
         startVPN = subprocess.Popen(confWG, shell=True)
         startVPN.wait()
 
