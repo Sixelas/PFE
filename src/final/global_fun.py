@@ -14,15 +14,20 @@ def loadFile(file) :
     if os.path.exists(selfFolderPath + "/ressources/"+ file):
         fichier = open(selfFolderPath + "/ressources/"+ file, "r")
         for line in fichier :
-            return  line.strip('\n') 
+            return  line.strip('\n')
         fichier.close()
     print( "Erreur : " + selfFolderPath + "/ressources/" + file +" non trouvé")
     return "Erreur lors de la génération des clés" #Message d'erreur à retourner au choix, ici pensé pour retourner la clé publique wireguard
 
 ### Cette fonction retourne le contenu d'un fichier .json
 def loadJSON(filePath):
-    with open(filePath, 'r') as file:
-        return json.load(file)
+    try:
+        with open(filePath, 'r') as file:
+            return json.load(file)
+    except IOError:
+        print("Erreur: Le fichier ne semble pas exister")
+        return 0
+
 
 ### Fonction qui permet d'extraire la clé publique de serverName qui se trouve dans le VP qu'il a envoyé 
 def extractPubKey(serverName, file) :
