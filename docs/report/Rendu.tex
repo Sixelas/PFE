@@ -369,8 +369,25 @@ Quand le Client voudra se connecter sur le Serveur Wireguard, il devra en premie
 \section{Analyse du fonctionnement \& Tests}
 \noindent 
 \begin{flushleft}
-TODO
+
+\subsection{Analyse du fonctionnement}
+Tous les modules de notre application fonctionnent, les tests permettent d'assurer que les bugs ou erreurs majeurs n'apparaissent pas pendant l'utilisation de l'application.\\
+Bien entendu que, une partie de notre code à savoir le ServeurB, ClientW, ServeurW excecute des commandes \textbf{Aries Cloud Agent - Python} et \textbf{von-network} (qui sont en cours de développement, soit importés ailleurs), augmentent considérablement les différents cas d'erreurs et tous n'ont pas pus être testés.  
+\subsection{Tests}
+
+\subsubsection{Test de couverture}
+
+\begin{figure}[H]
+\includegraphics[scale=0.5]{coverage.png}
+\centering
+\caption{Resultat des tests de couverture}
+\end{figure}
+
+\subsubsection{Discussion des résultats}
+Quand on observe les pourcentages obtenus par rapport aux différents codes que nous avons produit, on note que le ServerB est le moins couvert. Parce que les tests du serverB sont plus complexe à faire et il ne nous reste pas beaucoup de temps.
+
 \end{flushleft}
+
 
 \section{Conclusion}
 \noindent 
