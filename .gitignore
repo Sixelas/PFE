@@ -21,3 +21,9 @@ src/Cloud-Agent/Front-end/serveurB/privatekey
 src/Cloud-Agent/Front-end/serveurB/publickey
 src/Cloud-Agent/Front-end/clientW/publickey
 src/Cloud-Agent/Front-end/clientW/privatekey
+
+src/Cloud-Agent/Front-end/tests/.coverage
+src/Cloud-Agent/Front-end/tests/.pytest_cache
+src/Cloud-Agent/Front-end/tests/htmlcov
+src/Cloud-Agent/Front-end/tests/privatekey
+src/Cloud-Agent/Front-end/tests/publickey
