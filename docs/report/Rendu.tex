@@ -384,22 +384,19 @@ Les tests de couverture ont pour principal objectif de mesurer la quantité de c
 \caption{Resultat des tests de couverture}
 \end{figure}
 
-Les résultats présentés au figure 9, montrent que (79\%) de tests réussi dans l'ensemble du code qui sont couvert par les tests. \\
-Avoir une couverture de 100\% ne veut rien dire, tout dépend du type de couverture utilisé. Chaque couverture a ses points forts, points faibles et son lot d’informations.
+Les résultats présentés au figure 9, montrent que (79\%) de tests réussis dans l'ensemble du code qui sont couvert par les tests. \\
+Avoir une couverture de 100\% ne veut rien dire, tout dépend du type de couverture utilisé. Chaque couverture a ses points forts, points faibles et son lot d’informations.\\
 Le choix de la couverture dépend de ses besoins.
 Pour les tests vitaux une couverture de méthode de 100\% peut sembler pertinente alors qu’elle ne l’est pas pour des tests de régression et encore moins des tests de validation. Pour ces tests
-nous avons fait des tests de couveruture des methodes (des fonctionnalités), cette couverture correspond à la couverture la plus basique. Elle correspond au pourcentage de fonctionnalités  de test effectué.
-Donc dans notre cas on a fait des tests sur la fonctionalité par exemple si une fonction qui lit dans une fichier et retoune la premiere ligne du fichier, fait ce qu'elle est sanscer faire.
-c'est a dire on test : 
-- est ce que la fonction lit le bon fichier
-- est ce que la fonction retourne la bonne ligne
-- est ce que c'est le resultat attendus qui est retourner par la fonction.
+nous avons fait des tests de couverture des méthodes (des fonctionnalités), cette couverture correspond à la couverture la plus basique. Elle correspond au pourcentage de fonctionnalités  de test effectué.\\
+Donc, dans notre cas on a fait des tests sur la fonctionnalité par exemple si une fonction qui lit dans un fichier et retourne la première ligne du fichier, fait ce qu'elle doit faire.\\
+c'est-à-dire on test : \\
+- est-ce que la fonction lit le bon fichier\\
+- est-ce que la fonction retourne la bonne ligne\\
+- est-ce que c'est le résultat attendu qui est retourner par la fonction.\\
 
 \subsubsection{Discussion des résultats}
 Quand on observe les pourcentages obtenus par rapport aux différents codes que nous avons produit, on note que le ServerB est le moins couvert. Parce que les tests du serverB sont plus complexe à faire car il faudra créé des images docker pour le réseaux VON, puis demarer le réseaux Indy et il ne nous reste pas beaucoup de temps.
-
-
-
 
 \end{flushleft}
 
