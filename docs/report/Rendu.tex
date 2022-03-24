@@ -372,19 +372,33 @@ Quand le Client voudra se connecter sur le Serveur Wireguard, il devra en premie
 
 \subsection{Analyse du fonctionnement}
 Tous les modules de notre application fonctionnent, les tests permettent d'assurer que les bugs ou erreurs majeurs n'apparaissent pas pendant l'utilisation de l'application.\\
-Bien entendu que, une partie de notre code à savoir le ServeurB, ClientW, ServeurW excecute des commandes \textbf{Aries Cloud Agent - Python} et \textbf{von-network} (qui sont en cours de développement, soit importés ailleurs), augmentent considérablement les différents cas d'erreurs et tous n'ont pas pus être testés.  
+Bien entendu que, une partie de notre code à savoir le ServeurB, ClientW, ServeurW excecute des commandes \textbf{Aries Cloud Agent - Python} et \textbf{von-network} (qui sont en cours de développement, soit importés ailleurs), augmentent considérablement les différents cas d'erreurs et tous n'ont pas pus être testés l’objectif est de minimiser au mieux l’impact des Bugs.  
 \subsection{Tests}
-
+Les tests permettent de vérifier le bon fonctionnement d’une partie bien précise (module) de notre application. Ils s'assurent qu'une méthode exposée à la manipulation par un utilisateur fonctionne bien de la façon dont elle a été conçue.
+Les tests ont pour principal objectif de garantir une qualité de service dans des conditions réelles d'utilisation.
 \subsubsection{Test de couverture}
-
+Les tests de couverture ont pour principal objectif de mesurer la quantité de code couvert lors de l'exécution de tests. d'avoir des informations sur les sections de code non testées.
 \begin{figure}[H]
 \includegraphics[scale=0.5]{coverage.png}
 \centering
 \caption{Resultat des tests de couverture}
 \end{figure}
 
+Les résultats présentés au figure 9, montrent que (79\%) de tests réussis dans l'ensemble du code qui sont couvert par les tests. \\
+Avoir une couverture de 100\% ne veut rien dire, tout dépend du type de couverture utilisé. Chaque couverture a ses points forts, points faibles et son lot d’informations.\\
+Le choix de la couverture dépend de ses besoins.
+Pour les tests vitaux une couverture de méthode de 100\% peut sembler pertinente alors qu’elle ne l’est pas pour des tests de régression et encore moins des tests de validation. \\
+Pour ces tests, nous avons fait des tests de couverture des méthodes (des fonctionnalités), cette couverture correspond à la couverture la plus basique. Elle correspond au pourcentage de fonctionnalités  de test effectué.
+Donc, dans notre cas on a fait des tests sur la fonctionnalité  par exemple si une fonction qui lit dans un fichier et retourne la premiere ligne du fichier, fait ce qu'elle doit faire.\\
+c'est-à-dire on test : \\
+- est-ce que la fonction lit le bon fichier\\
+- est-ce que la fonction retourne la bonne ligne\\
+- est-ce que c'est le résultat attendu qui est retourner par la fonction.\\
+
+
 \subsubsection{Discussion des résultats}
-Quand on observe les pourcentages obtenus par rapport aux différents codes que nous avons produit, on note que le ServerB est le moins couvert. Parce que les tests du serverB sont plus complexe à faire et il ne nous reste pas beaucoup de temps.
+Quand on observe les pourcentages obtenus par rapport aux différents codes que nous avons produit, on note que le ServerB est le moins couvert. Parce que les tests du serverB sont plus complexe à faire car il faudra créé des images docker pour le réseaux VON, puis demarer le réseaux Indy et il ne nous reste pas beaucoup de temps.
+
 
 \end{flushleft}
 
