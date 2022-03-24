@@ -223,7 +223,7 @@ L'objectif de ce projet était d'installer et configurer un VPN Wireguard tout e
 \subsection{Scénario initial}
 \noindent 
 \begin{flushleft}
-Le premier scénario de ce projet était composé de deux machines Debian11 et d'une machine Androidx86. Ces trois machines appartennaient toutes au même réseau. Afin de fournir à la fois un accès à internet et au réseau local, un routeur virtuel délivrant les services dnsmsak, dhcp et Masquerading reliait les 3 machines à internet et leur fournissait leurs adresses ip.\\
+Le premier scénario de ce projet était composé de deux machines Debian11 et d'une machine Androidx86. Ces trois machines appartenaient toutes au même réseau. Afin de fournir à la fois un accès à internet et au réseau local, un routeur virtuel délivrant les services dnsmsak, dhcp et Masquerading reliait les 3 machines à internet et leur fournissait leurs adresses ip.\\
 \vspace{2mm}
 Il y avait 3 types d'Agent à mettre en place : un Cloud Agent pour la machine Serveur Blockchain, un Cloud Agent pour la machine Serveur Wireguard et un Static Agent pour la machine Android. \\
 Le Serveur Blockchain devait générer des clés publiques compatibles avec WireGuard en utilisant OpenSSL, les mettre dans un Verifiable Credential et les envoyer au Client et au Serveur Wireguard. \\
@@ -350,16 +350,31 @@ Nous avons mis en place une interface graphique en python pour pouvoir gérer le
 \subsubsection{Mobile Agent}
 \noindent
 \begin{flushleft}
-
+Le Mobile Agent initialement prévu repose sur l'application Aries Bifold. Nous pouvons voir ci-dessous le principe de son fonctionnement prévu à l'origine sous forme de diagramme UML de séquences :\\
+\begin{figure}[H]
+\includegraphics[scale=0.5]{uml-MobileAgent.png}
+\centering
+\caption{Diagramme UML de séquence du Mobile Agent}
+\end{figure}
+Comme nous pouvons le voir ci-dessus, le Mobile Agent nécessite dans un premier temps d'établir une connexion avec un Mediator pour pouvoir ensuite par son intermédiaire discuter avec ServeurB et ServeurW. Par défaut, Aries Bifold propose l'utilisation d'un Mediator public clé en main basé sur ACA-py et développé par Indicio Technologies\footnote{Indicio Public Mediator : \url{https://indicio-tech.github.io/mediator/}}. Malheureusement c'est au  niveau du premier échange avec le Mediator que nous avons été bloqué. Nous avons alors essayé de nous-même conçevoir notre propre Mediator en se basant sur les options de médiation proposées par Aries Cloud Agent Python. Ces options étaient ajoutées à l'Agent Cloud ServeurB, et elles nous ont aussi permis de voir comment les interactions et messages étaient reçus côté Mediator, chose qui n'était pas possible avec celui par défaut. Cependant nous nous sommes confrontés au même problème qu'avec celui par défaut. Nous verrons plus tard dans la partie "Test du Mobile Agent" une explication détaillée du problème.\\
+\vspace{2mm}
+Le Mobile Agent ne se contente pas d'effectuer des connexions DIDComm avec les Agents de ServeurB et de ServeurW, mais il doit aussi être capable de configurer le tunnel VPN WireGuard. L'application Aries Bifold par défaut ne propose que la connexion à l'aide de QRCode et la réception de VC. Nous avions donc prévu d'implémenter des services supplémentaires pour générer le couple de clés publiques/privées WireGuard, émettre des Proofs à ServeurW ainsi qu'établir le tunnel VPN une fois la clé publique de ServeurW extraite. On peut voir ci-dessous l'interface graphique de l'application (version Android apk) de Aries Bifold avec l'ajout des fonctionnalités dont on a besoin :\\
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{mobile-agent.png}
+\centering
+\caption{GUI du Mobile Agent}
+\end{figure}
+Comme on peut le voir, nous avons ajouté un onglet WireGuard à l'application contenant toutes les options/étapes nécessaires sous forme de boutons cliquables. Nous avons également ajouté une option dans l'onglet Analyse pour établir la connexion en utilisant directement un URL en texte plutôt que via scannner de QRCode. cette option était nécessaire lorsqu'on utilisait l'application sur la VM ClientW Androidx86 car elle ne dispose pas d'objectif caméra.\\
+\vspace{2mm}
+Malheureusement, à cause des problèmes du Mediator et de l'impossibilité d'utiliser des messages DIDComm connexions et proofs en version 2 indispensables à nos Agents ServeurW et ClientW, nous nous sommes concentrés sur une version Aries Cloud-Agent Python sur Debian11 de ClientW et cette application Mobile Agent est resté sans suite.
 \end{flushleft}
-
 
 \subsubsection{Cloud Agent}
 \noindent 
 \begin{flushleft}
 Le Client Wireguard est une machine Debian qui a comme finalité se connecter sur le VPN du serveur Wireguard. \\
 Comme pour le Serveur Wireguard, le Serveur Blockchain doit délivrer un Verifiable Credential avec la clé publique Wireguard du client dedans. Ceci se fait avec une proposal de Verifiable Credential. \\
-Quand le Client voudra se connecter sur le Serveur Wireguard, il devra en premier faire une requête de preuve auprès du Serveur Wireguard, contenant la clé publique du client et demandant entre autres, la clé publique du serveur. Celui-ci envoie une Verifiable Presentation avec sa clé publique Wireguard. La requête du client contennait aussi sa clé publique, donc quand la Presentation est validé, le serveur et client Wireguard ont tous les deux les clés de l'autre.
+Quand le Client voudra se connecter sur le Serveur Wireguard, il devra en premier faire une requête de preuve auprès du Serveur Wireguard, contenant la clé publique du client et demandant entre autres, la clé publique du serveur. Celui-ci envoie une Verifiable Presentation avec sa clé publique Wireguard. La requête du client contenait aussi sa clé publique, donc quand la Presentation est validé, le serveur et client Wireguard ont tous les deux les clés de l'autre.
 
 \end{flushleft}
 
@@ -371,32 +386,33 @@ Quand le Client voudra se connecter sur le Serveur Wireguard, il devra en premie
 \begin{flushleft}
 
 \subsection{Analyse du fonctionnement}
-Tous les modules de notre application fonctionnent, les tests permettent d'assurer que les bugs ou erreurs majeurs n'apparaissent pas pendant l'utilisation de l'application.\\
-Bien entendu que, une partie de notre code à savoir le ServeurB, ClientW, ServeurW excecute des commandes \textbf{Aries Cloud Agent - Python} et \textbf{von-network} (qui sont en cours de développement, soit importés ailleurs), augmentent considérablement les différents cas d'erreurs et tous n'ont pas pus être testés, l’objectif est de minimiser au mieux l’impact des Bugs.
+Les différents projets Aries Hyperledgers utilisés pour la réalisation de ce projet étant en cours de développement et pour la plupart peu documentés, nous avons du réaliser de nombreux tests pour en analyser le fonctionnement et pour comprendre comment s'en servir avant de les implémenter à notre projet. Au niveau de Aries Cloud Agent Python, on retrouve des démos simplifiées basés sur des images Docker dans le dépôt officiel pour prendre en main les fonctionnalités. A l'aide de Wireshark nous observions le traffic entre les Agents des démos pour comprendre quels sont les échanges, les différents types de messages DIDComm apparaissant sous forme de requêtes http, etc.\\
+Au niveau de Aries Mobiel Agent React-Native, l'analyse du fonctionnement de l'application s'effectue au niveau d'Android Studio dans le terminal de logs. En combinant à Wireshark pour observer certains échanges non renseignés dans les logs, et pour comprendre quand des messages n'atteignent ou ne partent pas des agents, on peut finir par faire le lien avec la documentation théorique et sommaire du projet.\\
+Tous les modules de notre projet ont un comportement attendu à la date de la remise, comme nous pourrons le voir ci-dessous avec des tests qui ont été effectués pour détecter, corriger et limiter les bugs ou erreurs majeurs.
+Bien entendu, une partie de notre code à savoir les Agents Aries de ServeurB, ClientW et ServeurW étant basés sur \textbf{Aries Cloud Agent - Python} et \textbf{von-network} sont voués à être rapidement obsolètes au vu de l'avancée des normes DIDComm et Indy, ainsi que les modifications et mises à jour régulières de ce projet en cours de développement. Cela explique aussi pourquoi certains cas d'erreurs potentiels n'ont pas pu être testés de part la difficulté de les mettre en place avec cette base existante complexe en constante modification, surtout au niveau des échanges de messages DIDComm et des requêtes HTTP entre Agents Client/Serveur.
 \subsection{Tests}
 Les tests permettent de vérifier le bon fonctionnement d’une petite partie bien précise (module) de notre application. Ils s'assurent qu'une méthode exposée à la manipulation par un utilisateur fonctionne bien de la façon dont elle a été conçue.
 Les tests ont pour principal objectif de garantir une qualité de service dans des conditions réelles d'utilisation.
 \subsubsection{Test de couverture}
-Les tests de couverture ont pour principal objectif de mesurer la quantité de code couvert lors de l'exécution de tests. d'avoir des informations sur les sections de code non testées.
+Les tests de couverture ont pour principal objectif de mesurer la quantité de code couvert lors de l'exécution de tests. Cela permet aussi d'obtenir des informations sur les sections de code non testées.
 \begin{figure}[H]
 \includegraphics[scale=0.5]{coverage.png}
 \centering
 \caption{Resultat des tests de couverture}
 \end{figure}
 
-Les résultats présentés au figure 9, montrent que (79\%) de tests réussis dans l'ensemble du code qui sont couvert par les tests. \\
+Les résultats présentés en figure 9 ci-dessus montrent que la moyenne de couverture de l'ensemble des tests sur les différentes parties de notre projet est de 79\%.\\
 Avoir une couverture de 100\% ne veut rien dire, tout dépend du type de couverture utilisé. Chaque couverture a ses points forts, points faibles et son lot d’informations.\\
 Le choix de la couverture dépend de ses besoins.
 Pour les tests vitaux une couverture de méthode de 100\% peut sembler pertinente alors qu’elle ne l’est pas pour des tests de régression et encore moins des tests de validation. Pour ces tests
 nous avons fait des tests de couverture des méthodes (des fonctionnalités), cette couverture correspond à la couverture la plus basique. Elle correspond au pourcentage de fonctionnalités  de test effectué.\\
-Donc, dans notre cas on a fait des tests sur la fonctionnalité par exemple si une fonction qui lit dans un fichier et retourne la première ligne du fichier, fait ce qu'elle doit faire.\\
-c'est-à-dire on test : \\
-- est-ce que la fonction lit le bon fichier\\
-- est-ce que la fonction retourne la bonne ligne\\
-- est-ce que c'est le résultat attendu qui est retourner par la fonction.\\
+Donc, dans notre cas on a fait des tests sur la fonctionnalité. Par exemple dans le cadre de la fonction loadJSON() dont le but est de lire le contenu d'un fichier JSON, il faut s'assurer de plusieurs choses qui sont :\\
+- Est-ce que le fichier à lire existe ?\\
+- Est-ce que la fonction lit le bon fichier ?\\
+- Est-ce que la fonction retourne le contenu demandé ?\\
 
 \subsubsection{Discussion des résultats}
-Quand on observe les pourcentages obtenus par rapport aux différents codes que nous avons produit, on note que le ServerB est le moins couvert. Parce que les tests du serverB sont plus complexe à faire car il faudra créé des images docker pour le réseaux VON, puis demarer le réseaux Indy et il ne nous reste pas beaucoup de temps.
+Quand on observe les pourcentages obtenus par rapport aux différents codes que nous avons produit, on note que le ServerB est le moins couvert. Cela est dû au fait que ServeurB est plus complexe à tester de part l'accessibilité difficile au VON-Network dockerisé, ainsi qu'à toute la partie BlockChain Indy qui est initialement un projet à part entière. Cela nous aurait pris beaucoup trop de temps et les délais ne permettaient pas de s'attarder dessus.
 
 \end{flushleft}
 
@@ -427,6 +443,7 @@ TODO
 \item Aries Cloud Agent : \url{https://github.com/hyperledger/aries-cloudagent-python} (consulté le 15/03/2022)
 \item QEMU : \url{https://www.qemu.org/} , \url{https://wiki.qemu.org/Main_Page} (consulté le 15/03/2022)
 \item NEmu : \url{https://gitlab.com/v-a/nemu} (consulté le 15/03/2022)
+\item Indicio Public Mediator : \url{https://indicio-tech.github.io/mediator/} (consulté le 24/03/2022)
 
 \end{itemize}
 
