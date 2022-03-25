@@ -25,6 +25,9 @@ Toutes les étapes d'installation et de configuration devront être documentées
 
 Pour lancer le réseau virtuel et tester les Agents, suivre [ce tutoriel](https://github.com/Sixelas/PFE/tree/main/src/final) 
 
+## Rapport :
+Le rapport du projet est consultable [ici](https://github.com/Sixelas/PFE/tree/main/docs/report/Rendu.pdf) 
+
 ## Dépendances & Licence :
 
 - [Apache License Version 2.0](https://github.com/Sixelas/PFE/blob/main/LICENSE.md)
