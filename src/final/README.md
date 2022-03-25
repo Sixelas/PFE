@@ -4,19 +4,19 @@
 
 final
 |
-|_____    ressources            --> Dossier contenant les images nécessaires aux GUI.
-|        |____ Aries.png
-|        |____ von-logo.png
-|        |____ wg.png
-|
-|_____    ClientW.py            -->     Fichier python contenant l'application ClientW      
-|_____    config.py             -->     Fichier python contenant les commandes et configurations des Agents
-|_____    global_fun.py         -->     Fichier python contenant les fonctions globales utiles aux Agents
-|_____    launcher.py           -->     Script qui sert à lancer l'Agent de son choix
-|_____    QrCode_Generation.py  -->     Fichier python contenant le générateur de QRCode d'invitation
-|_____    README.md             -->     Ce fichier
-|_____    ServeurB.py           -->     Fichier python contenant l'application ServeurB
-|_____    ServeurW.py           -->     Fichier python contenant l'application ServeurW
+|_____    ressources            --> Dossier contenant les images nécessaires aux GUI.\
+|        |____ Aries.png\
+|        |____ von-logo.png\
+|        |____ wg.png\
+|\
+|_____    ClientW.py            -->     Fichier python contenant l'application ClientW\   
+|_____    config.py             -->     Fichier python contenant les commandes et configurations des Agents\
+|_____    global_fun.py         -->     Fichier python contenant les fonctions globales utiles aux Agents\
+|_____    launcher.py           -->     Script qui sert à lancer l'Agent de son choix\
+|_____    QrCode_Generation.py  -->     Fichier python contenant le générateur de QRCode d'invitation\
+|_____    README.md             -->     Ce fichier\
+|_____    ServeurB.py           -->     Fichier python contenant l'application ServeurB\
+|_____    ServeurW.py           -->     Fichier python contenant l'application ServeurW\
 
 
 
