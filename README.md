@@ -13,7 +13,7 @@ Toutes les étapes d'installation et de configuration devront être documentées
 
 ## Topologie du Réseau Virtuel et des interactions entre machines :
 
-![alt text](https://github.com/Sixelas/PFE/blob/main/docs/wk_reports/S7/topologieV3.jpg)
+![alt text](https://github.com/Sixelas/PFE/blob/main/docs/wk_reports/S10/topo.png)
 
 ## Explication des dossiers :
 
