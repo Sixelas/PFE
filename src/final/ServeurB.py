@@ -8,6 +8,7 @@ import json
 import time
 from socket import *
 from global_fun import *
+from config import *
 
 
 
@@ -25,27 +26,7 @@ from global_fun import *
 
 # /////// CONFIG ///////
 
-# Chemin du dossier qui contient ce fichier .py
-selfFolderPath = os.getcwd() 
-
-
 address,interface = listIntAddr()
-
-# Ip de la machine reliée au von-network. Sur ServeurB c'est lui-même donc on laisse localhost
-genesisIP = 'localhost'
-
-VonStartCommand = "~/von-network/manage start logs"
-
-# "&" pour lancer en tâche de fond.
-AgentStartCommand = "aca-py start   --label ServeurB   -it http 0.0.0.0 8000   -ot http   --admin 0.0.0.0 11000   --admin-insecure-mode   --genesis-url http://"+genesisIP+":9000/genesis   --seed ServeurB000000000000000000000000   --endpoint http://"+address+":8000/   --debug-connections   --public-invites   --auto-provision   --wallet-type indy   --wallet-name ServeurB   --wallet-key secret   --auto-accept-requests --auto-accept-invites --auto-respond-credential-proposal  --auto-respond-credential-offer  --auto-respond-credential-request  --auto-store-credential &"
-
-RegisterCommand_1 = ''' curl -X POST "http://localhost:9000/register" -d '{"seed": "ServeurW000000000000000000000000", "role": "TRUST_ANCHOR", "alias": "ServeurW"}' '''
-RegisterCommand_2 = ''' curl -X POST "http://localhost:9000/register" -d '{"seed": "ServeurB000000000000000000000000", "role": "TRUST_ANCHOR", "alias": "ServeurB"}' '''
-RegisterCommand_3 = ''' curl -X POST "http://localhost:9000/register" -d '{"seed": "ClientW0000000000000000000000000", "role": "TRUST_ANCHOR", "alias": "ClientW"}' '''
-
-InvitCommand = ''' curl -X POST "http://localhost:11000/out-of-band/create-invitation" -H 'Content-Type: application/json' -d '{ "handshake_protocols": ["did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"],"use_public_did": false}' > '''+selfFolderPath+'''/ressources/invitation.json '''
-
-CredentialSchemaCommand = ''' curl -X POST http://localhost:11000/schemas -H 'Content-Type: application/json' -d '{"attributes": ["public key","name"],"schema_name": "wg-schema","schema_version": "1.0"}' > '''+selfFolderPath+'''/ressources/CredSchema.json '''
 
 backgroundColor = 'white'
 windowTitle = "Agent ServeurB"
@@ -56,9 +37,10 @@ height=300
 
 # ///// END CONFIG /////
 
+
 ### Commande pour lancer l'agent Von du ServeurB. 
 print("Démarrage du von-network ...")
-Vonproc = subprocess.Popen(VonStartCommand, shell=True, preexec_fn=os.setsid)
+Vonproc = subprocess.Popen(SB_VonStartCommand, shell=True, preexec_fn=os.setsid)
 Vonproc.wait()
 print("Veuillez attendre 60s ...")
 time.sleep(60)
@@ -66,15 +48,15 @@ print("von-network OK : http://localhost:9000/")
 
 ### Commandes pour enregistrer les utilisateurs dans le von-network
 print("Enregistrement des utilisateurs ...")
-subprocess.Popen(RegisterCommand_1, shell=True, preexec_fn=os.setsid)
-subprocess.Popen(RegisterCommand_2, shell=True, preexec_fn=os.setsid)
-subprocess.Popen(RegisterCommand_3, shell=True, preexec_fn=os.setsid)
+subprocess.Popen(SB_RegisterCommand_1, shell=True, preexec_fn=os.setsid)
+subprocess.Popen(SB_RegisterCommand_2, shell=True, preexec_fn=os.setsid)
+subprocess.Popen(SB_RegisterCommand_3, shell=True, preexec_fn=os.setsid)
 time.sleep(10)
 print("Utilisateurs enregistrés")
 
 ### Commande pour lancer l'agent Cloud du ServeurB. 
 print("Démarrage du CloudAgent ...")
-Agentproc = subprocess.Popen(AgentStartCommand, shell=True, preexec_fn=os.setsid)
+Agentproc = subprocess.Popen(SB_AgentStartCommand, shell=True, preexec_fn=os.setsid)
 Agentproc.wait()
 print("Veuillez attendre 30s ...")
 time.sleep(30)
@@ -82,7 +64,7 @@ print("CloudAgent ServeurB OK")
 
 ### Commande pour enregistrer le Credential Schema :
 print("Enregistrement du schéma de VC ...")
-Credproc = subprocess.Popen(CredentialSchemaCommand, shell=True, preexec_fn=os.setsid)
+Credproc = subprocess.Popen(SB_CredentialSchemaCommand, shell=True, preexec_fn=os.setsid)
 Credproc.wait()
 CredSchema = loadJSON(selfFolderPath + "/ressources/CredSchema.json")
 ID_Schema = json.dumps(CredSchema['schema_id'])
@@ -107,7 +89,7 @@ class App:
 
         ft = tkFont.Font(family='Times',size=12)
 
-        VONimg = Image.open(selfFolderPath+"/ressources/von-logo.png")
+        VONimg = Image.open(IMG_von)
         VONimg = VONimg.resize((180, 50), Image.ANTIALIAS)
         VONimg = ImageTk.PhotoImage(VONimg)
         VONlabel = tk.Label(root, image=VONimg)
@@ -115,7 +97,7 @@ class App:
         VONlabel.place(x=15,y=15,width=180,height=50)
         VONlabel.configure(bg=backgroundColor)
 
-        Ariesimg = Image.open(selfFolderPath+"/ressources/Aries.png")
+        Ariesimg = Image.open(IMG_aries)
         Ariesimg = Ariesimg.resize((160, 45), Image.ANTIALIAS)
         Ariesimg = ImageTk.PhotoImage(Ariesimg)
         Arieslabel = tk.Label(root, image=Ariesimg)
@@ -163,10 +145,9 @@ class App:
 
 # Fonction appelée quand on clique sur le bouton "Générer invitation"
     def GButton_3_command(self):
-        #Commande pour lancer l'agent Cloud du ServeurB (en tâche de fond si possible, faut pas qu'il bloque le terminal). 
-        Invitproc = subprocess.Popen(InvitCommand, shell=True, preexec_fn=os.setsid)
+        Invitproc = subprocess.Popen(SB_InvitCommand, shell=True, preexec_fn=os.setsid)
         Invitproc.wait()
-        invitJson = loadJSON(selfFolderPath + "/ressources/invitation.json") #Récupère l'invitation dans le fichier json.
+        invitJson = loadJSON(selfFolderPath + "/ressources/invitation.json")
         invitURL = json.dumps(invitJson['invitation'])
         self.GLineEdit_3.delete(0, len(self.GLineEdit_3.get()))
         self.GLineEdit_3.insert(1,invitURL)

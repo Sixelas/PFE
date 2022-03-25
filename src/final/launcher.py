@@ -1,12 +1,7 @@
 import os
 import subprocess
+from config import *
 
-
-
-git = ''' git pull '''
-SB = ''' python3 ServeurB.py '''
-SW = ''' python3 ServeurW.py '''
-CW = ''' python3 ClientW.py '''
 
 def launcher(machine) :
     if(machine == "1") :
@@ -31,7 +26,8 @@ def launcher(machine) :
         commandProc = subprocess.Popen(CW, shell=True, preexec_fn=os.setsid)
         commandProc.wait()
 
-machine = input("Choisir l'agent à lancer :\n1 --> ServeurB\n2 --> ServeurW\n3 --> ClientW\n")
+print(LauncherText1)
+machine = input(LauncherText2)
 
 if machine in ["1","2","3"] :
     launcher(machine)

@@ -8,6 +8,7 @@ import json
 from socket import *
 import time
 from global_fun import *
+from config import *
 
 
 # ATTENTION Important :
@@ -29,19 +30,10 @@ connectID = ""
 pubKey = ""
 credID = ""
 servPubKey = ""
-
-# Si on a le von-network en local :
-#genesisIP = 'localhost'
-# Si le von-network est sur serveurB :
-genesisIP = '192.168.1.15'
+genIP = ip_serveurB
 
 address,interface = listIntAddr()
 
-# "&" pour lancer en tâche de fond.
-AgentStartCommand = "aca-py start   --label ClientW   -it http 0.0.0.0 8000   -ot http   --admin 0.0.0.0 11000   --admin-insecure-mode   --genesis-url http://"+genesisIP+":9000/genesis   --seed ClientW0000000000000000000000000   --endpoint http://"+address+":8000/   --debug-connections   --public-invites   --auto-provision   --wallet-type indy   --wallet-name ClientW   --wallet-key secret   --auto-accept-requests --auto-accept-invites  --auto-respond-credential-proposal  --auto-respond-credential-offer  --auto-respond-credential-request  --auto-store-credential --auto-respond-presentation-request --auto-respond-presentation-proposal --auto-verify-presentation &"
-
-InvitRequest1 = ''' curl -X POST "http://localhost:11000/out-of-band/receive-invitation" -H 'Content-Type: application/json' -d ' '''
-InvitRequest2 = ''' curl -X POST "http://localhost:11000/out-of-band/receive-invitation" -H 'Content-Type: application/json' -d ' '''
 
 backgroundColor = 'white'
 windowTitle = "Agent ClientW"
@@ -53,7 +45,7 @@ height=606
 # ///// END CONFIG ////
 
 ### Commande pour lancer l'agent Cloud du ClientW. 
-Agentproc = subprocess.Popen(AgentStartCommand, shell=True, preexec_fn=os.setsid)
+Agentproc = subprocess.Popen(CW_AgentStartCommand, shell=True, preexec_fn=os.setsid)
 
 
 ### Classe qui gère l'Interface Utilisateur Tkinter
@@ -72,7 +64,7 @@ class App:
 
         ft = tkFont.Font(family='Times',size=12)
 
-        WGimg = Image.open(selfFolderPath+"/ressources/wg.png")
+        WGimg = Image.open(IMG_wg)
         WGimg = WGimg.resize((40, 40), Image.ANTIALIAS)
         WGimg = ImageTk.PhotoImage(WGimg)
         WGlabel = tk.Label(root, image=WGimg)
@@ -80,7 +72,7 @@ class App:
         WGlabel.place(x=15,y=40,width=60,height=60)
         WGlabel.configure(bg=backgroundColor)
 
-        Ariesimg = Image.open(selfFolderPath+"/ressources/Aries.png")
+        Ariesimg = Image.open(IMG_aries)
         Ariesimg = Ariesimg.resize((180, 40), Image.ANTIALIAS)
         Ariesimg = ImageTk.PhotoImage(Ariesimg)
         Arieslabel = tk.Label(root, image=Ariesimg)
@@ -219,8 +211,8 @@ class App:
 
         subprocess.call("echo Génération des clés WireGuard", shell=True)
         # Ici on génère le couple publickey / privatekey
-        subprocess.call("umask 077", shell=True)
-        subprocess.call("wg genkey | tee ressources/privatekey | wg pubkey > ressources/publickey", shell=True)
+        subprocess.call(umask, shell=True)
+        subprocess.call(WG_genkey, shell=True)
         # Ici on met à jour la zone de texte à droite du bouton
         self.GLineEdit_1.delete(0, len(self.GLineEdit_1.get()))
         pubKey = loadFile("publickey")
@@ -230,7 +222,6 @@ class App:
 ### Fonction appelée quand on clique sur le bouton "OK" de l'invitation ServeurB
     def GButton_2_command(self):
 
-        global InvitRequest1
         global credID
         global connectID
 
@@ -240,7 +231,7 @@ class App:
             return
 
         ## Etape 1 : On établit la connexion avec serveurB à l'aide de l'invitation reçue :
-        reqMSG = InvitRequest1 + self.GLineEdit_2.get() +''' ' '''
+        reqMSG = InvitRequest + self.GLineEdit_2.get() +''' ' '''
         invitProc = subprocess.Popen(reqMSG, shell=True, preexec_fn=os.setsid)
         invitProc.wait()
         time.sleep(5)
@@ -249,7 +240,7 @@ class App:
         ## Etape 2 : On demande un VC selon le modèle voulu à serveurB :
 
         # On récupère l'identifiant de la connexion connectID
-        invitProc = subprocess.Popen(''' curl http://localhost:11000/connections > '''+selfFolderPath+'''/ressources/Connection_logs.json ''', shell=True, preexec_fn=os.setsid)
+        invitProc = subprocess.Popen(Connections, shell=True, preexec_fn=os.setsid)
         invitProc.wait()
         time.sleep(5)
         connectID = json.dumps(extractConnectID("ServeurB","Connection_logs.json"))
@@ -262,7 +253,7 @@ class App:
 
         # On récupère le VC obtenu et on le stocke dan WG_VC.json. On récupère également le credID du VC.
         print("\nVC obtenu : ")
-        invitProc = subprocess.Popen(''' curl -X GET "http://localhost:11000/credentials" > '''+selfFolderPath+'''/ressources/WG_VC.json''', shell=True, preexec_fn=os.setsid)
+        invitProc = subprocess.Popen(Credentials, shell=True, preexec_fn=os.setsid)
         invitProc.wait()
         connectJson = loadJSON(selfFolderPath + "/ressources/WG_VC.json")
         credID = json.dumps(connectJson['results'][0]['cred_def_id'])
@@ -271,15 +262,13 @@ class App:
 ### Fonction appelée quand on clique sur le bouton "OK" de l'invitation ServeurW
     def GButton_3_command(self):
 
-        global InvitRequest2
-
         if (len(self.GLineEdit_3.get()) == 0):
             self.GLineEdit_3.delete(0, len(self.GLineEdit_3.get()))
             self.GLineEdit_3.insert(1, "Veillez remplir le champ inviation...")
             return
 
         ## On établit la connexion avec serveurW à l'aide de l'invitation reçue :
-        reqMSG = InvitRequest2 + self.GLineEdit_3.get() +''' ' '''
+        reqMSG = InvitRequest + self.GLineEdit_3.get() +''' ' '''
         invitProc = subprocess.Popen(reqMSG, shell=True, preexec_fn=os.setsid)
         invitProc.wait()
         time.sleep(5)
@@ -297,7 +286,7 @@ class App:
         ## Etape 1 : On récupère le connectID de la connexion avec serveurW
 
         # Enregistrement de la connection avec ServeurW dans un fichier json puis récupération du connectID :
-        proofProc = subprocess.Popen(''' curl http://localhost:11000/connections > '''+selfFolderPath+'''/ressources/Connection_logs.json ''', shell=True,preexec_fn=os.setsid)
+        proofProc = subprocess.Popen(Connections, shell=True,preexec_fn=os.setsid)
         proofProc.wait()
         connectID = json.dumps(extractConnectID("ServeurW","Connection_logs.json"))
 
@@ -310,7 +299,6 @@ class App:
         time.sleep(15)
 
         # On enregistre le résultat dans un fichier json pour ensuite extraire la servPubKey WireGuard du Verifiable presentation de serveurW.
-        proofRecord = ''' curl -X 'GET' 'http://localhost:11000/present-proof-2.0/records' -H 'accept: application/json' > '''+selfFolderPath+'''/ressources/ProofRecord.json '''
         proofProc = subprocess.Popen(proofRecord, shell=True, preexec_fn=os.setsid)
         proofProc.wait()
 
@@ -321,27 +309,25 @@ class App:
 
 
 
-###TODO Fonction appelée quand on appuie sur le bouton Reset. Elle supprime toutes les connexions et les configs WireGuard en cours sur l'Agent.
+### Fonction appelée quand on appuie sur le bouton Reset. Elle supprime toutes les connexions et les configs WireGuard en cours sur l'Agent.
     def GButton_5_command(self):
         deleteConnexions("Connection_logs.json")
         revokeVC("ProofRecord.json")
         resetWG()
-        #subprocess.Popen(''' echo "TODO delete all Connexions + revoke VC + reset WireGuard" ''', shell=True, preexec_fn=os.setsid)
 
 
 ### Fonction appelée quand on clique sur le bouton "Configuration du Tunnel VPN"
     def GButton_6_command(self):
 
         global servPubKey
-        #servPubKey = self.GLineEdit_4.get()
 
         ## Etape 1 : On configure  le fichier /etc/wireguard/wg0.conf avec les informations obtenues précédemment :
-        confWG = ''' echo "[Interface]\nPrivateKey = ''' +loadFile("privatekey")+'''\nAddress = 120.0.0.2/24\nDNS = 192.168.2.1\n\n[Peer]\nPublicKey = ''' + servPubKey + '''\nEndpoint = 192.168.2.13:51820\nAllowedIPs = 0.0.0.0/0\nPersistentKeepalive = 25" > /etc/wireguard/wg0.conf'''
+        confWG = ''' echo "[Interface]\nPrivateKey = ''' +loadFile("privatekey")+'''\nAddress = 120.0.0.2/24\nDNS = '''+ip_dns+'''\n\n[Peer]\nPublicKey = ''' + servPubKey + '''\nEndpoint = '''+ip_serveurW+''':51820\nAllowedIPs = 0.0.0.0/0\nPersistentKeepalive = 25" > /etc/wireguard/wg0.conf'''
         startVPN = subprocess.Popen(confWG, shell=True)
         startVPN.wait()
 
         ## Etape 2 : On active l'interface wg0 du VPN :
-        startVPN = subprocess.Popen("wg-quick up wg0", shell=True, preexec_fn=os.setsid)
+        startVPN = subprocess.Popen(WG_up, shell=True, preexec_fn=os.setsid)
         startVPN.wait()
         subprocess.call('''echo "Connecté au serveur VPN serveurW !" ''', shell=True)
 

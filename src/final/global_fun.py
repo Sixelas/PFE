@@ -4,10 +4,8 @@ import json
 from socket import *
 import time
 from netifaces import interfaces, ifaddresses, AF_INET
+from config import *
 
-
-# Chemin du dossier qui contient ce fichier .py
-selfFolderPath = os.getcwd() 
 
 ### Cette fonction lit un fichier de nom "file" et retourne la première ligne sans le retour à la ligne \n
 def loadFile(file) :
@@ -35,7 +33,6 @@ def extractPubKey(serverName, file) :
     dataJson = loadJSON(selfFolderPath + "/ressources/"+file)
     
     for case in dataJson['results'] :
-        comment = serverName+' proof request'
         if(case['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_name_uuid']['raw'] == serverName) :
                 extractKey = case['by_format']['pres']['indy']['requested_proof']['revealed_attrs']['0_public_key_uuid']['raw']
                 return ''.join(x for x in extractKey if x not in '''"''')
@@ -61,8 +58,8 @@ def deleteConnexions(file) :
     
     for case in dataJson['results'] :
         id = ''.join(x for x in case['connection_id'] if x not in '''"''')
-        deleteCommand = ''' curl -X 'DELETE' 'http://localhost:11000/connections/''' + id + ''' ' -H 'accept: application/json' '''
         print("\nSuppression de la connexion avec "+case['their_label']+" d'identifiant "+id+"\n")
+        deleteCommand = ''' curl -X 'DELETE' 'http://localhost:11000/connections/''' + id + ''' ' -H 'accept: application/json' '''
         deleteProc = subprocess.Popen(deleteCommand, shell=True, preexec_fn=os.setsid)
         deleteProc.wait()
         time.sleep(3)
@@ -73,9 +70,9 @@ def revokeVC(file) :
 
 ### Fonction pour supprimer la config WireGuard active
 def resetWG() :
-    resetVPN = subprocess.Popen("wg-quick down wg0", shell=True, preexec_fn=os.setsid)
+    resetVPN = subprocess.Popen(WG_down, shell=True, preexec_fn=os.setsid)
     resetVPN.wait()
-    resetVPN = subprocess.Popen("rm /etc/wireguard/wg0.conf", shell=True, preexec_fn=os.setsid)
+    resetVPN = subprocess.Popen(WG_rm, shell=True, preexec_fn=os.setsid)
     resetVPN.wait()
 
 
