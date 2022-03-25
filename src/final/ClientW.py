@@ -173,7 +173,7 @@ class App:
         self.GButton_4.place(x=240,y=370,width=293,height=40)
         self.GButton_4["command"] = self.GButton_4_command
 
-        self.GText_3 = tk.Label(text = "Clé publique de ClientW : ")
+        self.GText_3 = tk.Label(text = "Clé publique de ServeurW : ")
         self.GText_3["bg"] = "#e88787"
         self.GText_3["font"] = ft
         self.GText_3["fg"] = "#333333"

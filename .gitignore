@@ -27,3 +27,5 @@ src/Cloud-Agent/Front-end/tests/.pytest_cache
 src/Cloud-Agent/Front-end/tests/htmlcov
 src/Cloud-Agent/Front-end/tests/privatekey
 src/Cloud-Agent/Front-end/tests/publickey
+
+src/final/__pycache__
