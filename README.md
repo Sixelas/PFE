@@ -15,7 +15,7 @@ Toutes les étapes d'installation et de configuration devront être documentées
 
 ![alt text](https://github.com/Sixelas/PFE/blob/main/docs/wk_reports/S10/topo.png)
 
-## Explication des dossiers :
+## Architecture :
 
 - docs&emsp;&emsp;-->&emsp;&emsp;Contient les rapports de RDV clients, le Mémoire et les rapports quotidiens.
 - src&emsp;&emsp;&emsp;-->&emsp;&emsp;Contient le code du projet.
