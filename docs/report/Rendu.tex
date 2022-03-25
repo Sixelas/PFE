@@ -14,6 +14,7 @@
 \usepackage{ragged2e}
 \usepackage{tabto}
 \usepackage{float}
+\usepackage{setspace}
 
 
 \setlength{\parindent}{0cm}
@@ -61,10 +62,15 @@
 \end{titlepage}
 
 \newpage
-
+%\hspace{-1cm}
+%\hspace{20cm}
+%\vspace{-20cm}
 \renewcommand{\contentsname}{Sommaire}
 %\addcontentsline{toc}{section}{Remerciements}
+%\enlargethispage*{1ex}
+\begin{spacing}{0.8}
 \tableofcontents
+\end{spacing}
 \newpage
 
 \section{Introduction}
@@ -408,7 +414,7 @@ Le Mobile Agent ne se contente pas d'effectuer des connexions DIDComm avec les A
 \end{figure}
 Comme on peut le voir, nous avons ajouté un onglet WireGuard à l'application contenant toutes les options/étapes nécessaires sous forme de boutons cliquables. Nous avons également ajouté une option dans l'onglet Analyse pour établir la connexion en utilisant directement un URL en texte plutôt que via scannner de QRCode. cette option était nécessaire lorsqu'on utilisait l'application sur la VM ClientW Androidx86 car elle ne dispose pas d'objectif caméra.\\
 \vspace{2mm}
-Malheureusement, à cause des problèmes du Mediator et de l'impossibilité d'utiliser des messages DIDComm connexions et proofs en version 2 indispensables à nos Agents ServeurW et ClientW, nous nous sommes concentrés sur une version Aries Cloud-Agent Python sur Debian11 de ClientW et cette application Mobile Agent est resté sans suite.
+Malheureusement, à cause des problèmes du Mediator et de l'impossibilité d'utiliser des messages DIDComm connexions et proofs en version 2 indispensables à nos Agents ServeurW et ClientW, nous nous sommes concentrés sur une version Aries Cloud-Agent Python sur Debian11 de ClientW et cette application Mobile Agent est resté sans suite. Nous avons fait ce choix car l'utilisation du Mobile Agent aurait nécessité de consacrer au développement d'un Mediator compatible, et cela n'était pas possible dans les délais.
 \end{flushleft}
 
 \subsubsection{Cloud Agent}
@@ -475,7 +481,8 @@ Quand on observe les pourcentages obtenus par rapport aux différents codes que 
 \begin{flushleft}
 Le besoin de pouvoir prouver son identité auprès d'un serveur, et viceversa, peut-être reglé avec des certificats délivrés par une authorité à laquelle on fait confiance. Cependant, le fait que l'authorité soit celle qui délivre les certificats impose une dynamique de pouvoir qui pouvant devenir gênante pour l'autre partie devenant dépendante de l'authorité. Si l'authorité le décide, elle peut par exemple révoquer un certificat, ou alors si elle attaquée, tous les certificats qu'elle aura délivré seront compromis. Avec l'apparition des technologies BlockChain reposant sur la décentralisation, nous avons la possibilité de considérer des alternatives différentes aux certificats délivrés par une authorité. \\
 L'objectif du projet \textit{Déploiement d'un VPN sur des équipes mobiles ou IoT} était de mettre en place un VPN sur un serveur et de pouvoir avoir un client mobiel qui s'y connecte. cela nécessite donc une authentification et confiance mutuelle entr les deux hôtes lors de la mise en place du VPN par échange de clés publiques. Les certificats délivrés par authorité de certification peuvent être utiles dans ce cas, car ils permettraient d'ajouter un tier de confiance dans l'échange. Néanmoins, cette vision centralisée pose différents problèmes évoqué précédemment. L'option alternative choisie ici repose donc sur l'utilisation des technologies Blockchain, à savoir sur le projet Aries Hyperledger soutenu par la Fondation Linux. Cet ensemble de sous-projets permet la délivrance de certificats décentralisés ou Verifiable Credentials.\\
-Au terme de ce projet nous avons pu découvrir le secteur novateur de la BlockChain, des normes de communication DIDComm ainsi que de l'ensemble du projet Aries Hyperledger. Malgré les nombreux problèmes auxquels nous nous sommes heurtés, nous avons tout de même réussi à mettre en place un réseau virtuel NEmu permettant de simuler les interactions entre 3 Aries Cloud Agent dans le but de délivrer des VC, les vérifier et établir un tunnel VPN dont les hôtes sont authentifiés par la BlockChain. Toutes ces étapes ont été regroupées dans trois applicationspour chacun des agents avec des interfaces utilisateurs réalisées en Python Tkinter.
+Au terme de ce projet nous avons pu découvrir le secteur novateur de la BlockChain, des normes de communication DIDComm ainsi que de l'ensemble du projet Aries Hyperledger. Malgré les nombreux problèmes auxquels nous nous sommes heurtés, nous avons tout de même réussi à mettre en place un réseau virtuel NEmu permettant de simuler les interactions entre 3 Aries Cloud Agent dans le but de délivrer des VC, les vérifier et établir un tunnel VPN dont les hôtes sont authentifiés par la BlockChain. Toutes ces étapes ont été regroupées dans trois applications pour chacun des agents avec des interfaces utilisateurs réalisées en Python Tkinter.
+En annexe \ref{gantt} de ce rapport on peut voir le Diagramme de Gantt final au terme du projet. On peut y voir les 3 phases de l'avancée du projet correspondant aux scénarios représentés par les 3 couleurs.
 \end{flushleft}
 \subsection{Limitations}
 \noindent 
@@ -494,6 +501,8 @@ Une autre extension que nous avons commencé à implémenter mais non terminée 
 Une dernière extension possible est de pouvoir révoquer des Verifiable Credentials sans pour autant réinitialiser tout le système via le bouton reset.\\
 \end{flushleft}
 
+\newpage
+
 \section{Bibliographie}
 \noindent 
 \begin{itemize}
@@ -509,11 +518,13 @@ Une dernière extension possible est de pouvoir révoquer des Verifiable Credent
 \item GreenLight Ledger : \url{http://greenlight.bcovrin.vonx.io/} (consulté le 24/03/2022)
 \end{itemize}
 
-\section{Annexe}
+\newpage
+
+\section{Annexes}
 \noindent 
-\begin{flushleft}
-TODO
-\end{flushleft}
+\subsection{Gantt Final du Projet} \label{gantt}
+\includegraphics[scale=0.7]{Gantt_Final_PFE.pdf}
+
 
 \end{document}
 
