@@ -2,21 +2,20 @@
 
 ## Architecture :
 
-final
-|
-|_____    ressources            --> Dossier contenant les images nécessaires aux GUI.\
-|        |____ Aries.png\
-|        |____ von-logo.png\
-|        |____ wg.png\
+final\
+&emsp;&emsp;|_____    ressources&nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;-->&emsp;&emsp;Dossier contenant les images nécessaires aux GUI + les fichiers générés par les Agents.\
+|&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;|____ Aries.png\
+|&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;|____ von-logo.png\
+|&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;|____ wg.png\
 |\
-|_____    ClientW.py            -->     Fichier python contenant l'application ClientW\   
-|_____    config.py             -->     Fichier python contenant les commandes et configurations des Agents\
-|_____    global_fun.py         -->     Fichier python contenant les fonctions globales utiles aux Agents\
-|_____    launcher.py           -->     Script qui sert à lancer l'Agent de son choix\
-|_____    QrCode_Generation.py  -->     Fichier python contenant le générateur de QRCode d'invitation\
-|_____    README.md             -->     Ce fichier\
-|_____    ServeurB.py           -->     Fichier python contenant l'application ServeurB\
-|_____    ServeurW.py           -->     Fichier python contenant l'application ServeurW\
+&emsp;&emsp;|_____ ClientW.py&nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;-->&emsp;&emsp;Fichier python contenant l'application ClientW\
+&emsp;&emsp;|_____ config.py&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;-->&emsp;&emsp;Fichier python contenant les commandes et configurations des Agents\
+&emsp;&emsp;|_____    global_fun.py&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;-->&emsp;&emsp;Fichier python contenant les fonctions globales utiles aux Agents\
+&emsp;&emsp;|_____ launcher.py&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;-->&emsp;&emsp;Script qui sert à lancer l'Agent de son choix\
+&emsp;&emsp;|_____ QrCode_Generation.py&emsp;&emsp;-->&emsp;&emsp;Fichier python contenant le générateur de QRCode d'invitation\
+&emsp;&emsp;|_____ README.md&nbsp;&nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;-->&emsp;&emsp;Ce fichier\
+&emsp;&emsp;|_____ ServeurB.py&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;-->&emsp;&emsp;Fichier python contenant l'application ServeurB\
+&emsp;&emsp;|_____ ServeurW.py&nbsp;&nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;-->&emsp;&emsp;Fichier python contenant l'application ServeurW
 
 
 
@@ -26,8 +25,8 @@ final
 Pour lancer le réseau virtuel du projet, suivre les étapes 1 à 5 de  [ce tutoriel](https://github.com/Sixelas/PFE/tree/main/src/NEmu)
 
 ## Etape 2 : Lancer les GUI des Agents :
-Si le dossier PFE/src/final/ n'existe pas, faire tout d'abord un git pull dans PFE/  (valable seulement pour l'ancienne image debian11.img)
-
+Si le dossier PFE/src/final/ n'existe pas, faire tout d'abord un git pull dans PFE/  (valable seulement pour l'ancienne image debian11.img)\
+On peut ensuite si besoin modifier les paramètres de configuration par défaut dans config.py, par exemple si les @ip des machines ne sont pas les mêmes.\
 On lance le launcher sur les 3 machines en commençant par ServeurB (attendre que l'Agent ServeurB soit lancé avant de lancer les autres) :
 ```
 cd PFE/src/final/
