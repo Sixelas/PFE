@@ -43,7 +43,7 @@ RegisterCommand_1 = ''' curl -X POST "http://localhost:9000/register" -d '{"seed
 RegisterCommand_2 = ''' curl -X POST "http://localhost:9000/register" -d '{"seed": "ServeurB000000000000000000000000", "role": "TRUST_ANCHOR", "alias": "ServeurB"}' '''
 RegisterCommand_3 = ''' curl -X POST "http://localhost:9000/register" -d '{"seed": "ClientW0000000000000000000000000", "role": "TRUST_ANCHOR", "alias": "ClientW"}' '''
 
-InvitCommand = ''' curl -X POST "http://localhost:11000/out-of-band/create-invitation" -H 'Content-Type: application/json' -d '{ "handshake_protocols": ["did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"],"use_public_did": false}' > '''+selfFolderPath+'''/ressources/invitServeurW.json '''
+InvitCommand = ''' curl -X POST "http://localhost:11000/out-of-band/create-invitation" -H 'Content-Type: application/json' -d '{ "handshake_protocols": ["did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/didexchange/1.0"],"use_public_did": false}' > '''+selfFolderPath+'''/ressources/invitation.json '''
 
 CredentialSchemaCommand = ''' curl -X POST http://localhost:11000/schemas -H 'Content-Type: application/json' -d '{"attributes": ["public key","name"],"schema_name": "wg-schema","schema_version": "1.0"}' > '''+selfFolderPath+'''/ressources/CredSchema.json '''
 
@@ -166,7 +166,7 @@ class App:
         #Commande pour lancer l'agent Cloud du ServeurB (en tâche de fond si possible, faut pas qu'il bloque le terminal). 
         Invitproc = subprocess.Popen(InvitCommand, shell=True, preexec_fn=os.setsid)
         Invitproc.wait()
-        invitJson = loadJSON(selfFolderPath + "/ressources/invitServeurW.json") #Récupère l'invitation dans le fichier json.
+        invitJson = loadJSON(selfFolderPath + "/ressources/invitation.json") #Récupère l'invitation dans le fichier json.
         invitURL = json.dumps(invitJson['invitation'])
         self.GLineEdit_3.delete(0, len(self.GLineEdit_3.get()))
         self.GLineEdit_3.insert(1,invitURL)

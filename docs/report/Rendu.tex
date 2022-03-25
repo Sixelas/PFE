@@ -217,16 +217,30 @@ NEmu pour Network Emulator for Mobile Universes est un environnement permettant 
 Dans le cadre de ce projet nous devons utiliser NEmu pour construire le réseau virtuel sur lequel nous simulerons les interactions entre Agents Aries et le VPN WireGuard.
 \end{flushleft}
 
-\section{Scénarios}
-L'objectif de ce projet était d'installer et configurer un VPN Wireguard tout en utilisant la technologie Blockchain à la place de certificats pour s'authentifier et échanger des clés publiques. 
+\section{Conduite de projet \& Scénarios}
+L'objectif de ce projet était d'installer et configurer un VPN Wireguard tout en utilisant la technologie Blockchain à la place de certificats pour s'authentifier et échanger des clés publiques. Au niveau de WireGuard, il s'agit d'un VPN entièrement fonctionnel, disponible sur plusieurs plateformes et disposant d'une base de documentation importante. La difficulté de ce projet résidait surtout dans la partie Aries Hyperledger et BlockChain, des concepts nouveaux et encore en développement. Ce projet devait à l'origine être en deux parties, avec d'un côté le réseau virtuel composé d'Agents Aries et de VPN WireGuard (celui-ci), et d'un autre un lien avec un autre projet se concentrant sur le noeud de BlockChain Indy. La partie BlockChain n'ayant pas trouvée preneur, c'est en collaboration avec nos client à l'origine de ce projet, Messieurs Damien MAGONI et Vincent AUTEFAGE, qu'elle serait développée. Des réunions hebdomadaires en visio-conférence ont donc eu lieu tout au long du projet avec nos clients, initialement pour se mettre en accord sur les intéractions entre les deux projets.\\
+Ce projet a vu son axe principal, les technologies utilisées et donc les User Stories être modifiées plusieurs fois, en accord avec nos clients. Pour mener à bien le projet, nous avons choisi d'adopter une méthodologie agile suivant un processus itératif hebdomadaire. les Users Stories (ou Scénarios) découpés en tâches ont été gérées depuis un Kanban permettant d'en voir la progression. L'objectif était que chaque semaine nous puissions réaliser une démo ainsi qu'un résumé des tâches accomplies et celles à faire pour les suivantes en accord avec nos clients. Nous avions à l'origine prévu un Gantt prévisionnel discuté en équipe que l'on peut retrouver ci-dessous :
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{gant_previ.png}
+\centering
+\caption{Gantt prévisionnel du projet}
+\end{figure}
+
+On constate sur ce Gantt que nous avions prévu à l'initiale de découper les tâches du projet en 3 groupes qui sont \textbf{Organisation du projet}, \textbf{Mise en place du réseau virtuel} et \textbf{Agents Aries}. Cela nous as permis de nous séparer le travail en fonction de ce que chacun préfère réaliser, que ce soit plutôt la partie réseau virtuel NEmu ou la partie développement des Agents Aries. Nous avons aussi défini un Niveau de priorité/importance de la tâche à réaliser, allant de 1 pour le plus important à 4 pour le moins important. Ces types de tâches ainsi que le niveau de priorité se retrouvent également sur le Kanban en suivant des codes couleurs.
 
 \subsection{Scénario initial}
 \noindent 
 \begin{flushleft}
-Le premier scénario de ce projet était composé de deux machines Debian11 et d'une machine Androidx86. Ces trois machines appartenaient toutes au même réseau. Afin de fournir à la fois un accès à internet et au réseau local, un routeur virtuel délivrant les services dnsmsak, dhcp et Masquerading reliait les 3 machines à internet et leur fournissait leurs adresses ip.\\
+Le premier scénario de ce projet était composé de deux machines Debian11 et d'une machine Androidx86. Ces trois machines appartenaient toutes au même réseau. Afin de fournir à la fois un accès à internet et au réseau local à l'android ne disposant que d'une interface réseau, le serveur Debian se chargeait de faire serveur proxy.\\
 \vspace{2mm}
-Il y avait 3 types d'Agent à mettre en place : un Cloud Agent pour la machine Serveur Blockchain, un Cloud Agent pour la machine Serveur Wireguard et un Static Agent pour la machine Android. \\
-Le Serveur Blockchain devait générer des clés publiques compatibles avec WireGuard en utilisant OpenSSL, les mettre dans un Verifiable Credential et les envoyer au Client et au Serveur Wireguard. \\
+Il y avait 3 types d'Agent à mettre en place : un Cloud Agent pour la machine Serveur Blockchain relié au projet 2, un Cloud Agent pour la machine Serveur Wireguard et un Static Agent pour la machine Android. Le Serveur Blockchain devait générer des clés publiques compatibles avec WireGuard en utilisant OpenSSL, les mettre dans un Verifiable Credential et les envoyer au Client et au Serveur Wireguard. Ces deux derniers devaient alors extraire les clés publiques des VC puis configurer le tunnel VPN. On peut voir ci-dessous le plan de la topologie réseau qui avait été pensé pour correspondre à ce scénario :
+
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{scenario1.png}
+\centering
+\caption{Schéma du scénario initial}
+\end{figure}
+
 Cependant, après des recherches nous avons constaté que ce scénario avait des problèmes limitant son implémentation. Le principal problème concernait le Static Agent. Le Static Agent était sensé être implémenté sur le Client Android, mais nous avons découvert après s'être penchés en détail sur sa documentation ainsi qu'effectué des tests qu'il n'avait pas de wallet. Il ne peut donc pas stocker des Verifiable Credentials. Cet Agent a été pensé seulement pour établir une communication DIDComm avec un CloudAgent, et échanger en peer-to-peer de simples messages DIDComm.
 \end{flushleft}
 
@@ -234,8 +248,12 @@ Cependant, après des recherches nous avons constaté que ce scénario avait des
 \noindent
 \begin{flushleft}
 Après avoir testé et démontré que le Static Agent n'était pas utilisable dans le cadre de ce projet, nous avons du modifier notre scénario initial. Le Static Agent sur le client Mobile Android a été remplacé par un projet novateur cherchant à implémenter un équivalent de Cloud Agent sur Mobile, à savoir le projet Aries Mobile Agent React Native.\\
-Notre scénario intermédiaire était donc composé de deux machines Debian11 implémentant toutes les deux des Cloud Agents, et une machine Androidx86 implémentant un Mobile Agent. \\
-\vspace{2mm}
+Notre scénario intermédiaire était donc composé de deux machines Debian11 implémentant toutes les deux des Cloud Agents, et une machine Androidx86 implémentant un Mobile Agent. Au niveau de l'accès à internet et de la configuration des interfaces/adresses ip, un VRouter a été ajouté pour gérer les services dhcp, dnsmak et nat masquerading. On peut voir ci-dessous le schéma prévu pour ce scénario :\\
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{scenario2.jpg}
+\centering
+\caption{Schéma du scénario intermédiaire}
+\end{figure}
 Malheureusement lors des tests et de l'implémentation du Mobile Agent dans le but de l'adapter à notre projet, nous nous sommes heurtés à de nombreux problèmes. Le projet Aries Mobile Agent est un projet réçent toujours en cours de développement dont le but est de centraliser toutes les avancées dans les portage sous mobile d'Agents Aries Hyperledgers. Comme nous le détaillerons plus tard dans la partie lui étant concernée, nous nous sommes heurtés à des problèmes de compatibilité entre ce Mobile Agent et les Cloud Agents de nos machines. Nous avons donc décidé de remplacer ce Mobile Agent sur le Client Wireguard par un Cloud Agent classique. Comme le Cloud Agent n'est pas prévu pour fonctionner sur Android, nous avons utilisé Debian11 à la place. \\
 \vspace{2mm}
 Au niveau des clés Wireguard, OpenSSL n'est pas capable de générer des clés Wireguard. En effet, WireGuard utilise un Algorithme propriétaire pour générer des paires de clés X25519 qui sont une méthode d'accord de clé et donc pas utilisables pour la signature. Donc chaque machine Wireguard devra générer ses propres clés en utilisant l'algorithme de Wireguard.
@@ -245,7 +263,7 @@ Au niveau des clés Wireguard, OpenSSL n'est pas capable de générer des clés 
 \noindent
 \begin{flushleft}
 Notre scénario final est composé de trois machines Debian11. Les trois implémentent un Cloud Agent. Chaque machine appartient à un sous-réseau différent du VRouter possédant les services dnsmask, dhcp et NAT Masquerading. Le routeur garantit l'accessibilité entre les différentes machines virtuelles ServeurB, ServeurW et ClientW.\\
-Les clés Wireguard sont générées en utilisant l'algorithme de Wireguard par le ClientW et le ServeurW Wireguard, puis envoyées au Serveur Blockchain qui les stocke dans des Verifiable Credential. Ces Verifiable Credentials sont envoyés aux machines Wireguard et utilisés pour s'authentifier et s'échanger les clés afin de mettre en place un tunnel VPN Wireguard. Dans ce scénario, il a été convenu que les deux machines WireGuard doivent s'authentifier mutuellement.
+Les clés Wireguard sont générées en utilisant l'algorithme de Wireguard par le ClientW et le ServeurW, puis envoyées au Serveur Blockchain qui les stocke dans des Verifiable Credential. Ces Verifiable Credentials sont envoyés aux machines Wireguard et utilisés pour s'authentifier et s'échanger les clés afin de mettre en place un tunnel VPN Wireguard. Dans ce scénario, il a été convenu que les deux machines WireGuard doivent s'authentifier mutuellement.
 \end{flushleft}
 
 \section{Architecture et implémentation}
@@ -284,28 +302,43 @@ Le fonctionnement de notre implémentation est le suivant :
 
 \begin{itemize}
 \color{green}
-\item[1.] \color{black} Nos Agents Client et Serveur Wireguard se connectent avec le Serveur Blockchain par Aries DIDComm
+\item[1.] \color{black} Nos Agents Client et Serveur Wireguard génèrent leurs paires de clés WireGuard, se connectent en Aries DIDComm avec le Serveur Blockchain à l'aide de l'invitation qu'il a généré, puis ils émettent une demande de VC en donnant leur clé publique WireGuard pour qu'elle y soit intégrée.
 
 \color{orange}
-\item[2.] \color{black} Le Serveur BlockChain qui est considéré le \textbf{Issuer} délivre les Verifiable Credentials au Client et Serveur Wireguard qui dans ce cas sont les \textbf{Holders}.
+\item[2.] \color{black} Le Serveur BlockChain qui est considéré comme \textbf{Issuer} délivre les Verifiable Credentials au Client et Serveur Wireguard selon le modèle demandé en y intégrant les clés publiques. ClientW et ServeurW sont donc des \textbf{Holders} de VC.
 
 \color{violet}
-\item[3.] \color{black} Le Serveur Wireguard et le Client établissent le canal sécurisé Aries à l’aide de l’Agent ACA-py.\\
-Ils peuvent ensuite prouver leur identité avec le VC qu’ils détiennent.
-Une fois la proof de VC effectuée, ils échangent leurs clés publiques WireGuard via le canal chiffré (DIDcomm messages).
+\item[3.] \color{black} Le Serveur Wireguard et le Client établissent le canal sécurisé Aries à l’aide de l’Agent ACA-py. Cela nécessite que ServeurW génère une invitation à ClientW.\\
+Ils peuvent ensuite prouver leur identité avec le VC qu’ils détiennent en faisant deux proofs exchanges réciproques. De ce proof exchanges ils peuvent extraire la clé publique WireGuard contenu dans le VC de leur hôte.
 
 \color{red}
 \item[4.] \color{black} Établissement du tunnel VPN avec Wireguard entre le Client et le Serveur Wireguard en utilisant les clés obtenues précédemment.
 
 \end{itemize}
 
+Nous pouvons voir ci-dessous le diagramme de Séquence général des interactions entre  les différents agents que comporte notre projet :
+\begin{figure}[H]
+	\includegraphics[scale=0.4]{sequence.png}
+	\centering
+	\caption{Diagramme de séquence général}
+\end{figure}
 
 \end{flushleft}
 
 \subsection{Cloud Agent du Serveur BlockChain}
 \noindent 
 \begin{flushleft}
-Le serveur Blockchain est le serveur qu'est directement relié au réseau de noeuds Blockchain.  Dans le cas où on veut avoir notre propre réseau de noeuds Blockchain, le serveur Blockchain sera celui qui déploie ce réseau en utilisant Von Network pour déployer les noeuds Blockchain. Nous avons aussi la possibilité de prendre comme référence un réseau de noeuds déjà éxistant. \\
+Le serveur Blockchain est le serveur étant directement relié au réseau de noeuds BlockChain Indy. Dans le cadre de ce projet nous voulions faire tourner notre propre réseau BlockChain sur ServeurB, c'est pourquoi nous avons utilisé le projet VON-Network\footnote{VON-Network : \url{https://github.com/bcgov/von-network}} dockerisé. Nous avions aussi la possibilité de prendre comme référence un réseau de noeuds déjà existant hébergé par une autre machine en renseignant son URL, comme par exemple celui de British Columbia Digital Government\footnote{GreenLight Ledger : \url{http://greenlight.bcovrin.vonx.io/}}.\\
+Le Serveur BlockChain ou ServeurB est celui qui enregistre tous les utilisateurs auprès de la blockchain, ainsi que le schéma et la définition du credential utilisé pour notre projet afin d'obtenir un VC contenant une clé publique WireGuard. Il nécessite donc d'avoir un Agent ACA-py ServeurB.\\
+Les Verifiable Credentials que nous avons choisi d'utiliser ont deux champs : un champ pour la \textbf{clé publique} et un autre pour le nom de la machine qui détient ce Verifiable Credential. Il y a aussi un champ contenant la signature du Verifiable Credential.
+
+\begin{figure}[H]
+	\includegraphics[scale=0.5]{cred_def.png}
+	\centering
+	\caption{Définition de notre Credential}
+\end{figure}
+
+ServeurB dispose également de sa propre application possédant une petite interface graphique qui simplifie les actions à effectuer qu'on peut voir ci-dessous : 
 
 \begin{figure}[h]
 \vspace{2mm}
@@ -314,15 +347,19 @@ Le serveur Blockchain est le serveur qu'est directement relié au réseau de noe
 \caption{Interface graphique de notre Serveur Blockchain}
 \end{figure}
 
-Le Serveur Blockvhain est l'acteur qu'enregistre les utilisateur auprès de la Blockchain. Il enregistre aussi les schemas et les définitions de credentials. Les Schemas et Définitions de Credentials permettent de mettre en place un format et des champs pour les Verifiable Credentials. Les Verifiable Credentials que nous avons choisi d'utiliser ont deux champs : un champ pour la \textbf{clé publique} et un autre pour le nom de la machine qui détient ce Verifiable Credential. Il y a aussi un champ contenant la signature du Verifiable Credential.\\
+Cette interface permet de stopper le von-network dockerisé local si on le souhaite car il s'agit d'un processus indépendant lancé au démarrage de l'application. Nous avons ajouté cette option pour des raisons pratiques lors du développement de l'agent. On peut aussi y voir un bouton pour générer des invitations à l'attention de CLientW et ServeurW. Ces invitations s'afficheront dans la zone de texte (vide sur cette image), mais seront également enregistrées dans \textbf{ressources/invitation.json}.
 
+On retrouve ci-dessous le diagramme d'états de ServeurB :
 \begin{figure}[H]
-	\includegraphics[scale=0.5]{cred_def.png}
+	\includegraphics[scale=0.5]{EtatServeurB.png}
 	\centering
-	\caption{Définition de notre Credential}
+	\caption{Diagramme d'état de ServeurB}
 \end{figure}
 
 \end{flushleft}
+
+
+
 
 
 
@@ -333,10 +370,10 @@ Le Serveur Wireguard est une machine Debian qui hoste un service VPN Wireguard. 
 \vspace{2mm}
 Avec l'Agent Server Blockchain il aura des interactions ayant comme objectif la réception de Verifiable Credentials. Le Serveur Wireguard génère des clés Wireguard et envoie sa clé publique dans une proposal de Verifiable Credential. Un proposal est une proposition de VC basée sur une Definition de Credential ( celle que nous avons enregistrée avec le Serveur Blockchain ). Le Serveur Blockchain lui délivre un VC avec la clé publique et son nom. \\
 \vspace{2mm}
-Les échanges avec le Client Wireguard seront différents. En premier, le Serveur Wireguard doit répondre aux requêtes de preuves de la part du Client Wireguard. Le Serveur Wireguard doit en premier lieu produire une Verifiable Presentation puis l'envoyer. Cette Verifiable Presentation dépend de la requête du Client Wireguard, c'est à dire, la construction et les champs inclus dans cette Presentation dépendent de ce que le Client demande. Normalement, il va envoyer une Verifiable Presentation contenant sa clé publique et son 'nom'. \\
-Dans la requête de preuve, le Client inclut sa clé publique Wireguard. Une fois que notre présentation est bien validée, le client aura récuperé notre clé publique. Finalement, le VPN Wireguard peut être mis en place des deux côtés. \\
+Les échanges avec le Client Wireguard seront différents. En premier, le Serveur Wireguard doit répondre aux requêtes de preuves de la part du Client Wireguard. Le Serveur Wireguard doit en premier lieu produire une Verifiable Presentation puis l'envoyer. Cette Verifiable Presentation dépend de la requête du Client Wireguard, c'est à dire que la construction et les champs inclus dans cette Presentation dépendent de ce que le Client demande. Normalement, il va envoyer une Verifiable Presentation contenant sa clé publique et son 'nom'. \\
+Dans la requête de preuve, le Client inclut sa clé publique Wireguard. Une fois que notre présentation est bien validée, le client aura récupéré notre clé publique. Finalement, le VPN Wireguard peut être mis en place des deux côtés. \\
 
-Nous avons mis en place une interface graphique en python pour pouvoir gérer les différentes intéractions et événements.\\
+Nous avons mis en place une interface graphique pour pouvoir gérer les différentes intéractions et événements, ainsi qu'un diagramme d'états de l'application.\\
 
 \begin{figure}[H]
 \includegraphics[scale=0.5]{serveurW.png}
@@ -344,6 +381,11 @@ Nous avons mis en place une interface graphique en python pour pouvoir gérer le
 \caption{Interface graphique de notre Serveur Wireguard}
 \end{figure}
 
+\begin{figure}[H]
+\includegraphics[scale=0.5]{EtatServeurW.png}
+\centering
+\caption{Diagramme d'état de ServeurW}
+\end{figure}
 \end{flushleft}
 
 \subsection{Agent du Client WireGuard}
@@ -356,7 +398,7 @@ Le Mobile Agent initialement prévu repose sur l'application Aries Bifold. Nous 
 \centering
 \caption{Diagramme UML de séquence du Mobile Agent}
 \end{figure}
-Comme nous pouvons le voir ci-dessus, le Mobile Agent nécessite dans un premier temps d'établir une connexion avec un Mediator pour pouvoir ensuite par son intermédiaire discuter avec ServeurB et ServeurW. Par défaut, Aries Bifold propose l'utilisation d'un Mediator public clé en main basé sur ACA-py et développé par Indicio Technologies\footnote{Indicio Public Mediator : \url{https://indicio-tech.github.io/mediator/}}. Malheureusement c'est au  niveau du premier échange avec le Mediator que nous avons été bloqué. Nous avons alors essayé de nous-même concevoir notre propre Mediator en se basant sur les options de médiation proposées par Aries Cloud Agent Python. Ces options étaient ajoutées à l'Agent Cloud ServeurB, et elles nous ont aussi permis de voir comment les interactions et messages étaient reçus côté Mediator, chose qui n'était pas possible avec celui par défaut. Cependant nous nous sommes confrontés au même problème qu'avec celui par défaut. Nous verrons plus tard dans la partie "Test du Mobile Agent" une explication détaillée du problème.\\
+Comme nous pouvons le voir ci-dessus, le Mobile Agent nécessite dans un premier temps d'établir une connexion avec un Mediator pour pouvoir ensuite par son intermédiaire discuter avec ServeurB et ServeurW. Par défaut, Aries Bifold propose l'utilisation d'un Mediator public clé en main basé sur ACA-py et développé par Indicio Technologies\footnote{Indicio Public Mediator : \url{https://indicio-tech.github.io/mediator/}}. Malheureusement c'est au  niveau du premier échange avec le Mediator que nous avons été bloqué. Nous avons alors essayé de nous-même concevoir notre propre Mediator en se basant sur les options de médiation proposées par Aries Cloud Agent Python. Ces options étaient ajoutées à l'Agent Cloud ServeurB, et elles nous ont aussi permis de voir comment les interactions et messages étaient reçus côté Mediator, chose qui n'était pas possible avec celui par défaut. Cependant nous nous sommes confrontés au même problème qu'avec celui par défaut.\\
 \vspace{2mm}
 Le Mobile Agent ne se contente pas d'effectuer des connexions DIDComm avec les Agents de ServeurB et de ServeurW, mais il doit aussi être capable de configurer le tunnel VPN WireGuard. L'application Aries Bifold par défaut ne propose que la connexion à l'aide de QRCode et la réception de VC. Nous avions donc prévu d'implémenter des services supplémentaires pour générer le couple de clés publiques/privées WireGuard, émettre des Proofs à ServeurW ainsi qu'établir le tunnel VPN une fois la clé publique de ServeurW extraite. On peut voir ci-dessous l'interface graphique de l'application (version Android apk) de Aries Bifold avec l'ajout des fonctionnalités dont on a besoin :\\
 \begin{figure}[H]
@@ -375,9 +417,20 @@ Malheureusement, à cause des problèmes du Mediator et de l'impossibilité d'ut
 Le Client Wireguard est une machine Debian qui a comme finalité se connecter sur le VPN du serveur Wireguard. \\
 Comme pour le Serveur Wireguard, le Serveur Blockchain doit délivrer un Verifiable Credential avec la clé publique Wireguard du client dedans. Ceci se fait avec une proposal de Verifiable Credential. \\
 Quand le Client voudra se connecter sur le Serveur Wireguard, il devra en premier faire une requête de preuve auprès du Serveur Wireguard, contenant la clé publique du client et demandant entre autres, la clé publique du serveur. Celui-ci envoie une Verifiable Presentation avec sa clé publique Wireguard. La requête du client contenait aussi sa clé publique, donc quand la Presentation est validé, le serveur et client Wireguard ont tous les deux les clés de l'autre.
+Ci-dessous nous pouvons voir l'interface graphique de l'Agent ClientW ainsi que le diagramme d'états associé :
+\begin{figure}[H]
+\includegraphics[scale=0.5]{clientW.png}
+\centering
+\caption{Interface graphique de notre Client Wireguard}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale=0.5]{EtatClientW.png}
+\centering
+\caption{Diagramme d'état de ClientW}
+\end{figure}
 
 \end{flushleft}
-
 
 
 
@@ -420,23 +473,25 @@ Quand on observe les pourcentages obtenus par rapport aux différents codes que 
 \section{Conclusion}
 \noindent 
 \begin{flushleft}
-Le besoin de pouvoir prouver son identité auprès d'un serveur, et viceversa, peut-être reglé avec des certificats délivrés par une authorité à laquelle on fait confiance. Cependant, le fait que l'authorité soit celle qui délivre les certificats impose une dynamique de pouvoir qui peut devenir dangereuse pour l'autre partie qui devient dépendante de l'authorité. Si l'authorité le décide, elle peut révoquer un certificat, ou si elle attaquée, les certificats seront compromis. Avec l'apparition des technologies Blockchain qui réposent sur la décentralisation, nous avons la possibilité de considèrer des alternatives différentes aux certificats délivrés par une authorité. \\
-L'objectif du projet \textit{Déploiement d'un VPN sur des équipes mobiles ou IoT} était de mettre en place un VPN sur un serveur et pouvoir avoir un client qui se connecte. Cependant, le serveur et client de ce projet devaient s'authentifier mutuellement et échanger des clés nécessaires pour la mise en place du VPN. Les certificats peuvent être utiles dans ce cas, ça permettrait aux acteurs de vérifier leur identetité, et aussi les clés peuvent être contenues dans le certificat. Par contre, les certificats centralisés posent des problèmes que nous avons ennoncé avant. La solution que nous proposons ici est d'utiliser une technologie Blockchain, à savoir le projet Aries Hyperledger, pour délivrer des certificats décentralisés. 
+Le besoin de pouvoir prouver son identité auprès d'un serveur, et viceversa, peut-être reglé avec des certificats délivrés par une authorité à laquelle on fait confiance. Cependant, le fait que l'authorité soit celle qui délivre les certificats impose une dynamique de pouvoir qui pouvant devenir gênante pour l'autre partie devenant dépendante de l'authorité. Si l'authorité le décide, elle peut par exemple révoquer un certificat, ou alors si elle attaquée, tous les certificats qu'elle aura délivré seront compromis. Avec l'apparition des technologies BlockChain reposant sur la décentralisation, nous avons la possibilité de considérer des alternatives différentes aux certificats délivrés par une authorité. \\
+L'objectif du projet \textit{Déploiement d'un VPN sur des équipes mobiles ou IoT} était de mettre en place un VPN sur un serveur et de pouvoir avoir un client mobiel qui s'y connecte. cela nécessite donc une authentification et confiance mutuelle entr les deux hôtes lors de la mise en place du VPN par échange de clés publiques. Les certificats délivrés par authorité de certification peuvent être utiles dans ce cas, car ils permettraient d'ajouter un tier de confiance dans l'échange. Néanmoins, cette vision centralisée pose différents problèmes évoqué précédemment. L'option alternative choisie ici repose donc sur l'utilisation des technologies Blockchain, à savoir sur le projet Aries Hyperledger soutenu par la Fondation Linux. Cet ensemble de sous-projets permet la délivrance de certificats décentralisés ou Verifiable Credentials.\\
+Au terme de ce projet nous avons pu découvrir le secteur novateur de la BlockChain, des normes de communication DIDComm ainsi que de l'ensemble du projet Aries Hyperledger. Malgré les nombreux problèmes auxquels nous nous sommes heurtés, nous avons tout de même réussi à mettre en place un réseau virtuel NEmu permettant de simuler les interactions entre 3 Aries Cloud Agent dans le but de délivrer des VC, les vérifier et établir un tunnel VPN dont les hôtes sont authentifiés par la BlockChain. Toutes ces étapes ont été regroupées dans trois applicationspour chacun des agents avec des interfaces utilisateurs réalisées en Python Tkinter.
 \end{flushleft}
 \subsection{Limitations}
 \noindent 
 \begin{flushleft}
-Le projet Hyperledger promet de proposer des librairies, outils et frameworks qui rendraient possible l'adaptation et utilisation des technologies Blockchain au sein des entreprises. Cependant, ce projet est toujours en cours de développement ce qui présente une des plus grandes limites de notre projet. Un des plus grands objectifs de ce projet était de pouvoir déployer un Agent Aries Mobile sur Android. Malheureusement, ceci n'a pas été possible, comme nous avons expliqué dans les parties sur l'Agent Mobile. À présent la limite de temps, avec la limite de développement du côté Agent Mobile, fait que ça n'a pas été possible de mettre en place cet agent.  \\
-Dans notre projet, nous voulions déployer différents types d'agents. Un Agent Cloud pour le serveur Blockchain, un Agent Static pour le serveur VPN et un Agent Mobile pour le client VPN. L'Agent Mobile n'a pas été possible, et l'Agent Statique non plus. Ça aurait été intéressant de pouvoir avoir déployé des agents différents et les comparer. \\
-Ce projet déploie des Agent Aries Cloud. Ces Agents sont en communication avec un réseau de noeuds Blockchain, dans ce cas Von Network. Il y a des tests que nous avons pu faire et que nous avons détaillé dans la partie Tests, mais il y en a qui malheureusement nous n'avons pas pu mettre en place, par le fait que nous pouvons pas tester grande chose à part les requêtes HTTP, nous pouvons pas tester le réseau de noeuds Blockchain. \\
+Le projet Hyperledger promet de proposer des librairies, outils et frameworks qui rendraient possible l'adaptation et utilisation des technologies Blockchain au sein des entreprises. Cependant, ce projet est toujours en cours de développement ce qui présente une des plus grandes limites de notre projet. Un des plus grands objectifs de ce projet était de pouvoir déployer un Agent Aries Mobile sur Android. Malheureusement, cela n'a pas été possible, comme nous avons pu l'expliquer précédemment dans les parties lui étant réservées. La contrainte de temps, avec la limite de développement du côté Agent Mobile nécessitant de développer en plus un Mediator, nous as contraint à abandonner cet agent pour nous concentrer sur un autre qui est lui fonctionnel, le Cloud Agent.\\
+A l'origine de ce projet, nous voulions déployer différents types d'agents. Un Agent Cloud pour le serveur Blockchain, un Agent Cloud pour le serveur VPN et un Agent Mobile pour le client VPN. L'Agent Mobile devait lui-même à l'origine être un Static-Agent malheureusement non compatible avec le projet. Il aurait pu être intéressant de mettre en lien différents types d'agents sur des plateformes différentes pour comparer leurs modes de fonctionnement, leurs compatibilités, etc.\\
+Ce projet déploie des Agent Aries Cloud sur des machines Debian11. Ces Agents sont en communication avec un réseau de noeuds Blockchain, dans notre cas un VON-Network dockerisé. Il y a des tests que nous avons pu faire et que nous avons détaillé dans la partie Tests, mais il y en a que malheureusement nous n'avons pas pu mettre en place, de part la complexité de tester toutes les interactions entre les différents serveurs interrogés de manière indirecte par requêtes HTTP POST et GET. Toute la partie VON-Network initialement prévue dans le Projet 2 n'a également pas pu être testée par manque de temps. De nombreux cas d'erreurs non traîtés à notre niveau dans les applications sont cependant affichés dans les terminaux des agents par des retours d'erreurs des serveurs aca-py. Un traitement des sorties STDOUT des processus pourrait être mis en place pour à minima renseigner les erreurs proprement dans les interfaces graphiques des agents.\\
+Pour finir, ce projet étant dépendant de l'instabilité et de la complexité de Aries Hyperledger Cloud Agent Python ainsi que de VON-Network, nous n'avons pas eu le temps de mettre en place des systèmes pour sécuriser nos Agents, comme par exemple le fait que les logs, les VC et informations relatives aux connexions soient enregistrés en clair dans des fichiers json dans le dossier \textit{ressources/} par souci de praticité et de compréhension des informations. Ce projet n'est donc pas adapté à être mis en production.
 \end{flushleft}
 \subsection{Extensions}
 \noindent 
 \begin{flushleft}
-Une idée intéressante, et sûrement utile dans le futur serait de pouvoir exporter ce projet sur d'autres OS comme par exemple, Raspberry Pi, surtout pour être utilisé en tant qu'objet IoT. Un VPN serait sûrement très nécessaire, et ce projet pourrait convenir au déploiement de celui-ci tout en authentifiant les objets avec des VC. \\
-Dans notre projet nous avons un client, mais dans la réalité il se peut qu'il y en ait plusieurs clients VPN sur notre serveur VPN. Pour le moment notre serveur VPN peut se charger que d'un client. Une extension pourrait être de permettre au serveur de hoster un service VPN pour plusieurs clients différents. \\
-Il y a aussi des petits détails qui pourraient être ajoutés en tant que Extensions, comme un bouton Reset qui permet de réinitialiser l'Agent et nettoyer les registres de connexions ou autres données. Côté client aussi, un bouton qui puisse juste arrêter le service VPN sans pour autant arrêter l'Agent. \\
-Finalement, la dernière extension que nous pouvons proposer est de pouvoir révoquer des Verifiable Credentials. Notre serveur Blockchain gère la délivrance de ceux-ci, mais ça pourrait être intéressant aussi de pouvoir les révoquer si jamais nous voulons plus donner accès à un client au service VPN. 
+Une idée intéressante, et sûrement utile dans le futur serait de pouvoir exporter ce projet sur d'autres plateformes comme par exemple sur Raspberry Pi. L'intérêt ici serait son utilisation en IoT\footnote{IOT : Internet Of Things, ou Objets connectés.}. Un VPN pour IOT peut être utile dans certains cas, avec pour avantage de le combiner à la BlockChain et aux VC pour l'authentification. Raspbian étant un système proche de Debian sur lequel nous avons réalisé ce projet, cela pourrait faciliter le portage sous Raspberry.\\
+Dans notre projet nous avons un client unique, mais dans la réalité il se peut que notre serveur VPN supporte plusieurs client en simultané. WireGuard est en mesure de supporter plusieurs clients, une extension pourrait donc permettre l'accès au serveur pour plusieurs clients.\\
+Une autre extension que nous avons commencé à implémenter mais non terminée par manque de temps concerne un bouton pour réinitialiser toutes les connexions DIDComm , les configurations VPN et les VC enregistrés par un agent (révocation de VC). Cela peut avoir un intérêt dans le cadre de problèmes techniques nécessitant une réinitialisation du système. On pourrait aussi ajouter côté client un bouton pour permettre de stopper et de réactiver le VPN sans forcément fermer complètement l'Agent.\\
+Une dernière extension possible est de pouvoir révoquer des Verifiable Credentials sans pour autant réinitialiser tout le système via le bouton reset.\\
 \end{flushleft}
 
 \section{Bibliographie}
@@ -450,7 +505,8 @@ Finalement, la dernière extension que nous pouvons proposer est de pouvoir rév
 \item QEMU : \url{https://www.qemu.org/} , \url{https://wiki.qemu.org/Main_Page} (consulté le 15/03/2022)
 \item NEmu : \url{https://gitlab.com/v-a/nemu} (consulté le 15/03/2022)
 \item Indicio Public Mediator : \url{https://indicio-tech.github.io/mediator/} (consulté le 24/03/2022)
-
+\item VON-Network : \url{https://github.com/bcgov/von-network} (consulté le 24/03/2022)
+\item GreenLight Ledger : \url{http://greenlight.bcovrin.vonx.io/} (consulté le 24/03/2022)
 \end{itemize}
 
 \section{Annexe}
