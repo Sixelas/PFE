@@ -26,6 +26,8 @@ Toutes les étapes d'installation et de configuration devront être documentées
 
 Pour lancer le réseau virtuel et tester les Agents, suivre [ce tutoriel](https://github.com/Sixelas/PFE/tree/main/src/final) 
 
+Vous pouvez aussi regarder cette vidéo de démonstration :\
+[![Alt text for your video](https://img.youtube.com/vi/u6M6-7f82Ew/0.jpg)](https://www.youtube.com/watch?v=u6M6-7f82Ew)
 ## Rapport :
 Le rapport du projet est consultable [ici](https://github.com/Sixelas/PFE/tree/main/docs/report/Rendu.pdf) 
 
