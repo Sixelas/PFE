@@ -19,7 +19,7 @@ Toutes les étapes d'installation et de configuration devront être documentées
 
 - docs&emsp;&emsp;-->&emsp;&emsp;Contient les rapports de RDV clients, le Mémoire et les rapports quotidiens.
 - src&emsp;&emsp;&emsp;-->&emsp;&emsp;Contient le code du projet.
-- final&emsp;&emsp;-->&emsp;&emsp;Contient le code du rendu final du projet.
+- src/final&emsp;&emsp;-->&emsp;&emsp;Contient le code du rendu final du projet.
 
 ## Tester le projet :
 
